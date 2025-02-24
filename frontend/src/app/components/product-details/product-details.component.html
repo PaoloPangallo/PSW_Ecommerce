@@ -1,0 +1,16 @@
+<div *ngIf="isLoading">
+  <p>Caricamento...</p>
+</div>
+
+<div *ngIf="!isLoading && product; else noProduct">
+  <h2>{{ product.name }}</h2>
+  <img [src]="product.imageUrl" alt="{{ product.name }}">
+  <p>{{ product.description }}</p>
+  <p>Prezzo: {{ product.price | currency }}</p>
+  <button (click)="addToCart()">Aggiungi al Carrello</button>
+  <button (click)="goBack()">Torna indietro</button>
+</div>
+
+<ng-template #noProduct>
+  <p>Prodotto non trovato.</p>
+</ng-template>

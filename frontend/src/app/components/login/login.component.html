@@ -1,0 +1,62 @@
+<h2 *ngIf="!isRegisterMode">Login</h2>
+<h2 *ngIf="isRegisterMode">Registrazione</h2>
+
+<form (ngSubmit)="onSubmit()">
+  <div>
+    <label for="username">Username:</label>
+    <input
+      type="text"
+      [(ngModel)]="username"
+      name="username"
+      id="username"
+      required
+    />
+  </div>
+
+  <!-- Campo email visibile solo in modalità registrazione -->
+  <div *ngIf="isRegisterMode">
+    <label for="email">Email:</label>
+    <input
+      type="email"
+      [(ngModel)]="email"
+      name="email"
+      id="email"
+      required
+    />
+  </div>
+
+  <div>
+    <label for="password">Password:</label>
+    <input
+      type="password"
+      [(ngModel)]="password"
+      name="password"
+      id="password"
+      required
+    />
+  </div>
+
+  <button type="submit">
+    {{ isRegisterMode ? 'Registrati' : 'Login' }}
+  </button>
+</form>
+
+<div *ngIf="errorMessage" style="color: red;">
+  {{ errorMessage }}
+</div>
+
+<div *ngIf="successMessage" style="color: green;">
+  {{ successMessage }}
+</div>
+
+<!-- Link per passare dalla modalità login a registrazione e viceversa -->
+<p>
+  <span *ngIf="!isRegisterMode">
+    Non hai un account?
+    <a (click)="toggleMode()" style="cursor: pointer;">Registrati qui</a>
+  </span>
+  <span *ngIf="isRegisterMode">
+    Hai già un account?
+    <a (click)="toggleMode()" style="cursor: pointer;">Login qui</a>
+  </span>
+</p>

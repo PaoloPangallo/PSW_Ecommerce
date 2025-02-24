@@ -1,0 +1,42 @@
+<nav class="navbar">
+  <!-- Barra superiore -->
+  <div class="nav-top">
+    <div class="logo">
+      <a routerLink="/">⭐ euronics</a>
+    </div>
+
+    <div class="search-box">
+      <input type="text" placeholder="Cerca un prodotto..." (input)="onSearch($event)">
+      <button (click)="search()">🔍</button>
+    </div>
+
+    <div class="user-icons">
+      <span>
+        <a (click)="handleAccount()">👤 Account</a>
+      </span>
+      <span>
+        <a routerLink="/cart">🛒 Carrello</a>
+      </span>
+      <!-- Mostra il logout se l'utente è loggato -->
+      <span *ngIf="isLoggedIn()">
+        <a (click)="logout()" style="cursor: pointer;">Logout</a>
+      </span>
+    </div>
+  </div>
+
+  <!-- Barra inferiore con categorie -->
+  <div class="nav-bottom">
+    <ul>
+      <li><a routerLink="/category/Smartphone e Telefonia">Smartphone e Telefonia</a></li>
+      <li><a routerLink="/category/TV e Home Entertainment">TV e Home Entertainment</a></li>
+      <li><a routerLink="/category/Informatica e Accessori">Informatica e Accessori</a></li>
+      <li><a routerLink="/category/Elettrodomestici">Elettrodomestici</a></li>
+      <li><a routerLink="/category/Gaming e Console">Gaming e Console</a></li>
+      <li><a routerLink="/category/Audio e Hi-Fi">Audio e Hi-Fi</a></li>
+      <li><a routerLink="/category/Fotocamere e Videocamere">Fotocamere e Videocamere</a></li>
+      <li><a routerLink="/category/Climatizzazione e Riscaldamento">Climatizzazione e Riscaldamento</a></li>
+      <li><a routerLink="/category/Smartwatch e Wearable">Smartwatch e Wearable</a></li>
+      <li><a routerLink="/category/Droni e Mobilità Elettrica">Droni e Mobilità Elettrica</a></li>
+    </ul>
+  </div>
+</nav>
