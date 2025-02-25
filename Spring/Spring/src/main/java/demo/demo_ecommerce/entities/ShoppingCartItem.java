@@ -18,8 +18,9 @@ public class ShoppingCartItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "shopping_cart_id", nullable = false)  // <-- se nel DB è shopping_cart_id
+    @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
+
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)

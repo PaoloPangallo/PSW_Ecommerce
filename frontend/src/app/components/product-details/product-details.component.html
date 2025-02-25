@@ -7,7 +7,7 @@
   <img [src]="product.imageUrl" alt="{{ product.name }}">
   <p>{{ product.description }}</p>
   <p>Prezzo: {{ product.price | currency }}</p>
-  <button (click)="addToCart()">Aggiungi al Carrello</button>
+  <button type="button" (click)="addToCart()">Aggiungi al Carrello</button>
   <button (click)="goBack()">Torna indietro</button>
 </div>
 

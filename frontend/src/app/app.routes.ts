@@ -10,7 +10,7 @@ import { RegisterComponent } from './components/register/register.component';
 
 export const appRoutes: Routes = [
   { path: '', component: ProductListComponent },
-  { path: 'login', component: LoginComponent }, // <--- Eccola!
+  { path: 'login', component: LoginComponent },
   { path: 'product/:id', component: ProductDetailsComponent },
   { path: 'category/:categoryName', component: ProductListComponent },
   { path: 'cart', component: CartComponent },
