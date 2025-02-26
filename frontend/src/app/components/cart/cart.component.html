@@ -1,1 +1,32 @@
-<p>cart works!</p>
+<div *ngIf="cart && cart.items.length > 0; else emptyCart">
+  <h2>Il tuo Carrello</h2>
+  <table>
+    <thead>
+    <tr>
+      <th>Prodotto</th>
+      <th>Quantità</th>
+      <th>Prezzo</th>
+      <th>Azioni</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let item of cart.items; trackBy: trackByProductId">
+      <td>{{ item.productName }}</td>
+      <td>
+        <button (click)="decreaseQuantity(item.productId, item.quantity)">➖</button>
+        <span>{{ item.quantity }}</span>
+        <button (click)="increaseQuantity(item.productId, item.quantity)">➕</button>
+      </td>
+      <td>{{ item.price | currency:'EUR' }}</td>
+      <td>
+        <button (click)="remove(item.productId)">Rimuovi</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <button (click)="clear()">Svuota carrello</button>
+</div>
+
+<ng-template #emptyCart>
+  <p>Il carrello è vuoto.</p>
+</ng-template>

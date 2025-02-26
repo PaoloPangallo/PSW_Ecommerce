@@ -1,16 +1,18 @@
 <div *ngIf="isLoading">
-  <p>Caricamento...</p>
+  <p>Caricamento in corso...</p>
 </div>
 
-<div *ngIf="!isLoading && product; else noProduct">
+<div *ngIf="!isLoading && product">
   <h2>{{ product.name }}</h2>
-  <img [src]="product.imageUrl" alt="{{ product.name }}">
+  <!-- Se hai un'immagine, ad esempio: -->
+  <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="{{ product.name }}">
   <p>{{ product.description }}</p>
-  <p>Prezzo: {{ product.price | currency }}</p>
-  <button type="button" (click)="addToCart()">Aggiungi al Carrello</button>
-  <button (click)="goBack()">Torna indietro</button>
+  <p>Prezzo: {{ product.price | currency:'EUR' }}</p>
+  <button (click)="addToCart()">Aggiungi al Carrello</button>
 </div>
 
-<ng-template #noProduct>
+<div *ngIf="!isLoading && !product">
   <p>Prodotto non trovato.</p>
-</ng-template>
+</div>
+
+<button (click)="goBack()">Indietro</button>

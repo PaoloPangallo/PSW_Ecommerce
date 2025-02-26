@@ -7,7 +7,7 @@ import { Product } from '../../models/product.model';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { CartDTO } from '../../models/cart.model';
+import {AuthService} from '../../services/auth.services';
 
 @Component({
   selector: 'app-product-details',
@@ -25,7 +25,8 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
-    private cartService: CartService
+    private cartService: CartService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -43,31 +44,30 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
 
   loadProduct(productId: number): void {
     this.isLoading = true;
-    this.productService.getProductById(productId).subscribe(
-      (data: Product) => {
+    this.productService.getProductById(productId).subscribe({
+      next: (data: Product) => {
         console.log("Prodotto ricevuto:", data);
         this.product = data;
         this.isLoading = false;
       },
-      (error: any) => {
+      error: (error: any) => {
         console.error('Errore nel caricamento del prodotto:', error);
         this.isLoading = false;
       }
-    );
+    });
   }
 
-  // Metodo per aggiungere il prodotto al carrello usando addItem
   addToCart(): void {
     if (this.product) {
-      const userId = 1; // In un'app reale, otterresti l'ID dell'utente loggato
-      this.cartService.addItem(userId, this.product.id!, 1).subscribe({
-        next: (data: CartDTO) => {
-          console.log("Prodotto aggiunto al carrello:", data);
-          // Puoi mostrare un messaggio di conferma o aggiornare l'interfaccia
-        },
-        error: (error: any) => {
-          console.error("Errore nell'aggiunta al carrello:", error);
-        }
+      const userId = this.authService.getCurrentUserId();
+      if (!userId) {
+        console.error("Nessun utente loggato.");
+        return;
+      }
+      console.log("Aggiungo prodotto con ID:", this.product.id);
+      this.cartService.updateItemQuantity(userId, this.product.id!, 1).subscribe({
+        next: () => console.log("Prodotto aggiunto al carrello."),
+        error: (error: any) => console.error("Errore nell'aggiunta al carrello:", error)
       });
     }
   }

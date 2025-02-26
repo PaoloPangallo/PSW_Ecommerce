@@ -1,6 +1,7 @@
+// src/app/components/login/login.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.services'; // Assicurati che il path sia corretto
+import { AuthService } from '../../services/auth.services';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -13,11 +14,11 @@ import { FormsModule } from '@angular/forms';
 })
 export class LoginComponent {
   username = '';
-  email = ''; // Campo email per la registrazione
+  email = '';
   password = '';
   errorMessage = '';
   successMessage = '';
-  isRegisterMode: boolean = false; // false = login, true = registrazione
+  isRegisterMode: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -32,7 +33,6 @@ export class LoginComponent {
 
   onSubmit(): void {
     if (this.isRegisterMode) {
-      // Modalità registrazione
       const userDTO = {
         username: this.username,
         email: this.email,
@@ -40,13 +40,11 @@ export class LoginComponent {
       };
       this.authService.register(userDTO).subscribe({
         next: (response) => {
-          this.successMessage = response; // Messaggio dal backend (es. "User registered successfully")
+          this.successMessage = response;
           this.errorMessage = '';
-          // Puoi, ad esempio, resettare i campi del form
           this.username = '';
           this.email = '';
           this.password = '';
-          // Dopo un po', passa alla modalità login
           setTimeout(() => {
             this.toggleMode();
             this.successMessage = '';
@@ -58,11 +56,12 @@ export class LoginComponent {
         }
       });
     } else {
-      // Modalità login
       this.authService.login(this.username, this.password).subscribe({
         next: (res) => {
+          console.log("Login riuscito, token ricevuto:", res.token);
           this.authService.setToken(res.token);
           this.errorMessage = '';
+          // Puoi eventualmente richiamare loadCart qui se hai accesso al CartService, oppure nella dashboard
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {

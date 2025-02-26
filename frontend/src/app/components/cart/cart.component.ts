@@ -1,67 +1,74 @@
-// src/app/components/cart/cart.component.ts
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { CartService } from '../../services/cart.service';
 import { CartDTO } from '../../models/cart.model';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
   imports: [CommonModule, RouterModule],
-  template: `
-    <div *ngIf="cart && cart.items.length > 0; else emptyCart">
-      <h2>Il tuo Carrello</h2>
-      <ul>
-        <li *ngFor="let item of cart.items">
-          Prodotto ID: {{ item.productId }} – Nome: {{ item.productName }} – Quantità: {{ item.quantity }}
-          <button (click)="remove(item.productId)">Rimuovi</button>
-        </li>
-      </ul>
-      <button (click)="clear()">Svuota carrello</button>
-    </div>
-    <ng-template #emptyCart>
-      <p>Carrello vuoto.</p>
-    </ng-template>
-  `,
-  styles: [`
-    h2 { margin-bottom: 1rem; }
-    ul { list-style-type: none; padding: 0; }
-    li { margin-bottom: 0.5rem; }
-    button { margin-left: 1rem; }
-  `]
+  templateUrl: './cart.component.html',
+  styleUrls: ['./cart.component.css']
 })
 export class CartComponent implements OnInit {
-  userId = 1; // In un'app reale questo valore verrebbe dall'autenticazione
+  userId = 1; // Simulazione autenticazione
   cart: CartDTO | null = null;
-  private cartService = inject(CartService);
+
+  constructor(private cartService: CartService) {}
 
   ngOnInit(): void {
-    // Carica il carrello all'avvio del componente
     this.loadCart();
-
-    // Sottoscrivi ai cambiamenti del carrello
-    this.cartService.cart$.subscribe((cart: CartDTO | null) => {
-      this.cart = cart;
-    });
   }
 
   loadCart(): void {
-    this.cartService.getCart(this.userId).subscribe((cart: CartDTO) => {
-      this.cart = cart;
+    this.cartService.getCart(this.userId).subscribe({
+      next: cart => {
+        console.log("🔄 Carrello aggiornato nel componente:", cart);
+        this.cart = cart;
+      },
+      error: err => console.error("Errore nel caricamento del carrello", err)
     });
   }
 
+  increaseQuantity(productId: number, currentQuantity: number): void {
+    const newQuantity = currentQuantity + 1;
+    console.log("🆙 Aggiornamento quantità per productId:", productId, "a", newQuantity);
+    this.cartService.updateItemQuantity(this.userId, productId, newQuantity).subscribe({
+      next: () => this.loadCart(),
+      error: err => console.error("Errore nell'aggiornamento della quantità", err)
+    });
+  }
+
+  decreaseQuantity(productId: number, currentQuantity: number): void {
+    const newQuantity = currentQuantity - 1;
+    console.log("🔽 Aggiornamento quantità per productId:", productId, "a", newQuantity);
+    if (newQuantity <= 0) {
+      this.remove(productId);
+    } else {
+      this.cartService.updateItemQuantity(this.userId, productId, newQuantity).subscribe({
+        next: () => this.loadCart(),
+        error: err => console.error("Errore nell'aggiornamento della quantità", err)
+      });
+    }
+  }
+
   remove(productId: number): void {
-    this.cartService.removeItem(this.userId, productId).subscribe((cart: CartDTO) => {
-      this.cart = cart;
+    console.log("Rimuovo item con productId:", productId);
+    this.cartService.removeItem(this.userId, productId).subscribe({
+      next: () => this.loadCart(),
+      error: err => console.error("Errore nella rimozione", err)
     });
   }
 
   clear(): void {
-    this.cartService.clearCart(this.userId).subscribe(() => {
-      // Aggiorna la vista impostando il carrello vuoto
-      this.cart = { userId: this.userId, items: [] };
+    this.cartService.clearCart(this.userId).subscribe({
+      next: () => this.loadCart(),
+      error: err => console.error("Errore nello svuotamento del carrello", err)
     });
+  }
+
+  trackByProductId(index: number, item: any): number {
+    return item.productId;
   }
 }

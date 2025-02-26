@@ -1,8 +1,8 @@
 // src/app/services/auth.service.ts
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { CartService } from './cart.service'; // Assicurati che il path sia corretto
 
 export interface LoginRequest {
   username: string;
@@ -13,43 +13,59 @@ export interface LoginResponse {
   token: string;
 }
 
+export interface DecodedToken {
+  sub: string; // In questo esempio, l'ID utente è in "sub"
+  // puoi aggiungere altri campi se necessario
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  // URL base per il backend (senza proxy)
   private readonly baseUrl = 'http://localhost:8080/api/auth';
+  private currentUserId: number | null = null;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private cartService: CartService) {}
 
-  // Login: POST http://localhost:8080/api/auth/login
   login(username: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, { username, password });
+    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, { username, password }).pipe(
+      tap(response => {
+        this.setToken(response.token);
+        // Decodifica il token per ottenere l'ID utente
+        const decoded = jwt_decode<DecodedToken>(response.token);
+        this.currentUserId = parseInt(decoded.sub, 10);
+        console.log("User ID estratto dal token:", this.currentUserId);
+      })
+    );
   }
 
-  // Registrazione: POST http://localhost:8080/api/auth/register
   register(userDTO: any): Observable<string> {
     return this.http.post(`${this.baseUrl}/register`, userDTO, { responseType: 'text' });
   }
 
-  // Salva il token (ad esempio in localStorage)
   setToken(token: string): void {
     localStorage.setItem('token', token);
   }
 
-  // Recupera il token
   getToken(): string | null {
     return localStorage.getItem('token');
   }
 
-  // Rimuove il token (logout)
   removeToken(): void {
     localStorage.removeItem('token');
   }
 
-  // Metodo per il logout (comodo per eventuali altre logiche)
+  getCurrentUserId(): number | null {
+    return this.currentUserId;
+  }
+
+  // Logout: rimuove il token e resetta il carrello
   logout(): void {
+    console.log("Eseguo il logout: rimuovo token e resetto il carrello.");
     this.removeToken();
+    this.currentUserId = null;
+    this.cartService.resetCart();
+    console.log("Logout completato, carrello resettato.");
   }
 }
