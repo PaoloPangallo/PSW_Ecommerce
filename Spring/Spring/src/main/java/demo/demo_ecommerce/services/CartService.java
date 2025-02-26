@@ -169,9 +169,16 @@ public class CartService {
 
 
     @Transactional
-    public void clearCart(Long userId) {
+    public Cart clearCart(Long userId) {
         Cart cart = getCartByUserId(userId);
+        // Cancella tutti gli item associati al carrello
         shoppingCartItemRepository.deleteAllByCartId(cart.getId());
+        // Pulisce la lista degli item nel carrello in memoria
+        cart.getItems().clear();
+        // Salva il carrello aggiornato
         cartRepository.save(cart);
+        // Ricarica il carrello aggiornato (con join fetch, per coerenza)
+        return getCartByUserId(userId);
     }
+
 }
