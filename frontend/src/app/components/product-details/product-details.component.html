@@ -1,18 +1,23 @@
-<div *ngIf="isLoading">
-  <p>Caricamento in corso...</p>
-</div>
+<div class="product-details-wrapper">
+  <div class="product-details-container" *ngIf="!isLoading && product">
+    <div class="image-container">
+      <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name">
+    </div>
+    <div class="details-container">
+      <h2>{{ product.name }}</h2>
+      <p class="description">{{ product.description }}</p>
+      <p class="price">Prezzo: {{ product.price | currency:'EUR' }}</p>
+      <button (click)="addToCart()">Aggiungi al Carrello</button>
+    </div>
+  </div>
 
-<div *ngIf="!isLoading && product">
-  <h2>{{ product.name }}</h2>
-  <!-- Se hai un'immagine, ad esempio: -->
-  <img *ngIf="product.imageUrl" [src]="product.imageUrl" alt="{{ product.name }}">
-  <p>{{ product.description }}</p>
-  <p>Prezzo: {{ product.price | currency:'EUR' }}</p>
-  <button (click)="addToCart()">Aggiungi al Carrello</button>
-</div>
+  <div class="loading-container" *ngIf="isLoading">
+    <p class="loading-text">Caricamento in corso...</p>
+  </div>
 
-<div *ngIf="!isLoading && !product">
-  <p>Prodotto non trovato.</p>
-</div>
+  <div class="notfound-container" *ngIf="!isLoading && !product">
+    <p class="not-found">Prodotto non trovato.</p>
+  </div>
 
-<button (click)="goBack()">Indietro</button>
+  <button class="back-button" (click)="goBack()">Indietro</button>
+</div>

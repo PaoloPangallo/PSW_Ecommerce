@@ -16,7 +16,7 @@ export const appRoutes: Routes = [
   { path: 'cart', component: CartComponent },
   { path: 'order-history', component: OrderHistoryComponent },
   { path: 'user-profile', component: UserProfileComponent },
-  { path: 'register', component: RegisterComponent }, // <--- rotta per la registrazione
+  { path: 'register', component: RegisterComponent }, // <--- IMPORTANTE: Usa il componente standalone
 
   { path: '**', redirectTo: '' },
 ];

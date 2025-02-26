@@ -1,64 +1,116 @@
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f8f9fa;
+/* Reset globale */
+* {
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
+/* Corpo della pagina */
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  line-height: 1.6;
+}
+
+/* Navbar */
 .navbar {
   background-color: #0033a0;
-  color: white;
-  padding: 15px;
+  color: #fff;
+  padding: 15px 30px;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
+}
+
+.navbar .logo {
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 15px;
+  gap: 20px;
 }
 
 .nav-links li a {
-  color: white;
+  color: #fff;
   text-decoration: none;
-  font-weight: bold;
+  font-weight: 500;
+  transition: color 0.3s;
 }
 
+.nav-links li a:hover {
+  color: #ffcc00;
+}
+
+/* Griglia della product list */
 .product-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* ✅ Griglia prodotti */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 20px;
   padding: 20px;
   max-width: 1200px;
-  margin: auto;
+  margin: 40px auto;
 }
 
+/* Card prodotto */
 .product {
-  background: white;
-  padding: 15px;
+  background: #fff;
+  padding: 20px;
   border-radius: 10px;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .product img {
   width: 100%;
   max-height: 200px;
   object-fit: contain;
+  border-radius: 6px;
+  margin-bottom: 15px;
 }
 
+.product h2 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.product p {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+/* Pulsanti */
 button {
   background-color: #ffcc00;
   border: none;
-  padding: 10px;
-  font-size: 14px;
+  padding: 12px 20px;
+  font-size: 0.9rem;
   cursor: pointer;
   border-radius: 5px;
-  margin-top: 10px;
+  transition: background 0.3s, transform 0.2s;
 }
 
 button:hover {
   background-color: #ffaa00;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+/* Se stai usando Angular, puoi usare :host per il componente */
+:host {
+  display: block;
+  height: 100%;
 }

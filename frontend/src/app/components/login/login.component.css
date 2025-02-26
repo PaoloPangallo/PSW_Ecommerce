@@ -1,0 +1,149 @@
+
+
+/* Elimina eventuali margini e padding di default
+   e occupa l'intera altezza della finestra */
+:host {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(120deg, #0d47a1, #1976d2);
+  font-family: 'Poppins', sans-serif;
+  position: relative; /* Per posizionare le onde */
+}
+
+/* Forma ondulata in alto (se desideri aggiungerla al template) */
+.waves {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 250px;
+  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 320' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23ffffff' fill-opacity='1' d='M0,224L80,208C160,192,320,160,480,160C640,160,800,192,960,208C1120,224,1280,224,1360,224L1440,224L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: 0 0;
+  z-index: 1;
+}
+
+/* Card centrale */
+.login-container {
+  position: relative;
+  z-index: 2; /* Sopra le onde */
+  width: 400px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: slideIn 0.5s ease forwards;
+}
+
+/* Animazione di comparsa */
+@keyframes slideIn {
+  0% {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Titolo */
+.login-container h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+/* Form */
+.login-container form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.login-container .form-group {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.login-container label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.login-container input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  transition: border-color 0.3s;
+  outline: none;
+}
+
+.login-container input:focus {
+  border-color: #1976d2;
+}
+
+/* Pulsante di submit */
+.login-container button {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.login-container button:hover {
+  background: #1565c0;
+}
+
+.login-container button:active {
+  transform: scale(0.97);
+}
+
+/* Messaggi di errore e successo */
+.error {
+  color: #e74c3c;
+  margin-top: 1rem;
+  font-weight: 500;
+}
+
+.success {
+  color: #27ae60;
+  margin-top: 1rem;
+  font-weight: 500;
+}
+
+/* Link di navigazione */
+.login-container p {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.login-container p a {
+  color: #1976d2;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.login-container p a:hover {
+  text-decoration: underline;
+  color: #1565c0;
+}

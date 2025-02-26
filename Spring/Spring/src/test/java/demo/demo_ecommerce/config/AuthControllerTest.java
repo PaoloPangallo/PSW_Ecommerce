@@ -6,7 +6,6 @@ import demo.demo_ecommerce.dtos.UserDTO;
 import demo.demo_ecommerce.entities.Role;
 import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.services.UsersService;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,15 +13,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
-
+import static org.mockito.Mockito.*;
 
 class AuthControllerTest {
 
@@ -50,6 +48,9 @@ class AuthControllerTest {
         userDTO.setUsername("testuser");
         userDTO.setEmail("testuser@example.com");
         userDTO.setPassword("securepassword");
+        userDTO.setConfirmPassword("securepassword");
+
+        BindingResult bindingResult = new BeanPropertyBindingResult(userDTO, "userDTO");
 
         when(usersService.findByUsername("testuser")).thenReturn(Optional.empty());
         when(usersService.existsByEmail("testuser@example.com")).thenReturn(false);
@@ -70,6 +71,9 @@ class AuthControllerTest {
         userDTO.setUsername("testuser");
         userDTO.setEmail("testuser@example.com");
         userDTO.setPassword("securepassword");
+        userDTO.setConfirmPassword("securepassword");
+
+        BindingResult bindingResult = new BeanPropertyBindingResult(userDTO, "userDTO");
 
         when(usersService.findByUsername("testuser")).thenReturn(Optional.of(new User()));
 
@@ -91,13 +95,11 @@ class AuthControllerTest {
         User user = new User();
         user.setUsername("testuser");
         user.setPassword("$2a$10$abcde..."); // Simulazione di una password codificata
-        user.setRole(Role.USER); // Assegna un ruolo per evitare il NullPointerException
+        user.setRole(Role.USER);
 
-        // Simula il comportamento del service e delle dipendenze
         when(usersService.findByUsername("testuser")).thenReturn(Optional.of(user));
         when(passwordEncoder.matches("securepassword", user.getPassword())).thenReturn(true);
-        when(jwtTokenProvider.generateToken("testuser", "USER"))
-                .thenReturn("jwt-token");
+        when(jwtTokenProvider.generateToken("testuser", "USER")).thenReturn("jwt-token");
 
         // Act
         ResponseEntity<LoginResponseDTO> response = authController.login(loginRequest);
@@ -105,8 +107,6 @@ class AuthControllerTest {
         // Assert
         assertEquals(200, response.getStatusCodeValue());
         assertEquals("jwt-token", response.getBody().getToken());
-
-        // Verifica che i metodi mockati siano stati chiamati correttamente
         verify(usersService, times(1)).findByUsername("testuser");
         verify(passwordEncoder, times(1)).matches("securepassword", user.getPassword());
         verify(jwtTokenProvider, times(1)).generateToken("testuser", "USER");
@@ -133,4 +133,3 @@ class AuthControllerTest {
         assertEquals("Invalid username or password", exception.getMessage());
     }
 }
-

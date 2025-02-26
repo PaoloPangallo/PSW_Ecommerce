@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.services'; // Verifica il path corretto
+import { AuthService } from '../../services/auth.services';
 
 @Component({
   standalone: true,
@@ -15,36 +15,41 @@ export class RegisterComponent {
   username = '';
   email = '';
   password = '';
+  confirmPassword = '';
   errorMessage = '';
   successMessage = '';
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    protected router: Router
   ) {}
 
-  onSubmit() {
-    // Crei l'oggetto userDTO con i dati del form
+  onSubmit(): void {
+    // Verifica che le password coincidano
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage = 'Le password non coincidono';
+      return;
+    }
+
     const userDTO = {
       username: this.username,
       email: this.email,
-      password: this.password
+      password: this.password,
+      confirmPassword: this.confirmPassword
     };
 
-    // Chiami l'endpoint di registrazione
     this.authService.register(userDTO).subscribe({
       next: (response) => {
-        // Il backend potrebbe restituire un messaggio di successo
-        this.successMessage = response; // "User registered successfully"
-        // Dopo un po' di tempo, potresti reindirizzare al login
+        this.successMessage = response; // Esempio: "Registrazione effettuata con successo"
+        this.errorMessage = '';
+        // Dopo qualche secondo, reindirizza al login
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);
       },
       error: (err) => {
-        // Se il backend risponde con un errore (ad es. "Username already exists"),
-        // lo mostri qui
         this.errorMessage = err.error || err.message;
+        this.successMessage = '';
       }
     });
   }

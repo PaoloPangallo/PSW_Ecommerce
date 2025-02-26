@@ -117,25 +117,17 @@ public class UsersService {
 
 
     // Metodo per registrare un utente (usato dall'endpoint di registrazione)
-    // Nel UsersService o nel controller di registrazione:
     @Transactional
     public User registerUser(UserDTO userDTO) {
-        if (usersRepository.existsByUsername(userDTO.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
-        }
-        if (usersRepository.existsByEmail(userDTO.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
-        }
-
-        // Crea l'utente
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setRole(Role.USER);
-        User savedUser = usersRepository.save(user);
+        // Se il ruolo è null, imposta di default Role.USER
+        user.setRole(userDTO.getRole() != null ? userDTO.getRole() : Role.USER);
 
-        // Crea un nuovo carrello associato all'utente appena creato
+        User savedUser = usersRepository.save(user);
+        // Crea il carrello associato al nuovo utente
         Cart newCart = new Cart(savedUser);
         cartRepository.save(newCart);
 

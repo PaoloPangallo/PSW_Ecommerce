@@ -1,3 +1,4 @@
+// src/app/entities/User.java
 package demo.demo_ecommerce.entities;
 
 import jakarta.persistence.*;
@@ -15,7 +16,6 @@ import java.util.Collections;
 @Table(name = "users")
 public class User implements UserDetails {
 
-    // Getter e Setter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -37,9 +37,6 @@ public class User implements UserDetails {
     @JoinColumn(name = "cart_id", unique = true)
     private Cart cart;
 
-
-
-    // Costruttori
     public User() {
     }
 
@@ -50,7 +47,6 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    // Implementazioni di UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(() -> "ROLE_" + role.name());

@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
-import { CartService } from './cart.service'; // Assicurati che il path sia corretto
+import { CartService } from './cart.service'; // Verifica che il path sia corretto
 
 export interface LoginRequest {
   username: string;
@@ -11,7 +11,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string;
-  userId: number; // Campo aggiunto per l'ID utente
+  userId: number;  // Campo aggiunto per l'ID utente
 }
 
 @Injectable({
