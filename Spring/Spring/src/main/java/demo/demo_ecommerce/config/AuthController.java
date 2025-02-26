@@ -1,7 +1,7 @@
+// src/main/java/demo/demo_ecommerce/config/AuthController.java
 package demo.demo_ecommerce.config;
 
-
-
+import demo.demo_ecommerce.dtos.LoginResponseDTO;
 import demo.demo_ecommerce.dtos.UserDTO;
 import demo.demo_ecommerce.services.UsersService;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequest loginRequest) {
         // Verifica username
         var user = usersService.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
@@ -36,8 +36,8 @@ public class AuthController {
         // Genera il token
         String token = jwtTokenProvider.generateToken(user.getUsername(), user.getRole().name());
 
-        // Ritorna il token
-        return ResponseEntity.ok(new LoginResponse(token));
+        // Ritorna il token e l'ID utente
+        return ResponseEntity.ok(new LoginResponseDTO(token, user.getId()));
     }
 
     @PostMapping("/register")
@@ -55,5 +55,4 @@ public class AuthController {
 
         return ResponseEntity.ok("User registered successfully");
     }
-
 }

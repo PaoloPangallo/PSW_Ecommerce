@@ -1,6 +1,7 @@
 package demo.demo_ecommerce.config;
 
 
+import demo.demo_ecommerce.dtos.LoginResponseDTO;
 import demo.demo_ecommerce.dtos.UserDTO;
 import demo.demo_ecommerce.entities.Role;
 import demo.demo_ecommerce.entities.User;
@@ -99,7 +100,7 @@ class AuthControllerTest {
                 .thenReturn("jwt-token");
 
         // Act
-        ResponseEntity<LoginResponse> response = authController.login(loginRequest);
+        ResponseEntity<LoginResponseDTO> response = authController.login(loginRequest);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());

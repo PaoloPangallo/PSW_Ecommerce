@@ -5,7 +5,7 @@ import demo.demo_ecommerce.entities.ShoppingCartItem;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
-import java.util.Map;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
@@ -15,19 +15,19 @@ public class CartDTO {
     private final Long id;
 
     @NotNull
-    private final Map<Long, Integer> items;
+    private final List<ShoppingCartItemDTO> items;
 
-    public CartDTO(Long id, Map<Long, Integer> items) {
+    public CartDTO(Long id, List<ShoppingCartItemDTO> items) {
         this.id = id;
         this.items = items;
     }
 
     public static CartDTO fromEntity(Cart cart) {
-        Map<Long, Integer> itemsMap = cart.getItems().stream()
-                .collect(Collectors.toMap(
-                        (ShoppingCartItem item) -> item.getProduct().getId(),
-                        ShoppingCartItem::getQuantity
-                ));
-        return new CartDTO(cart.getId(), itemsMap);
+        List<ShoppingCartItemDTO> itemsList = cart.getItems().stream()
+                .filter(item -> item.getProduct() != null)
+                .map(ShoppingCartItemDTO::new)
+                .collect(Collectors.toList());
+        return new CartDTO(cart.getId(), itemsList);
     }
+
 }

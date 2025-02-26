@@ -1,6 +1,7 @@
 package demo.demo_ecommerce.Controllers;
 
 import demo.demo_ecommerce.dtos.CartDTO;
+import demo.demo_ecommerce.dtos.QuantityUpdateRequest;
 import demo.demo_ecommerce.entities.Cart;
 import demo.demo_ecommerce.services.CartService;
 import jakarta.validation.constraints.Min;
@@ -18,20 +19,30 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    @PatchMapping("/{userId}/items/{productId}")
+    public ResponseEntity<CartDTO> updateItemQuantity(@PathVariable Long userId,
+                                                      @PathVariable Long productId,
+                                                      @RequestBody QuantityUpdateRequest request) {
+        Cart cart = cartService.updateItemQuantity(userId, productId, request.getQuantity());
+        return ResponseEntity.ok(CartDTO.fromEntity(cart));
+    }
+
+
     @GetMapping("/{userId}")
     public ResponseEntity<CartDTO> getCart(@PathVariable Long userId) {
         Cart cart = cartService.getCartByUserId(userId);
         return ResponseEntity.ok(CartDTO.fromEntity(cart));
     }
 
-
     @PostMapping("/{userId}/add")
-    public ResponseEntity<Cart> addItemToCart(@PathVariable Long userId,
-                                              @RequestParam @NotNull Long productId,
-                                              @RequestParam @Min(1) int quantity) {
+    public ResponseEntity<CartDTO> addItemToCart(@PathVariable Long userId,
+                                                 @RequestParam @NotNull Long productId,
+                                                 @RequestParam int quantity) {
         Cart cart = cartService.addItemToCart(userId, productId, quantity);
-        return ResponseEntity.ok(cart);
+        return ResponseEntity.ok(CartDTO.fromEntity(cart)); // Converte Cart in CartDTO
     }
+
+
 
 
     @DeleteMapping("/{userId}/items/{productId}")

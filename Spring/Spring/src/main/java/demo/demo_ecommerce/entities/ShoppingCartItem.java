@@ -1,4 +1,5 @@
 package demo.demo_ecommerce.entities;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -11,6 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class ShoppingCartItem {
 
     @Id
@@ -18,14 +20,11 @@ public class ShoppingCartItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "cart_id", nullable = false)
+    @JsonIgnore  // 🔥 Evitiamo il ciclo di serializzazione JSON
     private Cart cart;
 
-
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Min(1)
-    private Integer quantity;
+    private int quantity;
 }

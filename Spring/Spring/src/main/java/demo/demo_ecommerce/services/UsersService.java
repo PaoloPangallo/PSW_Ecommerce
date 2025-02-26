@@ -2,8 +2,10 @@ package demo.demo_ecommerce.services;
 
 import demo.demo_ecommerce.Utility.UserNotFoundException;
 import demo.demo_ecommerce.dtos.UserDTO;
+import demo.demo_ecommerce.entities.Cart;
 import demo.demo_ecommerce.entities.Role;
 import demo.demo_ecommerce.entities.User;
+import demo.demo_ecommerce.repositories.CartRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -24,10 +26,15 @@ public class UsersService {
 
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CartRepository cartRepository; // Aggiungi questa dichiarazione
 
-    public UsersService(UsersRepository usersRepository, PasswordEncoder passwordEncoder) {
+
+    public UsersService(UsersRepository usersRepository,
+                        PasswordEncoder passwordEncoder,
+                        CartRepository cartRepository) {
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
+        this.cartRepository = cartRepository; // Assegna correttamente il repository
     }
 
     public Page<User> getAllUsers(Pageable pageable) {
@@ -110,7 +117,9 @@ public class UsersService {
 
 
     // Metodo per registrare un utente (usato dall'endpoint di registrazione)
-    public void registerUser(UserDTO userDTO) {
+    // Nel UsersService o nel controller di registrazione:
+    @Transactional
+    public User registerUser(UserDTO userDTO) {
         if (usersRepository.existsByUsername(userDTO.getUsername())) {
             throw new IllegalArgumentException("Username already exists");
         }
@@ -118,23 +127,19 @@ public class UsersService {
             throw new IllegalArgumentException("Email already exists");
         }
 
+        // Crea l'utente
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setRole(Role.USER); // Ruolo predefinito
+        user.setRole(Role.USER);
+        User savedUser = usersRepository.save(user);
 
-        usersRepository.save(user);
-    }
+        // Crea un nuovo carrello associato all'utente appena creato
+        Cart newCart = new Cart(savedUser);
+        cartRepository.save(newCart);
 
-    // Metodo per creare utenti come amministratore
-    public User createUserAsAdmin(@org.jetbrains.annotations.NotNull UserDTO userDTO) {
-        User user = new User();
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setRole(userDTO.getRole() != null ? userDTO.getRole() : Role.USER);
-        return usersRepository.save(user);
+        return savedUser;
     }
 
     public Optional<User> findByUsername(String username) {

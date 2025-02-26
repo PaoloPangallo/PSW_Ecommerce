@@ -31,20 +31,35 @@ public class CartService {
         this.shoppingCartItemRepository = shoppingCartItemRepository;
     }
 
+    @Transactional
     public Cart getCartByUserId(Long userId) {
-        Cart cart = cartRepository.findByUserIdWithItems(userId)
-                .orElseGet(() -> {
-                    User user = usersRepository.findById(userId)
-                            .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
-                    Cart newCart = new Cart(user);
-                    return cartRepository.save(newCart);
-                });
-
-        // Forza il caricamento della lista `items`
-        cart.getItems().size(); // Questo inizializza la lista prima che la sessione si chiuda
-
-        return cart;
+        // Prova a caricare il carrello con tutti gli item e i relativi prodotti
+        Optional<Cart> cartOpt = cartRepository.findByUserIdWithItems(userId);
+        if (cartOpt.isPresent()) {
+            Cart cart = cartOpt.get();
+            // Forza il caricamento degli items
+            cart.getItems().size();
+            return cart;
+        } else {
+            // Se non troviamo il carrello con join fetch, proviamo a caricare il carrello "base"
+            Optional<Cart> cartBaseOpt = cartRepository.findByUserId(userId);
+            if (cartBaseOpt.isPresent()) {
+                return cartBaseOpt.get();
+            } else {
+                // Se non esiste un carrello, creiamo un nuovo carrello vuoto per l'utente
+                User user = usersRepository.findById(userId)
+                        .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+                Cart newCart = new Cart(user);
+                newCart = cartRepository.save(newCart);
+                // Forza il caricamento degli items (sarà vuoto, ma per coerenza)
+                newCart.getItems().size();
+                return newCart;
+            }
+        }
     }
+
+
+
 
 
 
@@ -77,20 +92,81 @@ public class CartService {
 
         return cartRepository.save(cart);
     }
+    @Transactional
+    public Cart updateItemQuantity(Long userId, Long productId, int newQuantity) {
+        Cart cart = getCartByUserId(userId);
+        System.out.println(">> Carrello prima dell'update: " + cart.getId() + " con " + cart.getItems().size() + " item.");
+
+        Optional<ShoppingCartItem> itemOpt = shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
+        if (itemOpt.isPresent()) {
+            ShoppingCartItem item = itemOpt.get();
+            System.out.println(">> Item trovato per productId " + productId + ". Quantità attuale: " + item.getQuantity());
+            if (newQuantity <= 0) {
+                // Rimuovi l'item se la quantità è zero o negativa
+                shoppingCartItemRepository.delete(item);
+                cart.getItems().removeIf(i -> i.getProduct().getId().equals(productId));
+                System.out.println(">> Item rimosso per productId " + productId);
+            } else {
+                // Aggiorna la quantità
+                item.setQuantity(newQuantity);
+                shoppingCartItemRepository.save(item);
+                System.out.println(">> Quantità aggiornata per productId " + productId + " a " + newQuantity);
+            }
+        } else {
+            // Se l'item non esiste e la quantità è positiva, aggiungilo
+            if (newQuantity > 0) {
+                Product product = productRepository.findById(productId)
+                        .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
+                ShoppingCartItem newItem = new ShoppingCartItem();
+                newItem.setCart(cart);
+                newItem.setProduct(product);
+                newItem.setQuantity(newQuantity);
+                shoppingCartItemRepository.save(newItem);
+                cart.getItems().add(newItem);
+                System.out.println(">> Nuovo item aggiunto per productId " + productId + " con quantità " + newQuantity);
+            } else {
+                throw new IllegalArgumentException("Impossibile aggiornare un item con quantità non positiva.");
+            }
+        }
+        cartRepository.save(cart);
+        Cart updatedCart = getCartByUserId(userId);
+        System.out.println(">> Carrello aggiornato finale: " + updatedCart.getItems().size() + " item.");
+        updatedCart.getItems().forEach(i ->
+                System.out.println("   - productId: " + i.getProduct().getId() + ", quantity: " + i.getQuantity())
+        );
+        return updatedCart;
+    }
+
+
+
+
 
     @Transactional
     public Cart removeItemFromCart(Long userId, Long productId) {
         Cart cart = getCartByUserId(userId);
-        Optional<ShoppingCartItem> existingItemOpt = shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
+        ShoppingCartItem itemToRemove = shoppingCartItemRepository
+                .findByCartIdAndProductId(cart.getId(), productId)
+                .orElseThrow(() -> new IllegalArgumentException("Prodotto non trovato nel carrello."));
 
-        if (existingItemOpt.isPresent()) {
-            shoppingCartItemRepository.delete(existingItemOpt.get());
-        } else {
-            throw new IllegalArgumentException("Item not found in the cart.");
-        }
+        // Cancella l'item
+        shoppingCartItemRepository.delete(itemToRemove);
+        cart.getItems().removeIf(i -> i.getProduct().getId().equals(productId));
 
-        return cartRepository.save(cart);
+        // Salva
+        cartRepository.save(cart);
+
+        // LOGGA IL CARRELLO DOPO LA RIMOZIONE
+        System.out.println("Dopo removeItem, nel DB il carrello ha " + cart.getItems().size() + " item:");
+        cart.getItems().forEach(i ->
+                System.out.println("  - productId: " + i.getProduct().getId() + ", quantity=" + i.getQuantity())
+        );
+
+        return getCartByUserId(userId); // se stai ricaricando per avere un carrello "pulito"
     }
+
+
+
+
 
     @Transactional
     public void clearCart(Long userId) {

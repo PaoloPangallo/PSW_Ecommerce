@@ -11,11 +11,7 @@ export interface LoginRequest {
 
 export interface LoginResponse {
   token: string;
-}
-
-export interface DecodedToken {
-  sub: string; // In questo esempio, l'ID utente è in "sub"
-  // puoi aggiungere altri campi se necessario
+  userId: number; // Campo aggiunto per l'ID utente
 }
 
 @Injectable({
@@ -32,10 +28,8 @@ export class AuthService {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, { username, password }).pipe(
       tap(response => {
         this.setToken(response.token);
-        // Decodifica il token per ottenere l'ID utente
-        const decoded = jwt_decode<DecodedToken>(response.token);
-        this.currentUserId = parseInt(decoded.sub, 10);
-        console.log("User ID estratto dal token:", this.currentUserId);
+        this.currentUserId = response.userId;
+        console.log("User ID ricevuto dal backend:", this.currentUserId);
       })
     );
   }
