@@ -1,0 +1,185 @@
+/* Variabili CSS con fallback */
+:root {
+  --primary-color: #1976d2;
+  --primary-hover: #1565c0;
+  --accent-color: #ff9800;
+  --accent-hover: #fb8c00;
+  --error-color: #e53935;
+  --card-bg: #ffffff;
+  --border-radius: 8px;
+  --font-family: 'Roboto', sans-serif;
+}
+
+/* Container principale */
+.checkout-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: var(--card-bg, #ffffff);
+  border-radius: var(--border-radius, 8px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: var(--font-family, sans-serif);
+  color: #333;
+}
+
+/* Titoli */
+.checkout-container h2 {
+  text-align: center;
+  color: var(--primary-color, #1976d2);
+  margin-bottom: 20px;
+}
+
+.checkout-container h3 {
+  color: var(--accent-color, #ff9800);
+  margin-bottom: 15px;
+}
+
+/* ===================== */
+/*   STEP 1: Carrello    */
+/* ===================== */
+.checkout-step.step1 {
+  background-color: #f7f7f7;
+  padding: 1rem;
+  border-radius: var(--border-radius, 8px);
+  margin-bottom: 1rem;
+  border: 1px solid #eee;
+}
+
+.checkout-step.step1 .cart-summary {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: var(--border-radius, 8px);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cart-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cart-items li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.item-name {
+  font-weight: 500;
+  color: #555;
+}
+.item-price {
+  color: #333;
+  font-weight: 600;
+}
+
+.cart-total {
+  text-align: right;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #333;
+}
+
+/* ===================== */
+/*  Step generici        */
+/* ===================== */
+.checkout-step {
+  margin-bottom: 1rem;
+}
+
+/* Etichette e input */
+.checkout-container label {
+  display: block;
+  margin-top: 10px;
+  font-weight: 600;
+}
+.checkout-container input,
+.checkout-container select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.checkout-container input:focus,
+.checkout-container select:focus {
+  outline: none;
+  border-color: var(--primary-color, #1976d2);
+  box-shadow: 0 0 5px rgba(25, 118, 210, 0.3);
+}
+
+/* Errori */
+.error {
+  color: var(--error-color, #e53935);
+  font-size: 0.9rem;
+  margin-top: 3px;
+}
+
+/* Bottoni e Layout */
+.btn-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+/* Bottoni base */
+.btn-group button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: var(--border-radius, 8px);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: #fff;
+}
+
+/* Bottone "Indietro" */
+.back-button {
+  background-color: var(--primary-color, #1976d2);
+}
+.back-button:hover {
+  background-color: var(--primary-hover, #1565c0);
+}
+
+/* Bottone "Avanti" */
+.next-button {
+  background-color: var(--accent-color, #ff9800);
+}
+.next-button:hover {
+  background-color: var(--accent-hover, #fb8c00);
+}
+
+/* Bottone "Conferma Ordine" */
+.submit-button {
+  background-color: var(--accent-color, #ff9800);
+}
+.submit-button:hover {
+  background-color: var(--accent-hover, #fb8c00);
+}
+
+/* Messaggio di errore globale */
+.order-error {
+  background-color: #ffe6e6;
+  border: 1px solid var(--error-color, #e53935);
+  padding: 15px;
+  border-radius: var(--border-radius, 8px);
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Responsività */
+@media (max-width: 600px) {
+  .btn-group {
+    flex-direction: column;
+  }
+  .btn-group button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}

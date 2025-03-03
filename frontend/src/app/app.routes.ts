@@ -6,17 +6,27 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
 import { CartComponent } from './components/cart/cart.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
+import {CreatePaymentComponent} from './components/create-payment/create-payment.component';
+import {PaymentListComponent} from './components/payment-list/payment-list.component';
+import { CheckoutComponent } from './components/checkout/checkout.component';
+
+
+
 
 
 export const appRoutes: Routes = [
   { path: '', component: ProductListComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'order-history', component: OrderHistoryComponent },
   { path: 'product/:id', component: ProductDetailsComponent },
   { path: 'category/:categoryName', component: ProductListComponent },
+  { path: 'create-payment', component: CreatePaymentComponent },
+  { path: 'payments', component: PaymentListComponent },
   { path: 'cart', component: CartComponent },
   { path: 'order-history', component: OrderHistoryComponent },
   { path: 'user-profile', component: UserProfileComponent },
-  { path: 'register', component: RegisterComponent }, // <--- IMPORTANTE: Usa il componente standalone
+  { path: 'register', component: RegisterComponent },
+  { path: 'checkout', component: CheckoutComponent },
 
   { path: '**', redirectTo: '' },
 ];

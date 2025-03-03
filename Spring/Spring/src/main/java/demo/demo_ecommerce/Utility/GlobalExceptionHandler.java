@@ -9,9 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.nio.file.AccessDeniedException;
@@ -22,12 +20,15 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+
+
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // Gestione delle ConstraintViolationException
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(ConstraintViolationException ex,
-            WebRequest request) {
+    public ResponseEntity<Map<String, Object>> handleValidationExceptions(
+            ConstraintViolationException ex, WebRequest request) {
+
         Map<String, Object> response = new HashMap<>();
         response.put("error", "Validation failed");
         response.put("details", ex.getConstraintViolations().stream()
@@ -56,6 +57,24 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Aggiunta per gestire IllegalArgumentException con HTTP 400 (Bad Request).
+     * Esempio: quando la quantità supera lo stock disponibile.
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+        logger.warn("Bad request: {}", ex.getMessage());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("error", "Bad Request");
+        // Utilizzo "message" invece di "details"
+        response.put("message", ex.getMessage());
+        response.put("path", request.getDescription(false));
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+
     // Gestione di eccezioni generiche
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGenericException(Exception ex, WebRequest request) {
@@ -69,11 +88,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-
-
-
-
-        @ExceptionHandler(ResourceNotFoundException.class)
+    @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleResourceNotFound(ResourceNotFoundException ex, WebRequest request) {
         Map<String, String> response = new HashMap<>();
         response.put("error", "Resource not found");
@@ -96,24 +111,27 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
-    public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(org.springframework.dao.DataIntegrityViolationException ex, WebRequest request) {
+    public ResponseEntity<Map<String, String>> handleDataIntegrityViolation(
+            org.springframework.dao.DataIntegrityViolationException ex, WebRequest request) {
+
         Map<String, String> response = new HashMap<>();
         response.put("error", "Database integrity violation");
-        ex.getRootCause();
-        response.put("details", ex.getRootCause().getMessage());
+
+        // ex.getRootCause() potrebbe essere null, quindi controlliamo
+        Throwable rootCause = ex.getRootCause();
+        String causeMessage = (rootCause != null) ? rootCause.getMessage() : ex.getMessage();
+        response.put("details", causeMessage);
+
         response.put("path", request.getDescription(false));
 
         logger.error("Data integrity violation: {}", response);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleAccessDeniedException() {
         return "Accesso negato: non hai i permessi necessari.";
-
-
     }
 
 }

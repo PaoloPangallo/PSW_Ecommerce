@@ -1,12 +1,20 @@
 package demo.demo_ecommerce.Controllers;
 
+import demo.demo_ecommerce.dtos.PaymentRequestDTO;
+import demo.demo_ecommerce.dtos.PaymentResponseDTO;
+import demo.demo_ecommerce.entities.Order;
 import demo.demo_ecommerce.entities.Payment;
+import demo.demo_ecommerce.entities.User;
+import demo.demo_ecommerce.repositories.OrderRepository;
+import demo.demo_ecommerce.repositories.UsersRepository;
 import demo.demo_ecommerce.services.PaymentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -16,24 +24,66 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
+    // Aggiungi i repository necessari per recuperare l'utente e l'ordine
+    @Autowired
+    private UsersRepository userRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
     // Creazione di un nuovo pagamento
     @PostMapping
-    public ResponseEntity<Payment> createPayment(@RequestBody Payment payment) {
+    public ResponseEntity<PaymentResponseDTO> createPayment(@RequestBody @Valid PaymentRequestDTO paymentRequestDTO) {
+
+        // 1) Recupera l'utente dal database
+        User user = userRepository.findById(paymentRequestDTO.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "User not found with ID: " + paymentRequestDTO.getUserId()
+                ));
+
+        // 2) Recupera l'ordine dal database
+        Order order = orderRepository.findById(paymentRequestDTO.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Order not found with ID: " + paymentRequestDTO.getOrderId()
+                ));
+
+        // 3) Mappa i campi dal DTO all’entity Payment
+        Payment payment = Payment.builder()
+                .user(user)
+                .order(order)
+                .paymentMethod(paymentRequestDTO.getPaymentMethod())
+                .amount(paymentRequestDTO.getAmount())
+                .status(Payment.PaymentStatus.PENDING)
+                .timestamp(LocalDateTime.now())
+                .build();
+
+        // Salva il pagamento
         Payment createdPayment = paymentService.createPayment(payment);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment); // HTTP 201 Created
+
+        // 4) Crea un PaymentResponseDTO per restituirlo al client
+        PaymentResponseDTO responseDTO = new PaymentResponseDTO();
+        responseDTO.setId(createdPayment.getId());
+        responseDTO.setUserId(createdPayment.getUser().getId());
+        responseDTO.setOrderId(createdPayment.getOrder().getId());
+        responseDTO.setPaymentMethod(createdPayment.getPaymentMethod());
+        responseDTO.setAmount(createdPayment.getAmount());
+        responseDTO.setStatus(createdPayment.getStatus().toString());
+        responseDTO.setTimestamp(createdPayment.getTimestamp());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
+    // Recupera un pagamento per ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getPaymentById(@PathVariable Long id) {
-        Payment payment = paymentService.getPaymentById(id);  // Chiama direttamente il servizio
+        Payment payment = paymentService.getPaymentById(id);
         if (payment != null) {
-            return ResponseEntity.ok(payment);  // Se trovato, restituisci OK
+            return ResponseEntity.ok(payment);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Payment not found with ID: " + id);  // Se non trovato, restituisci errore 404
+                    .body("Payment not found with ID: " + id);
         }
     }
-
 
     // Recupero di tutti i pagamenti
     @GetMapping

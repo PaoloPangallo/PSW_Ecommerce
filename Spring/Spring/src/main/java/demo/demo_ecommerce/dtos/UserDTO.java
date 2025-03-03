@@ -30,7 +30,11 @@ public class UserDTO {
     // Ruolo opzionale: se non viene specificato, nel processo di registrazione potresti impostarlo di default (ad es. Role.USER)
     private Role role;
 
-    // Campi opzionali aggiuntivi, ad esempio:
+    // Campi opzionali aggiuntivi
     private String phone;
     private String address;
+    private String cap;       // Codice di avviamento postale
+    private String city;      // Città
+    private String region;    // Regione
+    private String country;   // Paese
 }

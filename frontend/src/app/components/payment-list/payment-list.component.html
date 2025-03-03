@@ -1,0 +1,15 @@
+<!-- src/app/components/payment-list/payment-list.component.html -->
+<div class="payment-list-container">
+  <h2>Elenco Pagamenti</h2>
+  <div *ngIf="error" class="error">{{ error }}</div>
+  <ul *ngIf="payments && payments.length > 0">
+    <li *ngFor="let p of payments">
+      <span>ID: {{ p.id }}</span> |
+      <span>OrderID: {{ p.orderId }}</span> |
+      <span>Amount: {{ p.amount }}</span> |
+      <span>Status: {{ p.status }}</span>
+      <button (click)="deletePayment(p.id)">Elimina</button>
+    </li>
+  </ul>
+  <p *ngIf="payments && payments.length === 0">Nessun pagamento trovato.</p>
+</div>

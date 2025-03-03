@@ -17,39 +17,27 @@ import java.time.LocalDateTime;
 @Getter
 public class Shipping {
 
-    private static final Logger logger = LoggerFactory.getLogger(Shipping.class);
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Mantieni il vincolo a livello DB, ma togli @NotNull a livello di Bean Validation
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
-    @NotNull(message = "Order ID cannot be null")
     private Order order;
 
-    @NotBlank(message = "Address cannot be blank")
-    @Size(max = 255, message = "Address cannot exceed 255 characters")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String address;
 
-    @NotBlank(message = "City cannot be blank")
-    @Size(max = 100, message = "City cannot exceed 100 characters")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String city;
 
-    @NotBlank(message = "ZIP Code cannot be blank")
-    @Pattern(regexp = "\\d{5}", message = "ZIP Code must be exactly 5 digits")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 5)
     private String zipCode;
 
-    @NotBlank(message = "Country cannot be blank")
-    @Size(max = 100, message = "Country cannot exceed 100 characters")
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String country;
 
-    @NotNull(message = "Shipping date cannot be null")
-    @FutureOrPresent(message = "Shipping date must be in the present or future")
     @Column(nullable = false)
     private LocalDateTime shippingDate;
 
@@ -59,29 +47,15 @@ public class Shipping {
 
     @PrePersist
     public void prePersist() {
+        // Se shippingDate non è settata dal service, la imposto di default a "adesso + 2 giorni"
         if (shippingDate == null) {
             shippingDate = LocalDateTime.now().plusDays(2);
-            logger.info("Shipping date not provided. Defaulting to: {}", shippingDate);
         }
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Shipping shipping = (Shipping) o;
-        return id != null && id.equals(shipping.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
-    // Enum per lo stato della spedizione
     public enum ShippingStatus {
-        PENDING,
-        SHIPPED,
-        DELIVERED
+        PENDING, SHIPPED, DELIVERED
     }
+
+    // equals, hashCode ...
 }

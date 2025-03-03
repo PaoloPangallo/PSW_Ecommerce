@@ -66,23 +66,30 @@ public class CartService {
     @Transactional
     public Cart addItemToCart(Long userId, Long productId, int quantity) {
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than zero.");
+            throw new IllegalArgumentException("La quantità deve essere maggiore di zero.");
         }
 
         Cart cart = getCartByUserId(userId);
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
+                .orElseThrow(() -> new IllegalArgumentException("Prodotto non trovato con ID: " + productId));
 
-        // Controlla se il prodotto è già nel carrello
+        int availableStock = product.getStock(); // Assumiamo che esista il metodo getStock() nell'entità Product
+
+        // Controlla se il prodotto è già presente nel carrello
         Optional<ShoppingCartItem> existingItemOpt = shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
 
         if (existingItemOpt.isPresent()) {
-            // Se il prodotto è già nel carrello, aggiorniamo la quantità
             ShoppingCartItem existingItem = existingItemOpt.get();
-            existingItem.setQuantity(existingItem.getQuantity() + quantity);
+            int newQuantity = existingItem.getQuantity() + quantity;
+            if (newQuantity > availableStock) {
+                throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
+            }
+            existingItem.setQuantity(newQuantity);
             shoppingCartItemRepository.save(existingItem);
         } else {
-            // Se il prodotto non è presente, creiamo un nuovo elemento
+            if (quantity > availableStock) {
+                throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
+            }
             ShoppingCartItem newItem = new ShoppingCartItem();
             newItem.setCart(cart);
             newItem.setProduct(product);
@@ -94,29 +101,41 @@ public class CartService {
     }
     @Transactional
     public Cart updateItemQuantity(Long userId, Long productId, int newQuantity) {
+        // Recuperiamo il carrello
         Cart cart = getCartByUserId(userId);
+        // Recuperiamo il prodotto per conoscere lo stock
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
+        int availableStock = product.getStock();
+
         System.out.println(">> Carrello prima dell'update: " + cart.getId() + " con " + cart.getItems().size() + " item.");
 
         Optional<ShoppingCartItem> itemOpt = shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
         if (itemOpt.isPresent()) {
             ShoppingCartItem item = itemOpt.get();
             System.out.println(">> Item trovato per productId " + productId + ". Quantità attuale: " + item.getQuantity());
+
             if (newQuantity <= 0) {
-                // Rimuovi l'item se la quantità è zero o negativa
+                // Rimuoviamo l'item se la quantità è zero o negativa
                 shoppingCartItemRepository.delete(item);
                 cart.getItems().removeIf(i -> i.getProduct().getId().equals(productId));
                 System.out.println(">> Item rimosso per productId " + productId);
             } else {
-                // Aggiorna la quantità
+                // Controlliamo che newQuantity non superi lo stock
+                if (newQuantity > availableStock) {
+                    throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
+                }
+                // Aggiorniamo la quantità
                 item.setQuantity(newQuantity);
                 shoppingCartItemRepository.save(item);
                 System.out.println(">> Quantità aggiornata per productId " + productId + " a " + newQuantity);
             }
         } else {
-            // Se l'item non esiste e la quantità è positiva, aggiungilo
+            // Se l'item non esiste e la quantità è positiva, aggiungilo (controllando lo stock)
             if (newQuantity > 0) {
-                Product product = productRepository.findById(productId)
-                        .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
+                if (newQuantity > availableStock) {
+                    throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
+                }
                 ShoppingCartItem newItem = new ShoppingCartItem();
                 newItem.setCart(cart);
                 newItem.setProduct(product);
@@ -128,6 +147,7 @@ public class CartService {
                 throw new IllegalArgumentException("Impossibile aggiornare un item con quantità non positiva.");
             }
         }
+
         cartRepository.save(cart);
         Cart updatedCart = getCartByUserId(userId);
         System.out.println(">> Carrello aggiornato finale: " + updatedCart.getItems().size() + " item.");
@@ -136,6 +156,7 @@ public class CartService {
         );
         return updatedCart;
     }
+
 
 
 

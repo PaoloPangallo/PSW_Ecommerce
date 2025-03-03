@@ -42,7 +42,6 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
-        // Verifica se username o email esistono già
         if (usersService.findByUsername(userDTO.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body("Username already exists");
         }

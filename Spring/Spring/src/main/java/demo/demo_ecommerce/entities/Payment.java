@@ -42,7 +42,7 @@ public class Payment {
     private PaymentStatus status;
 
     @NotNull(message = "Timestamp cannot be null")
-    @FutureOrPresent(message = "Timestamp cannot be in the past")
+    @PastOrPresent(message = "Timestamp cannot be in the future")
     @Column(nullable = false)
     private LocalDateTime timestamp;
 

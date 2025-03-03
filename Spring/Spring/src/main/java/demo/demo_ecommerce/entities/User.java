@@ -1,6 +1,6 @@
-// src/app/entities/User.java
 package demo.demo_ecommerce.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,6 +37,25 @@ public class User implements UserDetails {
     @JoinColumn(name = "cart_id", unique = true)
     private Cart cart;
 
+    // Nuovi campi
+    @Column(length = 20)
+    private String phone;
+
+    @Column(length = 255)
+    private String address;
+
+    @Column(length = 10)
+    private String cap;  // Codice di avviamento postale
+
+    @Column(length = 100)
+    private String city;
+
+    @Column(length = 100)
+    private String region;
+
+    @Column(length = 100)
+    private String country;
+
     public User() {
     }
 
@@ -48,6 +67,7 @@ public class User implements UserDetails {
     }
 
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singleton(() -> "ROLE_" + role.name());
     }

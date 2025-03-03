@@ -2,10 +2,7 @@ package demo.demo_ecommerce.repositories;
 
 import demo.demo_ecommerce.entities.Payment;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 
 @Repository
@@ -18,6 +15,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByOrderId(Long orderId);
 
     // Query personalizzata per trovare pagamenti con stato e importo maggiore di un certo valore
-    @Query("SELECT p FROM Payment p WHERE p.status = :status AND p.amount > :minAmount")
-    List<Payment> findPaymentsByStatusAndAmountGreaterThan(@Param("status") String status, @Param("minAmount") Double minAmount);
+    // (lascia invariato se lo usi, oppure modificalo se necessario)
+    // @Query("SELECT p FROM Payment p WHERE p.status = :status AND p.amount > :minAmount")
+    // List<Payment> findPaymentsByStatusAndAmountGreaterThan(@Param("status") String status, @Param("minAmount") Double minAmount);
+
+    // Metodo aggiornato per cercare in base al campo "paymentMethod"
+    Payment findByPaymentMethod(String paymentMethod);
 }

@@ -46,32 +46,30 @@ public class OrderService {
         Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Carrello non trovato per l'utente"));
 
-        // 3. Controlla che non sia vuoto
+        // 3. Controlla che il carrello non sia vuoto
         if (cart.getItems().isEmpty()) {
             throw new IllegalArgumentException("Il carrello è vuoto, non è possibile creare un ordine");
         }
 
-        // 4. Calcola il totale usando la lista di ShoppingCartItem
+        // 4. Calcola il totale usando la lista degli item del carrello
         BigDecimal totalBD = cart.getItems().stream()
                 .map(item -> {
-                    // Se la Product ha un campo BigDecimal price
                     BigDecimal price = item.getProduct().getPrice();
                     int quantity = item.getQuantity();
                     return price.multiply(BigDecimal.valueOf(quantity));
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        double total = totalBD.doubleValue();
-
-        if (total <= 0) {
+        if (totalBD.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Il totale dell'ordine deve essere maggiore di zero");
         }
 
-        // 5. Crea l'ordine
-        Order order = new Order();
-        order.setUser(user);
-        order.setTotal(BigDecimal.valueOf(total));
-        order.setCreatedAt(LocalDateTime.now());
+        // 5. Crea l'ordine utilizzando il builder
+        Order order = Order.builder()
+                .user(user)
+                .total(totalBD)
+                .build();
+        // NOTA: createdAt e status verranno impostati automaticamente in prePersist()
 
         // 6. Salva l'ordine
         order = orderRepository.save(order);
@@ -101,5 +99,15 @@ public class OrderService {
                 .map(Product::getPrice)
                 .orElseThrow(() -> new IllegalArgumentException("Prodotto non trovato con ID: " + productId));
     }
+
+
+    @Transactional
+    public Order updateOrder(Order order) {
+        if (order == null || order.getId() == null) {
+            throw new IllegalArgumentException("L'ordine non può essere nullo e deve avere un ID valido");
+        }
+        return orderRepository.save(order);
+    }
+
 
 }

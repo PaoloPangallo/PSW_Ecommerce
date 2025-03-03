@@ -17,6 +17,11 @@
       <span>
         <a routerLink="/cart">🛒 Carrello</a>
       </span>
+      <!-- Link agli ordini: visibili solo se l'utente è loggato -->
+      <span *ngIf="isLoggedIn()">
+        <a routerLink="/order-history">I miei Ordini</a>
+      </span>
+
       <!-- Mostra il logout se l'utente è loggato -->
       <span *ngIf="isLoggedIn()">
         <a (click)="logout()" style="cursor: pointer;">Logout</a>

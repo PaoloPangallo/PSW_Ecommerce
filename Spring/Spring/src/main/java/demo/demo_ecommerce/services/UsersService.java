@@ -2,6 +2,7 @@ package demo.demo_ecommerce.services;
 
 import demo.demo_ecommerce.Utility.UserNotFoundException;
 import demo.demo_ecommerce.dtos.UserDTO;
+import demo.demo_ecommerce.dtos.UserResponseDTO;  // Assicurati di creare questa classe DTO
 import demo.demo_ecommerce.entities.Cart;
 import demo.demo_ecommerce.entities.Role;
 import demo.demo_ecommerce.entities.User;
@@ -26,15 +27,14 @@ public class UsersService {
 
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CartRepository cartRepository; // Aggiungi questa dichiarazione
-
+    private final CartRepository cartRepository;
 
     public UsersService(UsersRepository usersRepository,
                         PasswordEncoder passwordEncoder,
                         CartRepository cartRepository) {
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
-        this.cartRepository = cartRepository; // Assegna correttamente il repository
+        this.cartRepository = cartRepository;
     }
 
     public Page<User> getAllUsers(Pageable pageable) {
@@ -42,31 +42,36 @@ public class UsersService {
         return usersRepository.findAll(pageable);
     }
 
-
     // Fetch user by ID
     public User getUserById(Long id) {
         logger.info("Fetching user with ID: {}", id);
         return findUserById(id);
     }
 
-    // Create a new user with default role and encoded password
+    // Crea un nuovo utente con i nuovi campi phone e address
     public User createUser(@Valid UserDTO userDTO) {
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(userDTO.getRole() != null ? userDTO.getRole() : Role.USER);
+        // Imposta i nuovi campi
+        user.setPhone(userDTO.getPhone());
+        user.setAddress(userDTO.getAddress());
         return usersRepository.save(user);
     }
 
-
+    // Aggiorna un utente esistente (inclusi i nuovi campi) e restituisce un DTO di risposta
     @Transactional
-    public User updateUser(Long id, @Valid User userDetails) {
+    public UserResponseDTO updateUser(Long id, @Valid User userDetails) {
         logger.info("Updating user with ID: {}", id);
         User existingUser = findUserById(id);
 
         existingUser.setUsername(userDetails.getUsername());
         existingUser.setEmail(userDetails.getEmail());
+        // Aggiorna i nuovi campi se forniti
+        existingUser.setPhone(userDetails.getPhone());
+        existingUser.setAddress(userDetails.getAddress());
 
         // Aggiorna la password solo se fornita
         if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
@@ -78,7 +83,8 @@ public class UsersService {
             existingUser.setRole(userDetails.getRole());
         }
 
-        return usersRepository.save(existingUser);
+        User savedUser = usersRepository.save(existingUser);
+        return toResponseDTO(savedUser);
     }
 
     @Transactional
@@ -102,7 +108,6 @@ public class UsersService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
-
     public Page<User> searchUsers(String username, String email, Pageable pageable) {
         if (username != null && email != null) {
             return usersRepository.findByUsernameContainingAndEmailContaining(username, email, pageable);
@@ -115,7 +120,6 @@ public class UsersService {
         }
     }
 
-
     // Metodo per registrare un utente (usato dall'endpoint di registrazione)
     @Transactional
     public User registerUser(UserDTO userDTO) {
@@ -123,8 +127,10 @@ public class UsersService {
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        // Se il ruolo è null, imposta di default Role.USER
         user.setRole(userDTO.getRole() != null ? userDTO.getRole() : Role.USER);
+        // Imposta i nuovi campi
+        user.setPhone(userDTO.getPhone());
+        user.setAddress(userDTO.getAddress());
 
         User savedUser = usersRepository.save(user);
         // Crea il carrello associato al nuovo utente
@@ -142,6 +148,20 @@ public class UsersService {
         return usersRepository.existsByEmail(email);
     }
 
-
+    // Helper method per convertire un'entità User in un DTO di risposta
+    private UserResponseDTO toResponseDTO(User user) {
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setRole(String.valueOf(user.getRole()));
+        dto.setPhone(user.getPhone());
+        dto.setAddress(user.getAddress());
+        dto.setCap(user.getCap());
+        dto.setCity(user.getCity());
+        dto.setRegion(user.getRegion());
+        dto.setCountry(user.getCountry());
+        return dto;
+    }
 
 }

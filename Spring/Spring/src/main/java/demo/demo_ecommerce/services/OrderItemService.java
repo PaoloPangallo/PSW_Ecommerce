@@ -52,11 +52,6 @@ public class OrderItemService {
         orderItemRepository.deleteById(id);
     }
 
-    // Calcola il totale della quantità per un ordine
-    public Integer getTotalQuantityByOrderId(Long orderId) {
-        return orderItemRepository.findTotalQuantityByOrderId(orderId);
-    }
-
     // Calcola il totale del prezzo per un ordine
     public BigDecimal getTotalPriceByOrderId(Long orderId) {
         return orderItemRepository.findTotalPriceByOrderId(orderId);

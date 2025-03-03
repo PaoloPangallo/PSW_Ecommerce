@@ -1,6 +1,7 @@
 package demo.demo_ecommerce.Controllers;
 
 import demo.demo_ecommerce.dtos.UserDTO;
+import demo.demo_ecommerce.dtos.UserResponseDTO;
 import demo.demo_ecommerce.entities.Role;
 import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.services.UsersService;
@@ -30,8 +31,6 @@ public class UsersController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Lista di utenti recuperata con successo.")
     })
-
-
     @GetMapping
     public ResponseEntity<Page<User>> getAllUsers(Pageable pageable) {
         Page<User> users = usersService.getAllUsers(pageable);
@@ -71,15 +70,14 @@ public class UsersController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
-
     @Operation(summary = "Aggiorna un utente esistente", description = "Modifica i dettagli di un utente specifico tramite ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Utente aggiornato con successo."),
             @ApiResponse(responseCode = "404", description = "Utente non trovato.")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
-        User updatedUser = usersService.updateUser(id, user);
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
+        UserResponseDTO updatedUser = usersService.updateUser(id, user);
         return ResponseEntity.ok(updatedUser);
     }
 
@@ -94,7 +92,6 @@ public class UsersController {
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/search")
     public ResponseEntity<Page<User>> searchUsers(
             @RequestParam(required = false) String username,
@@ -103,6 +100,4 @@ public class UsersController {
         Page<User> users = usersService.searchUsers(username, email, pageable);
         return ResponseEntity.ok(users);
     }
-
-
 }

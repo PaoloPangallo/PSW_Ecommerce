@@ -1,1 +1,122 @@
-<p>checkout works!</p>
+<div class="checkout-container">
+  <h2>Checkout</h2>
+
+  <!-- STEP 1: Riepilogo Carrello -->
+  <div *ngIf="currentStep === 1" class="checkout-step step1">
+    <h3>Riepilogo Carrello</h3>
+
+    <div *ngIf="cart && cart.items.length > 0; else emptyCart" class="cart-summary">
+      <ul class="cart-items">
+        <li *ngFor="let item of cart.items">
+          <span class="item-name">
+            {{ item.productName }} ({{ item.quantity }}x)
+          </span>
+          <span class="item-price">
+            {{ item.price | currency:'EUR' }}
+          </span>
+        </li>
+      </ul>
+      <p class="cart-total">
+        <strong>Totale:</strong> {{ getCartTotal() | currency:'EUR' }}
+      </p>
+
+      <!-- Pulsante per passare allo step successivo -->
+      <button type="button" class="next-button" (click)="nextStep()">Procedi al Checkout</button>
+    </div>
+
+    <ng-template #emptyCart>
+      <p>Il carrello è vuoto.</p>
+    </ng-template>
+  </div>
+
+  <!-- Form multi-step -->
+  <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+    <!-- STEP 2: Indirizzo di Spedizione -->
+    <div *ngIf="currentStep === 2" formGroupName="shipping" class="checkout-step step2">
+      <h3>Indirizzo di Spedizione</h3>
+
+      <label>Indirizzo</label>
+      <input formControlName="address" placeholder="Inserisci l'indirizzo" />
+      <div *ngIf="checkoutForm.get('shipping.address')?.invalid && checkoutForm.get('shipping.address')?.touched">
+        <small class="error">Il campo Indirizzo è obbligatorio.</small>
+      </div>
+
+      <label>Paese</label>
+      <input formControlName="country" placeholder="Inserisci il paese" />
+      <div *ngIf="checkoutForm.get('shipping.country')?.invalid && checkoutForm.get('shipping.country')?.touched">
+        <small class="error">Il campo Paese è obbligatorio.</small>
+      </div>
+
+      <label>Città</label>
+      <input formControlName="city" placeholder="Inserisci la città" />
+      <div *ngIf="checkoutForm.get('shipping.city')?.invalid && checkoutForm.get('shipping.city')?.touched">
+        <small class="error">Il campo Città è obbligatorio.</small>
+      </div>
+
+      <label>CAP / ZIP Code</label>
+      <input formControlName="zipCode" placeholder="Inserisci il CAP / ZIP Code" />
+      <div *ngIf="checkoutForm.get('shipping.zipCode')?.invalid && checkoutForm.get('shipping.zipCode')?.touched">
+        <small class="error">Il campo CAP / ZIP Code è obbligatorio.</small>
+      </div>
+
+      <label>Metodo di Spedizione</label>
+      <select formControlName="shippingMethod">
+        <option value="STANDARD">Standard</option>
+        <option value="EXPRESS">Espresso</option>
+      </select>
+
+      <div class="btn-group">
+        <button type="button" class="back-button" (click)="previousStep()">Indietro</button>
+        <button type="button" class="next-button" (click)="nextStep()">Avanti</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Metodo di Pagamento -->
+    <div *ngIf="currentStep === 3" formGroupName="transaction" class="checkout-step step3">
+      <h3>Metodo di Pagamento</h3>
+
+      <label>Scegli il metodo di pagamento:</label>
+      <select formControlName="paymentMethod">
+        <option *ngFor="let pm of paymentMethods" [value]="pm.value">
+          {{ pm.label }}
+        </option>
+      </select>
+      <div *ngIf="checkoutForm.get('transaction.paymentMethod')?.invalid && checkoutForm.get('transaction.paymentMethod')?.touched">
+        <small class="error">Seleziona un metodo di pagamento.</small>
+      </div>
+
+      <div class="btn-group">
+        <button type="button" class="back-button" (click)="previousStep()">Indietro</button>
+        <button type="button" class="next-button" (click)="nextStep()">Avanti</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Riepilogo Finale e Conferma -->
+    <div *ngIf="currentStep === 4" class="checkout-step step4">
+      <h3>Riepilogo Ordine</h3>
+      <p><strong>Indirizzo:</strong> {{ checkoutForm.get('shipping')?.value | json }}</p>
+      <p><strong>Metodo di Pagamento:</strong> {{ checkoutForm.get('transaction.paymentMethod')?.value }}</p>
+      <p><strong>Totale Carrello:</strong> {{ getCartTotal() | currency:'EUR' }}</p>
+
+      <div class="btn-group">
+        <button type="button" class="back-button" (click)="previousStep()">Indietro</button>
+        <button type="submit" class="submit-button" [disabled]="loading">
+          {{ loading ? 'Elaborazione...' : 'Conferma Ordine' }}
+        </button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Messaggio di successo -->
+  <div *ngIf="checkoutResponse">
+    <h3>Ordine Creato con Successo!</h3>
+    <p><strong>ID Ordine:</strong> {{ checkoutResponse.orderId }}</p>
+    <p><strong>Stato:</strong> {{ checkoutResponse.status }}</p>
+    <p>{{ checkoutResponse.message }}</p>
+  </div>
+
+  <!-- Messaggio di errore -->
+  <div *ngIf="error" class="order-error">
+    <p>❌ Errore: {{ error }}</p>
+  </div>
+</div>

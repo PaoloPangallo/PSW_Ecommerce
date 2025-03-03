@@ -16,34 +16,31 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @Builder
+@NoArgsConstructor
 public class Transaction {
-
-    public Transaction() {
-        this.id = null; // Valore predefinito per il campo final
-    }
-
-    private static final Logger logger = LoggerFactory.getLogger(Transaction.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private final Long id;
+    private Long id;
 
+    // Riferimento a Payment, obbligatorio a livello DB
     @ManyToOne
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
 
+    // Riferimento all'Order
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @NotBlank(message = "Transaction ID cannot be blank")
+    @Column(nullable = false)
     private String transactionId;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private TransactionStatus status;
 
-    @NotNull
-    @DecimalMin(value = "0.0", inclusive = false, message = "Amount must be greater than zero")
+    @Column(nullable = false)
     private BigDecimal amount;
 
     @Column(nullable = false)
@@ -53,25 +50,13 @@ public class Transaction {
     public void prePersist() {
         if (transactionDate == null) {
             transactionDate = LocalDateTime.now();
-            logger.info("Setting transaction date for TransactionId: {}", transactionId);
+        }
+        if (transactionId == null || transactionId.isBlank()) {
+            transactionId = "TEMP";
         }
     }
 
-    // Enum per lo stato della transazione
     public enum TransactionStatus {
         SUCCESS, FAILED, PENDING
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Transaction that = (Transaction) o;
-        return id != null && id.equals(that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
     }
 }

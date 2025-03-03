@@ -1,5 +1,3 @@
-// src/app/services/cart.service.ts
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
@@ -18,18 +16,26 @@ export class CartService {
 
   constructor(private http: HttpClient) {}
 
-  // Metodi esistenti...
+  // Ottiene il carrello per l'utente
   getCart(userId: number): Observable<CartDTO> {
     return this.http.get<CartDTO>(`${this.baseUrl}/${userId}`).pipe(
       tap(cart => {
         console.log('🛒 Carrello caricato:', cart);
         this.cartSubject.next(cart);
       }),
-      catchError(error => {
-        console.error('Errore nel recupero del carrello', error);
-        return throwError(() => error);
-      })
+      catchError(error => this.handleError(error))
     );
+  }
+
+  // Metodo privato per gestire gli errori
+  private handleError(error: any): Observable<never> {
+    console.error("❌ Errore HTTP:", error);
+
+    // Se il backend restituisce un JSON con { error, message }, lo recuperiamo
+    const errorMsg = error?.error?.message || "Si è verificato un errore imprevisto.";
+
+    // Ritorniamo un errore che includa il messaggio
+    return throwError(() => new Error(errorMsg));
   }
 
   updateItemQuantity(userId: number, productId: number, quantity: number): Observable<CartDTO> {
@@ -41,10 +47,7 @@ export class CartService {
         console.log("✅ Carrello aggiornato (updateItemQuantity):", cart);
         this.cartSubject.next(cart);
       }),
-      catchError(error => {
-        console.error("❌ Errore nell'aggiornamento del carrello:", error);
-        return throwError(() => error);
-      })
+      catchError(error => this.handleError(error))
     );
   }
 
@@ -54,10 +57,7 @@ export class CartService {
         console.log("✅ Prodotto rimosso:", cart);
         this.cartSubject.next(cart);
       }),
-      catchError(error => {
-        console.error("❌ Errore durante la rimozione del prodotto:", error);
-        return throwError(() => error);
-      })
+      catchError(error => this.handleError(error))
     );
   }
 
@@ -67,27 +67,9 @@ export class CartService {
         console.log("🗑️ Carrello svuotato:", cart);
         this.cartSubject.next(cart);
       }),
-      catchError(error => {
-        console.error("❌ Errore durante la pulizia del carrello:", error);
-        return throwError(() => error);
-      })
+      catchError(error => this.handleError(error))
     );
   }
-
-  loadCart(userId: number): void {
-    console.log(`Chiamo GET per caricare il carrello dell'utente ${userId}.`);
-    this.http.get<CartDTO>(`${this.baseUrl}/${userId}`).pipe(
-      tap(cart => {
-        console.log('🛒 Carrello caricato:', cart);
-        this.cartSubject.next(cart);
-      }),
-      catchError(error => {
-        console.error('Errore nel recupero del carrello', error);
-        return throwError(() => error);
-      })
-    ).subscribe();
-  }
-
 
   resetCart(): void {
     console.log("Resetto il carrello nel CartService.");

@@ -38,8 +38,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/products/**").permitAll()
                         .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/api/cart/**").permitAll()
+                        .requestMatchers("/api/payments/**").permitAll()
+                        .requestMatchers("/checkout/**").authenticated()  // Permetti solo agli utenti autenticati
                         .anyRequest().authenticated()
                 )
+
+
+
+
 
                 // 4. Aggiungi il tuo filtro JWT
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

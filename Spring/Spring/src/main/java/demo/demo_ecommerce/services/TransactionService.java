@@ -5,7 +5,6 @@ import demo.demo_ecommerce.entities.Transaction;
 import demo.demo_ecommerce.repositories.OrderRepository;
 import demo.demo_ecommerce.repositories.PaymentRepository;
 import demo.demo_ecommerce.repositories.TransactionRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -43,13 +42,25 @@ public class TransactionService {
         orderRepository.findById(transaction.getOrder().getId())
                 .orElseThrow(() -> new InvalidTransactionException("Order not found"));
 
+        // Simuliamo un pagamento andato a buon fine:
         if (transaction.getStatus() == null) {
-            transaction.setStatus(Transaction.TransactionStatus.PENDING);
+            transaction.setStatus(Transaction.TransactionStatus.SUCCESS);
         }
 
         logger.info("Creating transaction for Order ID: {} and Payment ID: {}",
                 transaction.getOrder().getId(), transaction.getPayment().getId());
-        return transactionRepository.save(transaction);
+
+        // Salva la transazione per ottenere l'ID auto-generato
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        // Genera il transactionId in modo incrementale basandosi sull'ID generato
+        if (savedTransaction.getTransactionId() == null || savedTransaction.getTransactionId().equals("TEMP")) {
+            savedTransaction.setTransactionId("TXN-" + savedTransaction.getId());
+            // Aggiorna la transazione con il transactionId definitivo
+            savedTransaction = transactionRepository.save(savedTransaction);
+        }
+
+        return savedTransaction;
     }
 
     // Recupera tutte le transazioni per un ordine

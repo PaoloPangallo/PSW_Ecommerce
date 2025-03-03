@@ -1,32 +1,76 @@
-<div *ngIf="cart && cart.items.length > 0; else emptyCart">
-  <h2>Il tuo Carrello</h2>
-  <table>
-    <thead>
-    <tr>
-      <th>Prodotto</th>
-      <th>Quantità</th>
-      <th>Prezzo</th>
-      <th>Azioni</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr *ngFor="let item of cart.items; trackBy: trackByProductId">
-      <td>{{ item.productName }}</td>
-      <td>
-        <button (click)="decreaseQuantity(item.productId, item.quantity)">➖</button>
-        <span>{{ item.quantity }}</span>
-        <button (click)="increaseQuantity(item.productId, item.quantity)">➕</button>
-      </td>
-      <td>{{ item.price | currency:'EUR' }}</td>
-      <td>
-        <button (click)="remove(item.productId)">Rimuovi</button>
-      </td>
-    </tr>
-    </tbody>
-  </table>
-  <button (click)="clear()">Svuota carrello</button>
+<mat-card class="cart-wrapper" *ngIf="cart && cart.items.length > 0; else emptyCart">
+  <mat-card-title>Il tuo Carrello</mat-card-title>
+  <mat-card-content>
+    <!-- Tabella con i prodotti -->
+    <table mat-table [dataSource]="cart.items" class="mat-elevation-z8">
+
+      <!-- Colonna Prodotto -->
+      <ng-container matColumnDef="productName">
+        <th mat-header-cell *matHeaderCellDef>Prodotto</th>
+        <td mat-cell *matCellDef="let item">{{ item.productName }}</td>
+      </ng-container>
+
+      <!-- Colonna Quantità -->
+      <ng-container matColumnDef="quantity">
+        <th mat-header-cell *matHeaderCellDef>Quantità</th>
+        <td mat-cell *matCellDef="let item">
+          <button mat-icon-button color="primary" (click)="decreaseQuantity(item.productId, item.quantity)">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <span>{{ item.quantity }}</span>
+          <button mat-icon-button color="primary" (click)="increaseQuantity(item.productId, item.quantity)">
+            <mat-icon>add</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Colonna Prezzo -->
+      <ng-container matColumnDef="price">
+        <th mat-header-cell *matHeaderCellDef>Prezzo Unitario</th>
+        <td mat-cell *matCellDef="let item">{{ item.price | currency:'EUR' }}</td>
+      </ng-container>
+
+      <!-- Colonna Totale per Prodotto -->
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef>Totale</th>
+        <td mat-cell *matCellDef="let item">{{ item.price * item.quantity | currency:'EUR' }}</td>
+      </ng-container>
+
+      <!-- Colonna Azioni -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Azioni</th>
+        <td mat-cell *matCellDef="let item">
+          <button mat-button color="warn" (click)="remove(item.productId)">Rimuovi</button>
+        </td>
+      </ng-container>
+
+      <!-- Header e righe della tabella -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <!-- Totale dell'ordine -->
+    <div class="cart-total">
+      <p><strong>Totale Ordine:</strong> {{ getTotalPrice() | currency:'EUR' }}</p>
+    </div>
+
+    <!-- Pulsante per svuotare il carrello -->
+    <div class="clear-btn-container">
+      <button mat-raised-button color="accent" (click)="clear()">Svuota carrello</button>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<!-- Pulsante per il checkout -->
+<div class="cart-summary" *ngIf="cart && cart.items.length > 0">
+  <button mat-raised-button color="primary" (click)="goToCheckout()">Procedi al Checkout</button>
 </div>
 
+<!-- Messaggio Carrello Vuoto -->
 <ng-template #emptyCart>
-  <p>Il carrello è vuoto.</p>
+  <mat-card class="cart-wrapper">
+    <mat-card-content>
+      <p>Il carrello è vuoto.</p>
+    </mat-card-content>
+  </mat-card>
 </ng-template>

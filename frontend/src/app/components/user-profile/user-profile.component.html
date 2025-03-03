@@ -1,1 +1,120 @@
-<p>user-profile works!</p>
+<div class="profile-wrapper" *ngIf="user">
+  <div class="profile-container">
+    <h2>Profilo Utente</h2>
+    <form (ngSubmit)="updateProfile()" #profileForm="ngForm">
+      <!-- Username -->
+      <div class="form-group">
+        <label for="username">Username:</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          [(ngModel)]="user.username"
+          required
+        />
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          [(ngModel)]="user.email"
+          required
+        />
+      </div>
+
+      <!-- Ruolo (non modificabile) -->
+      <div class="form-group">
+        <label>Ruolo:</label>
+        <input type="text" [value]="user.role" readonly>
+      </div>
+
+      <!-- Telefono -->
+      <div class="form-group">
+        <label for="phone">Telefono:</label>
+        <input
+          type="text"
+          id="phone"
+          name="phone"
+          [(ngModel)]="user.phone"
+          placeholder="Inserisci il tuo numero di telefono"
+        />
+      </div>
+
+      <!-- Indirizzo -->
+      <div class="form-group">
+        <label for="address">Indirizzo:</label>
+        <textarea
+          id="address"
+          name="address"
+          [(ngModel)]="user.address"
+          placeholder="Inserisci il tuo indirizzo"
+          rows="2"
+        ></textarea>
+      </div>
+
+      <!-- CAP -->
+      <div class="form-group">
+        <label for="cap">CAP:</label>
+        <input
+          type="text"
+          id="cap"
+          name="cap"
+          [(ngModel)]="user.cap"
+          placeholder="Inserisci il CAP"
+        />
+      </div>
+
+      <!-- Città -->
+      <div class="form-group">
+        <label for="city">Città:</label>
+        <input
+          type="text"
+          id="city"
+          name="city"
+          [(ngModel)]="user.city"
+          placeholder="Inserisci la città"
+        />
+      </div>
+
+      <!-- Regione -->
+      <div class="form-group">
+        <label for="region">Regione:</label>
+        <input
+          type="text"
+          id="region"
+          name="region"
+          [(ngModel)]="user.region"
+          placeholder="Inserisci la regione"
+        />
+      </div>
+
+      <!-- Paese -->
+      <div class="form-group">
+        <label for="country">Paese:</label>
+        <input
+          type="text"
+          id="country"
+          name="country"
+          [(ngModel)]="user.country"
+          placeholder="Inserisci il paese"
+        />
+      </div>
+
+      <button type="submit" [disabled]="profileForm.invalid">
+        Aggiorna Profilo
+      </button>
+    </form>
+
+    <!-- Messaggi di errore e successo -->
+    <div *ngIf="errorMessage" class="error">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="success">
+      {{ successMessage }}
+    </div>
+  </div>
+</div>
