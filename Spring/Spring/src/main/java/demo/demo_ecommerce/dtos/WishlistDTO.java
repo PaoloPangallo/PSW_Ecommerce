@@ -1,28 +1,30 @@
 package demo.demo_ecommerce.dtos;
 
 import demo.demo_ecommerce.entities.Wishlist;
-import lombok.Data;
+import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class WishlistDTO {
     private Long id;
     private Long userId;
-    private LocalDateTime createdDate;
-    private List<Long> productIds;
+    private List<ProductDTO> products;
 
+    // Metodo per convertire un'entità Wishlist in un DTO
     public static WishlistDTO fromEntity(Wishlist wishlist) {
-        WishlistDTO dto = new WishlistDTO();
-        dto.setId(wishlist.getId());
-        dto.setUserId(wishlist.getUser().getId());
-        dto.setCreatedDate(wishlist.getCreatedDate());
-        dto.setProductIds(wishlist.getProducts()
-                .stream()
-                .map(product -> product.getId())
-                .collect(Collectors.toList()));
-        return dto;
+        return WishlistDTO.builder()
+                .id(wishlist.getId())
+                .userId(wishlist.getUser().getId()) // Assumi che User non sia null
+                .products(wishlist.getProducts().stream()
+                        .map(ProductDTO::fromEntity) // Converte ogni prodotto in DTO
+                        .collect(Collectors.toList()))
+                .build();
     }
 }

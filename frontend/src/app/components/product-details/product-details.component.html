@@ -7,7 +7,12 @@
       <h2>{{ product.name }}</h2>
       <p class="description">{{ product.description }}</p>
       <p class="price">Prezzo: {{ product.price | currency:'EUR' }}</p>
+
       <button (click)="addToCart()">Aggiungi al Carrello</button>
+      <button (click)="addToWishlist()">❤️ Aggiungi alla Wishlist</button>
+
+      <!-- Messaggio di conferma -->
+      <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
     </div>
   </div>
 

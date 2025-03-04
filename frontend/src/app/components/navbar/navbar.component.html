@@ -2,7 +2,7 @@
   <!-- Barra superiore -->
   <div class="nav-top">
     <div class="logo">
-      <a routerLink="/"> euronics</a>
+      <a routerLink="/"> Unilire</a>
     </div>
 
     <div class="search-box">
@@ -17,6 +17,12 @@
       <span>
         <a routerLink="/cart">🛒 Carrello</a>
       </span>
+
+      <!-- ✅ Nuovo link alla Wishlist -->
+      <span>
+        <a routerLink="/wishlist">❤️ Wishlist</a>
+      </span>
+
       <!-- Link agli ordini: visibili solo se l'utente è loggato -->
       <span *ngIf="isLoggedIn()">
         <a routerLink="/order-history">I miei Ordini</a>

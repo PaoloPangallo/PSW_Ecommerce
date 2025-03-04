@@ -1,1 +1,40 @@
-<p>wishlist works!</p>
+<div class="wishlist-container">
+  <h2>La mia Wishlist</h2>
+
+  <!-- Stato di caricamento -->
+  <div *ngIf="isLoading" class="loading">
+    Caricamento in corso...
+  </div>
+
+  <!-- Messaggio di errore -->
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Contenuto della wishlist -->
+  <div *ngIf="!isLoading && wishlist">
+    <!-- Se la wishlist contiene dei prodotti -->
+    <ul class="wishlist-list" *ngIf="wishlist.products && wishlist.products.length > 0; else emptyWishlist">
+      <li *ngFor="let product of wishlist.products" class="wishlist-item">
+        <div class="item-info">
+          <span class="product-name">{{ product.name }}</span>
+          <span class="product-price">{{ product.price | currency:'EUR':'symbol' }}</span>
+        </div>
+        <button (click)="removeProduct(product.id!)">❌ Rimuovi</button>
+
+      </li>
+    </ul>
+
+    <!-- Template per wishlist vuota -->
+    <ng-template #emptyWishlist>
+      <div class="empty">
+        La wishlist è vuota.
+      </div>
+    </ng-template>
+
+    <!-- Bottone per eliminare l'intera wishlist -->
+    <button (click)="deleteWishlist()" class="delete-all">
+      Elimina tutta la wishlist
+    </button>
+  </div>
+</div>

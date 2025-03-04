@@ -1,6 +1,6 @@
 <div class="product-list-container">
   <div *ngFor="let product of products" class="product-card">
-    <img [src]="product.imageUrl" [alt]="product.name">
+    <img [src]="product.imageUrl" [alt]="product.name" />
     <h2>{{ product.name }}</h2>
     <p class="description">{{ product.description }}</p>
     <p class="price"><strong>Prezzo:</strong> €{{ product.price }}</p>

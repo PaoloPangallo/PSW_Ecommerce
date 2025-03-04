@@ -9,6 +9,8 @@ import { RegisterComponent } from './components/register/register.component';
 import {CreatePaymentComponent} from './components/create-payment/create-payment.component';
 import {PaymentListComponent} from './components/payment-list/payment-list.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
+import { WishlistComponent } from './components/wishlist/wishlist.component';
+
 
 
 
@@ -27,6 +29,9 @@ export const appRoutes: Routes = [
   { path: 'user-profile', component: UserProfileComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'checkout', component: CheckoutComponent },
+  { path: 'wishlist', component: WishlistComponent },
+
+
 
   { path: '**', redirectTo: '' },
 ];

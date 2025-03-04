@@ -1,10 +1,14 @@
 package demo.demo_ecommerce.services;
 
 import demo.demo_ecommerce.dtos.WishlistDTO;
+import demo.demo_ecommerce.entities.Product;
+import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.entities.Wishlist;
+import demo.demo_ecommerce.repositories.ProductRepository;
+import demo.demo_ecommerce.repositories.UsersRepository;
 import demo.demo_ecommerce.repositories.WishlistRepository;
 import demo.demo_ecommerce.Utility.WishlistNotFoundException;
-
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,27 +21,37 @@ import java.util.stream.Collectors;
 public class WishlistService {
 
     private final WishlistRepository wishlistRepository;
+    private final ProductRepository productRepository;
 
     @Autowired
-    public WishlistService(WishlistRepository wishlistRepository) {
+    public WishlistService(WishlistRepository wishlistRepository, ProductRepository productRepository) {
         this.wishlistRepository = wishlistRepository;
+        this.productRepository = productRepository;
     }
 
-    // Crea una nuova wishlist solo se non esiste già per l'utente
+    @Autowired
+    private UsersRepository userRepository; // Assicurati di avere il repository per gli utenti
+
     public WishlistDTO createWishlist(Long userId, @Valid WishlistDTO wishlistDTO) {
+        // Controlla se l'utente esiste
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+
+        // Controlla se l'utente ha già una wishlist
         if (wishlistRepository.existsByUserId(userId)) {
             throw new IllegalArgumentException("A wishlist already exists for this user.");
         }
 
-        // Converti DTO -> Entità
-        Wishlist wishlist = new Wishlist();
-        wishlist.setUser(null); // Qui dovresti associare lo User corretto
-        wishlist.setCreatedDate(LocalDateTime.now());
+        // Crea e salva la nuova wishlist associata all'utente
+        Wishlist wishlist = Wishlist.builder()
+                .user(user)
+                .createdDate(LocalDateTime.now())
+                .build();
 
         Wishlist savedWishlist = wishlistRepository.save(wishlist);
-
         return WishlistDTO.fromEntity(savedWishlist);
     }
+
 
     // Recupera la wishlist tramite ID
     public WishlistDTO getWishlistById(Long id) {
@@ -45,16 +59,16 @@ public class WishlistService {
                 .orElseThrow(() -> new WishlistNotFoundException("Wishlist not found with ID: " + id));
         return WishlistDTO.fromEntity(wishlist);
     }
-
-    // Recupera la wishlist dell'utente
+    @Transactional
     public WishlistDTO getUserWishlist(Long userId) {
-        Wishlist wishlist = wishlistRepository.findByUserId(userId)
+        Wishlist wishlist = wishlistRepository.findByUserIdWithProducts(userId)
                 .orElseThrow(() -> new WishlistNotFoundException("No wishlist found for user ID: " + userId));
+
         return WishlistDTO.fromEntity(wishlist);
     }
 
-    // Elimina una wishlist tramite ID
-    public void deleteWishlist(Long id) {
+@Transactional
+public void deleteWishlist(Long id) {
         if (!wishlistRepository.existsById(id)) {
             throw new WishlistNotFoundException("Wishlist not found with ID: " + id);
         }
@@ -76,4 +90,34 @@ public class WishlistService {
                 .map(WishlistDTO::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public WishlistDTO addProductToWishlist(Long wishlistId, Long productId) {
+        Wishlist wishlist = wishlistRepository.findById(wishlistId)
+                .orElseThrow(() -> new WishlistNotFoundException("Wishlist not found with ID: " + wishlistId));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
+
+        wishlist.getProducts().add(product);
+        Wishlist savedWishlist = wishlistRepository.save(wishlist);
+
+        return WishlistDTO.fromEntity(savedWishlist);
+    }
+
+
+    @Transactional
+    public WishlistDTO removeProductFromWishlist(Long wishlistId, Long productId) {
+        Wishlist wishlist = wishlistRepository.findById(wishlistId)
+                .orElseThrow(() -> new WishlistNotFoundException("Wishlist not found with ID: " + wishlistId));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
+
+        wishlist.getProducts().remove(product);
+        Wishlist savedWishlist = wishlistRepository.save(wishlist);
+
+        return WishlistDTO.fromEntity(savedWishlist);
+    }
+
 }

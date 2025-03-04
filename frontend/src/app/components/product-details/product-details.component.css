@@ -1,132 +1,135 @@
-/* Reset di base */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Contenitore principale con sfondo neutro */
+/* Layout generale del contenitore */
 .product-details-wrapper {
-  min-height: 100vh;
-  background: #f5f5f5;
-  font-family: 'Poppins', sans-serif;
-  padding: 2rem;
+  max-width: 1200px;       /* Aumentiamo la larghezza massima per un layout più ampio */
+  margin: 20px auto;       /* Centra il contenitore */
+  padding: 20px;           /* Spazio interno */
+  background-color: #f8f9fa; /* Grigio chiaro di sfondo per la pagina */
 }
 
-/* Card centrale con layout a due colonne */
+/* La “card” principale che racchiude i dettagli del prodotto */
 .product-details-container {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  max-width: 1200px;
-  margin: 2rem auto;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  padding: 2rem;
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  background-color: #fff;          /* Sfondo bianco */
+  border-radius: 8px;             /* Angoli arrotondati */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Ombreggiatura leggera */
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
-/* Contenitore dell’immagine */
+/* Contenitore dell'immagine */
 .image-container {
+  flex: 1; /* Occupa 1 parte della larghezza */
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid #e0e0e0;
-  padding-right: 2rem;
+  border-right: 1px solid #e0e0e0; /* Separatore verticale */
+  padding-right: 20px;
 }
 
 .image-container img {
   max-width: 100%;
-  max-height: 500px;
-  object-fit: contain;
-  border-radius: 4px;
+  border-radius: 8px;
+  object-fit: cover; /* Ritaglia l'immagine in caso di dimensioni diverse */
 }
 
-/* Contenitore dei dettagli */
+/* Contenitore dei dettagli (testo, pulsanti, messaggi) */
 .details-container {
+  flex: 2; /* Occupa 2 parti della larghezza */
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
+/* Titolo del prodotto */
 .details-container h2 {
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  margin: 0 0 10px;
   color: #333;
-  margin-bottom: 1rem;
 }
 
+/* Descrizione del prodotto */
 .details-container .description {
   font-size: 1rem;
-  line-height: 1.5;
   color: #555;
-  margin-bottom: 1.5rem;
+  margin-bottom: 15px;
+  line-height: 1.4;
 }
 
+/* Prezzo del prodotto */
 .details-container .price {
-  font-size: 1.75rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  color: #E47911; /* Un arancione in stile Amazon */
-  margin-bottom: 2rem;
+  margin-bottom: 15px;
 }
 
-/* Pulsante "Aggiungi al Carrello" */
+/* Pulsanti */
 .details-container button {
-  padding: 0.85rem 1.5rem;
-  background: #FFD814;
-  border: 1px solid #FCD200;
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 10px; /* Distanza dal pulsante successivo in verticale */
+  padding: 8px 16px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  background-color: #0069d9; /* Blu in stile “bootstrap-like” */
+  border: none;
   border-radius: 4px;
-  font-size: 1rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  width: fit-content;
+  transition: background-color 0.3s ease;
+  text-decoration: none; /* Rimuove eventuali sottolineature se si tratta di un link */
 }
 
 .details-container button:hover {
-  background: #F7CA00;
+  background-color: #0053a6; /* Blu più scuro al passaggio del mouse */
 }
 
-.details-container button:active {
-  transform: scale(0.98);
+/* Messaggio di conferma per l'aggiunta al carrello */
+.success-message {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #d4edda; /* Verde chiaro */
+  color: #155724;           /* Testo verde scuro */
+  border: 1px solid #c3e6cb;
+  border-radius: 4px;
 }
 
-/* Stili per lo stato di caricamento */
+/* Sezione di caricamento */
 .loading-container {
   text-align: center;
-  margin-top: 4rem;
+  margin-top: 20px;
 }
 
-.loading-text {
+.loading-container .loading-text {
   font-size: 1.2rem;
-  color: #666;
+  color: #333;
 }
 
-/* Stili per prodotto non trovato */
+/* Sezione prodotto non trovato */
 .notfound-container {
   text-align: center;
-  margin-top: 4rem;
+  margin-top: 20px;
 }
 
-.not-found {
+.notfound-container .not-found {
   font-size: 1.2rem;
   color: #e74c3c;
-  font-weight: 500;
 }
 
-/* Bottone "Indietro" */
+/* Pulsante "Indietro" */
 .back-button {
-  display: block;
-  margin: 2rem auto 0;
-  background: transparent;
+  padding: 10px 15px;
+  background-color: #6c757d; /* Grigio bootstrap-like */
   border: none;
-  color: #007185;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 1rem;
-  text-decoration: underline;
-  transition: color 0.3s;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  transition: background-color 0.3s ease;
 }
 
 .back-button:hover {
-  color: #005f6b;
+  background-color: #5a6268;
 }

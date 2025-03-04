@@ -1,9 +1,7 @@
 package demo.demo_ecommerce.Controllers;
 
-
 import demo.demo_ecommerce.dtos.WishlistDTO;
 import demo.demo_ecommerce.services.WishlistService;
-
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,12 +35,7 @@ public class WishlistController {
         return ResponseEntity.ok(wishlistDTO);
     }
 
-    // Recupera la wishlist di un utente
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<WishlistDTO> getUserWishlist(@PathVariable Long userId) {
-        WishlistDTO wishlistDTO = wishlistService.getUserWishlist(userId);
-        return ResponseEntity.ok(wishlistDTO);
-    }
+
 
     // Elimina una wishlist tramite ID
     @DeleteMapping("/{id}")
@@ -50,4 +43,26 @@ public class WishlistController {
         wishlistService.deleteWishlist(id);
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<WishlistDTO> getUserWishlist(@PathVariable Long userId) {
+        WishlistDTO wishlistDTO = wishlistService.getUserWishlist(userId);
+        return ResponseEntity.ok(wishlistDTO);
+    }
+
+    @PostMapping("/{wishlistId}/products/{productId}")
+    public ResponseEntity<WishlistDTO> addProductToWishlist(
+            @PathVariable Long wishlistId,
+            @PathVariable Long productId) {
+        WishlistDTO updatedWishlist = wishlistService.addProductToWishlist(wishlistId, productId);
+        return ResponseEntity.ok(updatedWishlist);
+    }
+
+    @DeleteMapping("/{wishlistId}/products/{productId}")
+    public ResponseEntity<WishlistDTO> removeProductFromWishlist(
+            @PathVariable Long wishlistId,
+            @PathVariable Long productId) {
+        WishlistDTO updatedWishlist = wishlistService.removeProductFromWishlist(wishlistId, productId);
+        return ResponseEntity.ok(updatedWishlist);
+    }
+
 }

@@ -1,4 +1,3 @@
-// src/app/components/product-details/product-details.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
@@ -7,7 +6,9 @@ import { Product } from '../../models/product.model';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
-import {AuthService} from '../../services/auth.services';
+import { AuthService } from '../../services/auth.services';
+import { WishlistService } from '../../services/wishlist.service';
+import { Wishlist } from '../../models/wishlist.model';
 
 @Component({
   selector: 'app-product-details',
@@ -19,14 +20,17 @@ import {AuthService} from '../../services/auth.services';
 export class ProductDetailsComponent implements OnInit, OnDestroy {
   product: Product | null = null;
   isLoading: boolean = false;
+  wishlist: Wishlist | null = null;  // Memorizziamo la wishlist corrente
   private routeSubscription: Subscription | null = null;
+  successMessage: string = ''; // Per mostrare un messaggio di conferma
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
     private cartService: CartService,
-    private authService: AuthService
+    private authService: AuthService,
+    private wishlistService: WishlistService // Aggiunto WishlistService
   ) {}
 
   ngOnInit(): void {
@@ -40,6 +44,9 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
         console.warn("ID prodotto non valido");
       }
     });
+
+    // Recupera la wishlist dell'utente loggato
+    this.loadWishlist();
   }
 
   loadProduct(productId: number): void {
@@ -53,6 +60,71 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       error: (error: any) => {
         console.error('Errore nel caricamento del prodotto:', error);
         this.isLoading = false;
+      }
+    });
+  }
+
+  loadWishlist(): void {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      console.error("Nessun utente loggato.");
+      return;
+    }
+
+    this.wishlistService.getUserWishlist(userId).subscribe({
+      next: (wishlist) => {
+        this.wishlist = wishlist;
+        console.log("Wishlist caricata:", wishlist);
+      },
+      error: (err) => {
+        if (err.status === 404) {
+          console.warn("Nessuna wishlist trovata, verrà creata quando necessario.");
+          this.wishlist = null;
+        } else {
+          console.error("Errore caricando la wishlist:", err);
+        }
+      }
+    });
+  }
+
+  addToWishlist(): void {
+    if (!this.product) return;
+
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      console.error("Nessun utente loggato.");
+      return;
+    }
+
+    // Se la wishlist non esiste, la creiamo prima di aggiungere il prodotto
+    if (!this.wishlist) {
+      this.wishlistService.createWishlist(userId).subscribe({
+        next: (newWishlist) => {
+          console.log("Wishlist creata:", newWishlist);
+          this.wishlist = newWishlist;
+
+          // Ora che la wishlist è creata, aggiungiamo il prodotto
+          this.addProductToWishlist(this.wishlist.id, this.product!.id!);
+        },
+        error: (err) => {
+          console.error("Errore creando la wishlist:", err);
+        }
+      });
+    } else {
+      this.addProductToWishlist(this.wishlist.id, this.product.id!);
+    }
+  }
+
+  addProductToWishlist(wishlistId: number, productId: number): void {
+    this.wishlistService.addProductToWishlist(wishlistId, productId).subscribe({
+      next: (updatedWishlist) => {
+        console.log("Prodotto aggiunto alla wishlist:", updatedWishlist);
+        this.wishlist = updatedWishlist;
+        this.successMessage = "Prodotto aggiunto alla wishlist!";
+        setTimeout(() => this.successMessage = '', 3000); // Nasconde il messaggio dopo 3 secondi
+      },
+      error: (err) => {
+        console.error("Errore aggiungendo il prodotto alla wishlist:", err);
       }
     });
   }

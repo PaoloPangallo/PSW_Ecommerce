@@ -7,15 +7,18 @@
 
 /* Contenitore della lista dei prodotti */
 .product-list-container {
+  max-width: 1200px; /* Limita la larghezza massima per un layout più professionale */
+  margin: 0 auto;    /* Centra il contenitore */
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  /* auto-fill o auto-fit: riempie le colonne in base allo spazio disponibile */
   gap: 2rem;
   padding: 2rem;
   background: #f5f5f5;
   font-family: 'Poppins', sans-serif;
 }
 
-/* Stile per ogni card prodotto */
+/* Card del prodotto */
 .product-card {
   background: #fff;
   border-radius: 8px;
@@ -23,38 +26,41 @@
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Effetto hover sulla card */
 .product-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* Immagine prodotto */
 .product-card img {
   width: 100%;
-  max-height: 200px;
+  max-height: 180px; /* Puoi adattare l'altezza massima secondo necessità */
   object-fit: contain;
   border-radius: 4px;
   margin-bottom: 1rem;
 }
 
-/* Titolo prodotto */
+/* Titolo del prodotto */
 .product-card h2 {
   font-size: 1.25rem;
   color: #333;
   margin-bottom: 0.75rem;
   font-weight: 600;
+  line-height: 1.2;
 }
 
-/* Descrizione prodotto */
+/* Descrizione del prodotto */
 .product-card .description {
   font-size: 0.9rem;
   color: #555;
   margin-bottom: 0.75rem;
-  flex-grow: 1;
+  line-height: 1.4; /* migliora la leggibilità */
+  flex-grow: 1;     /* spinge in basso il resto, utile se vuoi tenere i pulsanti in fondo */
+  overflow: hidden; /* se prevedi di limitare le righe */
 }
 
 /* Prezzo e disponibilità */
@@ -67,6 +73,7 @@
 
 /* Bottone "View Details" */
 .product-card button {
+  margin-top: auto; /* Se vuoi che il pulsante si allinei sempre in fondo alla card */
   padding: 0.75rem;
   background: #1976d2;
   color: #fff;
@@ -75,6 +82,7 @@
   font-size: 1rem;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.2s ease;
+  font-weight: 600;
 }
 
 .product-card button:hover {
