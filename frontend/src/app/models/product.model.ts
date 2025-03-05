@@ -6,4 +6,5 @@ export interface Product {
   stock: number;
   category?: { name: string };  // ✅ Categoria opzionale
   imageUrl?: string;
+  featured?: boolean;  // ✅ Nuovo campo per prodotti in evidenza
 }

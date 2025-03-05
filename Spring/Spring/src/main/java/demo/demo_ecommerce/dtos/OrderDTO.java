@@ -24,7 +24,8 @@ public class OrderDTO {
         this.createdAt = createdAt;
     }
 
-    // Metodo statico per la conversione da entità a DTO
+    // Metodo statico per la conversione da entità a DTO.
+    // Notare che non mappiamo la collezione orderItems per evitare LazyInitializationException.
     public static OrderDTO fromEntity(Order order) {
         if (order == null) {
             throw new IllegalArgumentException("Order cannot be null");

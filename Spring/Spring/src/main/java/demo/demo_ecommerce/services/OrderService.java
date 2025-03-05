@@ -1,39 +1,32 @@
 package demo.demo_ecommerce.services;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
-import demo.demo_ecommerce.entities.Product;
-import demo.demo_ecommerce.repositories.ProductRepository;
-import jakarta.transaction.Transactional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import demo.demo_ecommerce.entities.Cart;
 import demo.demo_ecommerce.entities.Order;
 import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.repositories.CartRepository;
 import demo.demo_ecommerce.repositories.OrderRepository;
+import demo.demo_ecommerce.repositories.ProductRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 @Service
 public class OrderService {
 
-    private ProductRepository productRepository;
-    Product product;
-    Pageable pageable;
-
-
     private final OrderRepository orderRepository;
     private final UsersRepository userRepository;
     private final CartRepository cartRepository;
+    private final ProductRepository productRepository;
 
     public OrderService(OrderRepository orderRepository, UsersRepository userRepository,
-                        CartRepository cartRepository) {
+                        CartRepository cartRepository, ProductRepository productRepository) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
+        this.productRepository = productRepository;
     }
 
     @Transactional
@@ -81,9 +74,8 @@ public class OrderService {
         return order;
     }
 
-    // Metodo per ottenere tutti gli ordini di un utente
-    public Page<Order> getOrdersByUserId(Long userId) {
-
+    // Metodo per ottenere tutti gli ordini di un utente con paginazione
+    public Page<Order> getOrdersByUserId(Long userId, Pageable pageable) {
         return orderRepository.findByUserId(userId, pageable);
     }
 
@@ -93,13 +85,12 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Ordine non trovato"));
     }
 
-    // Metodo helper per ottenere il prezzo di un prodotto (esempio di mock, puoi sostituirlo con una chiamata al repository dei prodotti)
+    // Metodo helper per ottenere il prezzo di un prodotto
     private BigDecimal getProductPriceById(Long productId) {
         return productRepository.findById(productId)
-                .map(Product::getPrice)
+                .map(product -> product.getPrice())
                 .orElseThrow(() -> new IllegalArgumentException("Prodotto non trovato con ID: " + productId));
     }
-
 
     @Transactional
     public Order updateOrder(Order order) {
@@ -108,6 +99,4 @@ public class OrderService {
         }
         return orderRepository.save(order);
     }
-
-
 }

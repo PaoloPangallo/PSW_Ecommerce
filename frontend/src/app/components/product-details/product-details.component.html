@@ -3,13 +3,16 @@
     <div class="image-container">
       <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name">
     </div>
+
     <div class="details-container">
       <h2>{{ product.name }}</h2>
       <p class="description">{{ product.description }}</p>
-      <p class="price">Prezzo: {{ product.price | currency:'EUR' }}</p>
+      <p class="price"><strong>Prezzo:</strong> {{ product.price }} L</p>
 
-      <button (click)="addToCart()">Aggiungi al Carrello</button>
-      <button (click)="addToWishlist()">❤️ Aggiungi alla Wishlist</button>
+      <div class="button-container">
+        <button class="cart-button" (click)="addToCart()">🛒 Aggiungi al Carrello</button>
+        <button class="wishlist-button" (click)="addToWishlist()">❤️ Aggiungi alla Wishlist</button>
+      </div>
 
       <!-- Messaggio di conferma -->
       <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
@@ -17,12 +20,12 @@
   </div>
 
   <div class="loading-container" *ngIf="isLoading">
-    <p class="loading-text">Caricamento in corso...</p>
+    <p class="loading-text">⏳ Caricamento in corso...</p>
   </div>
 
   <div class="notfound-container" *ngIf="!isLoading && !product">
-    <p class="not-found">Prodotto non trovato.</p>
+    <p class="not-found">⚠️ Prodotto non trovato.</p>
   </div>
 
-  <button class="back-button" (click)="goBack()">Indietro</button>
+  <button class="back-button" (click)="goBack()">⬅️ Indietro</button>
 </div>

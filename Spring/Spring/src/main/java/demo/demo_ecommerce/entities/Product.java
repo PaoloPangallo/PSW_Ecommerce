@@ -42,24 +42,27 @@ public class Product {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    // Relazione Many-to-One con Category
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
-    // Aggiunta per l'URL dell'immagine
     @Column(length = 255)
-    private String imageUrl;  // URL dell'immagine del prodotto
+    private String imageUrl;
+
+    // Nuovo campo per identificare i prodotti in evidenza
+    @Column(nullable = false)
+    private boolean featured = false;  // Default: false (non in evidenza)
 
     public Product() {}
 
-    public Product(String name, String description, BigDecimal price, int stock, Category category, String imageUrl) {
+    public Product(String name, String description, BigDecimal price, int stock, Category category, String imageUrl, boolean featured) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.stock = stock;
         this.category = category;
-        this.imageUrl = imageUrl;  // Settaggio del campo imageUrl
+        this.imageUrl = imageUrl;
+        this.featured = featured;
     }
 
     @Override

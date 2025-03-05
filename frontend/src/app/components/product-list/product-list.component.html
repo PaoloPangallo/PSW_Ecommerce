@@ -1,10 +1,22 @@
 <div class="product-list-container">
+  <h2>Lista Prodotti</h2>
+
+  <!-- Se non ci sono prodotti -->
+  <div *ngIf="products.length === 0">
+    <p class="empty-message">Nessun prodotto disponibile.</p>
+  </div>
+
+  <!-- Lista prodotti -->
   <div *ngFor="let product of products" class="product-card">
     <img [src]="product.imageUrl" [alt]="product.name" />
     <h2>{{ product.name }}</h2>
     <p class="description">{{ product.description }}</p>
-    <p class="price"><strong>Prezzo:</strong> €{{ product.price }}</p>
+    <p class="price"><strong>Prezzo:</strong> {{ product.price }} L</p>
     <p class="stock"><strong>Disponibilità:</strong> {{ product.stock }}</p>
-    <button [routerLink]="['/product', product.id]">🔍 View Details</button>
+
+    <div class="button-container">
+      <button class="details-button" [routerLink]="['/product', product.id]">🔍 Dettagli</button>
+      <button class="cart-button" (click)="addToCart(product)">🛒 Aggiungi al Carrello</button>
+    </div>
   </div>
 </div>

@@ -1,0 +1,34 @@
+<div class="home-container">
+  <!-- Hero Section -->
+  <div class="hero-section">
+    <h1>Unilire: Offerte da un'altra epoca!</h1>
+    <p>Scopri i migliori prodotti a prezzi storici!</p>
+    <button routerLink="/products">Scopri di più</button>
+  </div>
+
+  <!-- Sezione Prodotti in Evidenza (Vetrina) -->
+  <div class="featured-section" *ngIf="featuredProducts && featuredProducts.length > 0">
+    <h2>Prodotti in Evidenza</h2>
+    <div class="featured-grid">
+      <div class="featured-card" *ngFor="let product of featuredProducts">
+        <img [src]="product.imageUrl" [alt]="product.name">
+        <h3>{{ product.name }}</h3>
+        <p class="price">Prezzo: {{ product.price }} L</p>
+        <button [routerLink]="['/product', product.id]">Dettagli</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sezione Lista Completa Prodotti (opzionale) -->
+  <div class="products-section" *ngIf="allProducts && allProducts.length > 0">
+    <h2>Tutti i Prodotti</h2>
+    <div class="products-grid">
+      <div class="product-card" *ngFor="let product of allProducts">
+        <img [src]="product.imageUrl" [alt]="product.name">
+        <h3>{{ product.name }}</h3>
+        <p class="price">Prezzo: {{ product.price }} L</p>
+        <button [routerLink]="['/product', product.id]">Dettagli</button>
+      </div>
+    </div>
+  </div>
+</div>

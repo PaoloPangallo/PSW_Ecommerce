@@ -1,5 +1,6 @@
 package demo.demo_ecommerce.Controllers;
 
+import demo.demo_ecommerce.dtos.ProductDTO;
 import demo.demo_ecommerce.entities.Product;
 import demo.demo_ecommerce.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -92,4 +93,15 @@ public class ProductController {
         List<Product> products = (category != null) ? productService.getProductsByCategory(category) : productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
+
+    @GetMapping("/featured")
+    public List<ProductDTO> getFeaturedProducts() {
+        return productService.getFeaturedProducts().stream()
+                .map(ProductDTO::fromEntity) // Uso della lambda
+                .toList();
+    }
+
+
+
+
 }

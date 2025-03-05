@@ -39,9 +39,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/api/cart/**").permitAll()
                         .requestMatchers("/api/payments/**").permitAll()
-                        .requestMatchers("/checkout/**").authenticated()  // Permetti solo agli utenti autenticati
+                        .requestMatchers("/checkout/**").authenticated()
                         .anyRequest().authenticated()
                 )
+
+
 
 
 

@@ -1,94 +1,65 @@
-/* Reset di base */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-/* Contenitore della lista dei prodotti */
 .product-list-container {
-  max-width: 1200px; /* Limita la larghezza massima per un layout più professionale */
-  margin: 0 auto;    /* Centra il contenitore */
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  /* auto-fill o auto-fit: riempie le colonne in base allo spazio disponibile */
-  gap: 2rem;
-  padding: 2rem;
-  background: #f5f5f5;
-  font-family: 'Poppins', sans-serif;
-}
-
-/* Card del prodotto */
-.product-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
   display: flex;
-  flex-direction: column;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  padding: 20px;
 }
 
-/* Effetto hover sulla card */
-.product-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+.product-card {
+  background-color: #002f6c; /* Blu Euronics */
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  width: 220px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Immagine prodotto */
-.product-card img {
-  width: 100%;
-  max-height: 180px; /* Puoi adattare l'altezza massima secondo necessità */
-  object-fit: contain;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-}
-
-/* Titolo del prodotto */
 .product-card h2 {
-  font-size: 1.25rem;
-  color: #333;
-  margin-bottom: 0.75rem;
-  font-weight: 600;
-  line-height: 1.2;
+  color: #ffd700; /* Giallo Euronics */
+  font-size: 18px;
 }
 
-/* Descrizione del prodotto */
-.product-card .description {
-  font-size: 0.9rem;
-  color: #555;
-  margin-bottom: 0.75rem;
-  line-height: 1.4; /* migliora la leggibilità */
-  flex-grow: 1;     /* spinge in basso il resto, utile se vuoi tenere i pulsanti in fondo */
-  overflow: hidden; /* se prevedi di limitare le righe */
+.product-card img {
+  max-width: 100%;
+  border-radius: 5px;
 }
 
-/* Prezzo e disponibilità */
-.product-card .price,
-.product-card .stock {
-  font-size: 0.95rem;
-  margin-bottom: 0.5rem;
-  color: #333;
+.description {
+  font-size: 14px;
+  margin-bottom: 5px;
 }
 
-/* Bottone "View Details" */
-.product-card button {
-  margin-top: auto; /* Se vuoi che il pulsante si allinei sempre in fondo alla card */
-  padding: 0.75rem;
-  background: #1976d2;
-  color: #fff;
+.price {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffd700;
+}
+
+.stock {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.details-button,
+.cart-button {
+  background-color: #ffd700;
+  color: black;
+  padding: 5px 10px;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-  font-weight: 600;
+  font-weight: bold;
+  border-radius: 5px;
 }
 
-.product-card button:hover {
-  background: #1565c0;
-}
-
-.product-card button:active {
-  transform: scale(0.98);
+.details-button:hover,
+.cart-button:hover {
+  background-color: #ffcc00;
 }

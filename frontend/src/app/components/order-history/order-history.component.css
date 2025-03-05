@@ -1,0 +1,26 @@
+h2 {
+  text-align: center;
+  color: #ff9800;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+}
+
+.no-orders {
+  text-align: center;
+  color: gray;
+}
+
+table {
+  width: 100%;
+  margin: auto;
+  background: white;
+}
+
+.mat-elevation-z8 {
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+}

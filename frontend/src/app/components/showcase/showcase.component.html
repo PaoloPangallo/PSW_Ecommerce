@@ -1,0 +1,18 @@
+<div class="showcase-container">
+  <h2 class="showcase-title">
+    <span class="emoji">🔥</span>
+    Prodotti in Evidenza
+    <span class="emoji">🔥</span>
+  </h2>
+
+  <div class="showcase-cards">
+    <div class="showcase-card" *ngFor="let product of featuredProducts">
+      <img [src]="product.imageUrl" [alt]="product.name" />
+      <div class="showcase-card-body">
+        <h3>{{ product.name }}</h3>
+        <p class="price">Prezzo: {{ product.price }} L</p>
+        <button (click)="addToCart(product)">Aggiungi al Carrello</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -13,7 +13,6 @@ export class OrderService {
 
   // Crea un nuovo ordine per l'utente
   createOrder(userId: number): Observable<Order> {
-    // Il body della POST può essere vuoto o contenere parametri aggiuntivi
     return this.http.post<Order>(`${this.baseUrl}/users/${userId}/orders`, {});
   }
 
@@ -26,4 +25,6 @@ export class OrderService {
   getOrderById(userId: number, orderId: number): Observable<Order> {
     return this.http.get<Order>(`${this.baseUrl}/users/${userId}/orders/${orderId}`);
   }
+
+
 }

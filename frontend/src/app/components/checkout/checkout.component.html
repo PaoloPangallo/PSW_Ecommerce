@@ -12,12 +12,13 @@
             {{ item.productName }} ({{ item.quantity }}x)
           </span>
           <span class="item-price">
-            {{ item.price | currency:'EUR' }}
+            {{ item.price }} L
           </span>
         </li>
       </ul>
       <p class="cart-total">
-        <strong>Totale:</strong> {{ getCartTotal() | currency:'EUR' }}
+        <strong>Totale:</strong> {{ getCartTotal() | number:'1.2-2' }}
+        L
       </p>
 
       <!-- Pulsante per passare allo step successivo -->
@@ -96,7 +97,8 @@
       <h3>Riepilogo Ordine</h3>
       <p><strong>Indirizzo:</strong> {{ checkoutForm.get('shipping')?.value | json }}</p>
       <p><strong>Metodo di Pagamento:</strong> {{ checkoutForm.get('transaction.paymentMethod')?.value }}</p>
-      <p><strong>Totale Carrello:</strong> {{ getCartTotal() | currency:'EUR' }}</p>
+      <p><strong>Totale Carrello:</strong> <p><strong>Totale Carrello:</strong> {{ getCartTotal() | number:'1.2-2' }} L</p>
+
 
       <div class="btn-group">
         <button type="button" class="back-button" (click)="previousStep()">Indietro</button>

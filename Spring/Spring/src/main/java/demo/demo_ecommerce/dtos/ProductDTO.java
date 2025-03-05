@@ -14,13 +14,15 @@ public class ProductDTO {
     private Long id;
     private String name;
     private BigDecimal price;
+    private boolean featured;  // Aggiunto campo featured
 
-    // Metodo per convertire l'entità Product in un DTO
     public static ProductDTO fromEntity(Product product) {
         return ProductDTO.builder()
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
+                .featured(product.isFeatured()) // Assicurati che il campo esista
                 .build();
     }
+
 }

@@ -1,39 +1,47 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {Order} from '../../models/order.model';
-import {OrderService} from '../../services/order.service';
+import { Order } from '../../models/order.model';
+import { OrderService } from '../../services/order.service';
+import { AuthService } from '../../services/auth.services';
+import { MatTableModule } from '@angular/material/table';
+import { MatButtonModule } from '@angular/material/button';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-order-history',
   standalone: true,
-  imports: [CommonModule],
-  template: `
-    <h2>Storico Ordini</h2>
-    <div *ngIf="error" style="color: red">{{ error }}</div>
-    <div *ngIf="orders?.length === 0">Nessun ordine trovato.</div>
-    <ul *ngIf="orders && orders.length > 0">
-      <li *ngFor="let order of orders">
-        ID: {{ order.id }} - Totale: {{ order.total }} - Data: {{ order.createdAt }}
-        <!-- Esempio: link a un dettaglio ordine -->
-        <!-- <button (click)="goToOrderDetails(order.id)">Dettagli</button> -->
-      </li>
-    </ul>
-  `
+  imports: [CommonModule, MatTableModule, MatButtonModule, RouterLink],
+  templateUrl: './order-history.component.html',
+  styleUrls: ['./order-history.component.css']
 })
 export class OrderHistoryComponent implements OnInit {
   orders: Order[] = [];
   error = '';
-  userId = 1; // In un caso reale, lo recuperi da un AuthService o da route param
+  isLoading = true;
+  displayedColumns: string[] = ['id', 'total', 'date', 'actions'];
 
-  constructor(private orderService: OrderService) {}
+  private orderService = inject(OrderService);
+  private authService = inject(AuthService);
 
   ngOnInit(): void {
-    this.orderService.getOrdersByUser(this.userId).subscribe({
-      next: (data) => this.orders = data,
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      this.error = 'Nessun utente autenticato!';
+      this.isLoading = false;
+      return;
+    }
+
+    this.orderService.getOrdersByUser(userId).subscribe({
+      next: (data) => {
+        // Ordina gli ordini in base alla data in ordine decrescente
+        this.orders = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        this.isLoading = false;
+      },
       error: (err) => {
-        this.error = err.error ? err.error : 'Errore nel recupero ordini';
+        this.error = err.error?.message || 'Errore nel recupero ordini';
         console.error(err);
+        this.isLoading = false;
       }
     });
-  }
-}
+
+  }}

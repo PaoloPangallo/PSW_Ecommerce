@@ -49,9 +49,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Trova un prodotto per nome
     Optional<Product> findByName(String name);
 
+    List<Product> findByFeaturedTrue();
 
 
-        List<Product> findByCategory(Category category);
+    List<Product> findByCategory(Category category);
     }
+
+
 
 

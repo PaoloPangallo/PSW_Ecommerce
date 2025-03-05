@@ -1,4 +1,5 @@
 package demo.demo_ecommerce.services;
+import demo.demo_ecommerce.dtos.ProductDTO;
 import demo.demo_ecommerce.repositories.CategoryRepository;
 
 
@@ -126,4 +127,10 @@ public class ProductService {
             throw new IllegalArgumentException("Il prezzo deve essere maggiore di 0.");
         }
     }
+
+
+    public List<Product> getFeaturedProducts() {
+        return productRepository.findByFeaturedTrue();
+    }
+
 }
