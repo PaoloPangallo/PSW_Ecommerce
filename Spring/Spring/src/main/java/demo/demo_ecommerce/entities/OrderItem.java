@@ -8,24 +8,24 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "order_items")
-@Getter
-@Setter
+@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class OrderItem {
-
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // Relazione ManyToOne con Order
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
-    @NotNull(message = "The order must not be null")
     private Order order;
 
+    // Relazione ManyToOne con Product
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    @NotNull(message = "The product must not be null")
     private Product product;
 
     @NotNull(message = "The quantity must not be null")
@@ -42,13 +42,11 @@ public class OrderItem {
         return price.multiply(BigDecimal.valueOf(quantity));
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OrderItem that = (OrderItem) o;
-        return id != null && id.equals(that.id);
+        if (!(o instanceof OrderItem)) return false;
+        return id != null && id.equals(((OrderItem) o).id);
     }
 
     @Override

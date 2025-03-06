@@ -33,8 +33,7 @@ export class OrderHistoryComponent implements OnInit {
 
     this.orderService.getOrdersByUser(userId).subscribe({
       next: (data) => {
-        // Ordina gli ordini in base alla data in ordine decrescente
-        this.orders = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        this.orders = data;
         this.isLoading = false;
       },
       error: (err) => {
@@ -43,5 +42,5 @@ export class OrderHistoryComponent implements OnInit {
         this.isLoading = false;
       }
     });
-
-  }}
+  }
+}

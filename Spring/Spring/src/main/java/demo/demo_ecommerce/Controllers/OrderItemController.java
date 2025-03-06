@@ -1,6 +1,5 @@
 package demo.demo_ecommerce.Controllers;
 
-
 import demo.demo_ecommerce.entities.OrderItem;
 import demo.demo_ecommerce.services.OrderItemService;
 import jakarta.validation.Valid;
@@ -57,4 +56,3 @@ public class OrderItemController {
         return ResponseEntity.noContent().build();
     }
 }
-

@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
@@ -19,17 +20,19 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     // Trova gli ordini per un determinato utente
     Page<Order> findByUserId(Long userId, Pageable pageable);
 
-
-    // Trova un ordine per un determinato ID e un determinato ID utente
+    // Trova un ordine per un determinato ID e un determinato ID utente (senza join fetch)
     Optional<Order> findByIdAndUserId(Long orderId, Long userId);
+
+    @Query("SELECT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.id = :orderId AND o.user.id = :userId")
+    Optional<Order> findByIdAndUserIdFetchItems(@Param("orderId") Long orderId, @Param("userId") Long userId);
+
+
 
     // Trova gli ordini creati dopo una certa data
     Page<Order> findByCreatedAtAfter(LocalDateTime date, Pageable pageable);
 
-
     @Query("SELECT oi FROM OrderItem oi WHERE oi.order.id = :orderId AND oi.price > :price")
     List<OrderItem> findByOrderIdAndPriceGreaterThan(Long orderId, BigDecimal price);
-
 
     @Query("SELECT SUM(oi.quantity) FROM OrderItem oi WHERE oi.order.id = :orderId")
     Integer findTotalQuantityByOrderId(Long orderId);

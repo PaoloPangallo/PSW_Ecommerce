@@ -1,4 +1,3 @@
-// order.model.ts
 export interface Order {
   id: number;
   total: number;           // BigDecimal lato Java, ma come number in TS
