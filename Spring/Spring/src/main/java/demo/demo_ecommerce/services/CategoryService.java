@@ -9,37 +9,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class CategoryService {
 
     @Autowired
     private CategoryRepository categoryRepository;
-
     @Autowired
     private ProductRepository productRepository;
 
-    // Crea una nuova categoria
+    @Transactional // Sovrascrive readOnly = true e abilita la scrittura
     public Category createCategory(Category category) {
         return categoryRepository.save(category);
     }
 
-    // Ottieni tutte le categorie
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
 
-    // Ottieni una categoria per ID
     public Category getCategoryById(Long id) {
         return categoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
     }
 
-    // Trova i prodotti di una categoria
     public Page<Product> getProductsByCategory(Long categoryId, Pageable pageable) {
         return productRepository.findByCategoryId(categoryId, pageable);
     }
 }
-

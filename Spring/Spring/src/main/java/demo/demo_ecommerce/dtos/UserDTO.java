@@ -20,14 +20,12 @@ public class UserDTO {
     @Size(min = 8, message = "La password deve contenere almeno 8 caratteri")
     private String password;
 
-    // Campo opzionale per la conferma della password (eventualmente validato con un validatore custom)
     private String confirmPassword;
 
     @NotBlank(message = "L'email è obbligatoria")
     @Email(message = "L'email deve essere valida")
     private String email;
 
-    // Ruolo opzionale: se non viene specificato, nel processo di registrazione potresti impostarlo di default (ad es. Role.USER)
     private Role role;
 
     // Campi opzionali aggiuntivi

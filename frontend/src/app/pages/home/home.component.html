@@ -1,12 +1,79 @@
 <div class="home-container">
-  <!-- Hero Section -->
+
+  <!-- Hero Section (già esistente) -->
   <div class="hero-section">
     <h1>Unilire: Offerte da un'altra epoca!</h1>
     <p>Scopri i migliori prodotti a prezzi storici!</p>
     <button routerLink="/products">Scopri di più</button>
   </div>
 
-  <!-- Sezione Prodotti in Evidenza (Vetrina) -->
+  <!-- 1) Promo/Carousel (base, senza librerie JS) -->
+  <div class="promo-carousel">
+    <div class="slide">
+      <img src="assets/promo1.jpg" alt="Promo 1" />
+      <div class="slide-caption">
+        <h3>Offerta Imperdibile</h3>
+        <p>Fino al 50% di sconto su smartphone!</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 2) Categorie in evidenza -->
+  <div class="categories-highlight">
+    <h2>Categorie Popolari</h2>
+    <div class="categories-grid">
+      <div class="category-box" routerLink="/category/Smartphone e Telefonia">
+        <img src="assets/icons/smartphone-icon.png" alt="Smartphone" />
+        <h3>Smartphone e Telefonia</h3>
+      </div>
+      <div class="category-box" routerLink="/category/TV e Home Entertainment">
+        <img src="assets/icons/tv-icon.png" alt="TV e Home Entertainment" />
+        <h3>TV e Home Entertainment</h3>
+      </div>
+      <div class="category-box" routerLink="/category/Informatica e Accessori">
+        <img src="assets/icons/laptop-icon.png" alt="Informatica e Accessori" />
+        <h3>Informatica e Accessori</h3>
+      </div>
+      <div class="category-box" routerLink="/category/Elettrodomestici">
+        <img src="assets/icons/home-icon.png" alt="Elettrodomestici" />
+        <h3>Elettrodomestici</h3>
+      </div>
+      <!-- Puoi aggiungere altre category-box se vuoi -->
+    </div>
+  </div>
+
+  <!-- 3) Sezione Servizi/Vantaggi -->
+  <div class="services-section">
+    <div class="service-box">
+      <img src="assets/icons/shipping-icon.png" alt="Spedizione">
+      <h4>Spedizione Gratis</h4>
+      <p>Per ordini sopra i 50€</p>
+    </div>
+    <div class="service-box">
+      <img src="assets/icons/support-icon.png" alt="Supporto">
+      <h4>Assistenza 24/7</h4>
+      <p>Chat o telefono sempre attivi</p>
+    </div>
+    <div class="service-box">
+      <img src="assets/icons/payment-icon.png" alt="Pagamenti Sicuri">
+      <h4>Pagamenti Sicuri</h4>
+      <p>Criptati e protetti</p>
+    </div>
+  </div>
+
+  <!-- 4) Sezione Newsletter -->
+  <div class="newsletter-section">
+    <h2>Iscriviti alla Newsletter</h2>
+    <p>Rimani aggiornato sulle ultime offerte</p>
+    <!-- Esempio di form, puoi gestire la logica in TS -->
+    <form (submit)="subscribeToNewsletter($event)">
+      <input type="email" placeholder="Inserisci la tua email" required />
+      <button type="submit">Iscriviti</button>
+    </form>
+  </div>
+
+  <!-- Sezione Prodotti in Evidenza (già presente) -->
   <div class="featured-section" *ngIf="featuredProducts && featuredProducts.length > 0">
     <h2>Prodotti in Evidenza</h2>
     <div class="featured-grid">
@@ -14,12 +81,14 @@
         <img [src]="product.imageUrl" [alt]="product.name">
         <h3>{{ product.name }}</h3>
         <p class="price">Prezzo: {{ product.price }} L</p>
-        <button [routerLink]="['/product', product.id]">Dettagli</button>
+        <button class="details-button" [routerLink]="['/product', product.id]">
+          Dettagli
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Sezione Lista Completa Prodotti (opzionale) -->
+  <!-- Sezione Lista Completa Prodotti (già presente) -->
   <div class="products-section" *ngIf="allProducts && allProducts.length > 0">
     <h2>Tutti i Prodotti</h2>
     <div class="products-grid">
@@ -27,8 +96,11 @@
         <img [src]="product.imageUrl" [alt]="product.name">
         <h3>{{ product.name }}</h3>
         <p class="price">Prezzo: {{ product.price }} L</p>
-        <button [routerLink]="['/product', product.id]">Dettagli</button>
+        <button class="details-button" [routerLink]="['/product', product.id]">
+          Dettagli
+        </button>
       </div>
     </div>
   </div>
+
 </div>

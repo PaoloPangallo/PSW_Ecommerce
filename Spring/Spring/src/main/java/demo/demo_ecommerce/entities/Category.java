@@ -29,6 +29,10 @@ public class Category {
     @ToString.Exclude
     private List<Product> products;  // Relazione con i prodotti
 
+
+    @Version
+    private Long version;
+
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;

@@ -5,13 +5,11 @@ import { CartService } from '../../services/cart.service';
 import { CartDTO, CartItemDTO } from '../../models/cart.model';
 import { AuthService } from '../../services/auth.services';
 import { OrderService } from '../../services/order.service';
-import { Location } from '@angular/common';  // Se vuoi un goBack() con location
 import { MatCardModule } from '@angular/material/card';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-cart',

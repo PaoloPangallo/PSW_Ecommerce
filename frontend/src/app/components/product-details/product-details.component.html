@@ -14,6 +14,13 @@
         <button class="wishlist-button" (click)="addToWishlist()">❤️ Aggiungi alla Wishlist</button>
       </div>
 
+      <!-- Bottone visibile solo agli admin -->
+      <div *ngIf="authService.isAdmin()" class="admin-button-container">
+        <button class="admin-generate-button" [routerLink]="['/admin/generate-image', product.id]">
+          Genera un'immagine coerente con {{ product.name }}
+        </button>
+      </div>
+
       <!-- Messaggio di conferma -->
       <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
     </div>

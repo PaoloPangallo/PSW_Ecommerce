@@ -79,4 +79,25 @@ export class AuthService {
     this.cartService.resetCart();
     console.log("Logout completato, carrello resettato.");
   }
+
+  /**
+   * Decodifica il token JWT e verifica se il claim "role" è "ADMIN".
+   */
+  isAdmin(): boolean {
+    const token = this.getToken();
+    if (!token) {
+      return false;
+    }
+    try {
+      // Il token JWT è composto da tre parti: header.payload.signature
+      const payloadPart = token.split('.')[1];
+      const payloadJson = atob(payloadPart);
+      const payload = JSON.parse(payloadJson);
+      // Controlla che il ruolo sia "ADMIN"
+      return payload.role === 'ADMIN';
+    } catch (error) {
+      console.error('Errore nel decodificare il token', error);
+      return false;
+    }
+  }
 }

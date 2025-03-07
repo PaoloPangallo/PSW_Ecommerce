@@ -1,166 +1,368 @@
-/* Container generale */
+/*****************************************
+ * Contenitore principale della Home
+ *****************************************/
 .home-container {
   padding: 20px;
+  background: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%);
+  /* Per centrare il contenuto su schermi grandi, puoi decommentare:
+     max-width: 1200px;
+     margin: 0 auto;
+  */
 }
 
-/* Hero Section */
+/*****************************************
+ * Hero Section (Banner principale)
+ *****************************************/
 .hero-section {
   text-align: center;
-  background: linear-gradient(45deg, #002f6c, #00337f);
-  color: #fff;
-  padding: 40px;
-  border-radius: 10px;
   margin-bottom: 30px;
+  background: linear-gradient(135deg, #ffd700 0%, #ffb000 100%);
+  color: #002f6c;
+  padding: 40px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
 .hero-section h1 {
-  font-size: 2.5em;
+  font-size: 2.4rem;
   margin-bottom: 10px;
 }
 
 .hero-section p {
-  font-size: 1.2em;
+  font-size: 1.3rem;
   margin-bottom: 20px;
 }
 
 .hero-section button {
+  background-color: #002f6c;
+  color: #ffd700;
+  padding: 12px 24px;
+  border: 2px solid #ffd700;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hero-section button:hover {
   background-color: #ffd700;
-  color: #000;
-  padding: 12px 20px;
-  font-size: 1em;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+  color: #002f6c;
+  border-color: #002f6c;
+  transform: scale(1.05);
 }
 
-/* Sezione Prodotti in Evidenza (Vetrina) */
-.featured-section {
-  margin-bottom: 30px;
+/*****************************************
+ * 1) Promo/Carousel (Base, effetto fade-in)
+ *****************************************/
+.promo-carousel {
+  position: relative;
+  margin: 20px 0;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.promo-carousel .slide {
+  position: relative;
+  animation: fadeIn 3s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+.promo-carousel img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 8px;
+}
+
+.slide-caption {
+  position: absolute;
+  bottom: 15%;
+  left: 5%;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 10px 15px;
+  border-radius: 5px;
+  color: #ffd700;
+}
+
+.slide-caption h3 {
+  margin: 0 0 5px;
+  font-size: 1.8rem;
+}
+
+.slide-caption p {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+/*****************************************
+ * 2) Categorie in evidenza
+ *****************************************/
+.categories-highlight {
+  margin: 40px 0;
   text-align: center;
 }
 
-.featured-section h2 {
+.categories-highlight h2 {
+  font-size: 1.8rem;
   color: #002f6c;
   margin-bottom: 20px;
 }
 
-.featured-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
+  justify-items: center;
 }
 
-.featured-card {
+.category-box {
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  width: 220px;
-  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 20px;
+  max-width: 200px;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-align: center;
-  transition: transform 0.3s ease;
 }
 
-.featured-card:hover {
-  transform: translateY(-5px);
+.category-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
-.featured-card img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 5px;
+.category-box img {
+  width: 80px;
+  height: auto;
   margin-bottom: 10px;
 }
 
-.featured-card h3 {
-  font-size: 1.1em;
-  margin-bottom: 8px;
+.category-box h3 {
+  font-size: 1rem;
   color: #002f6c;
 }
 
-.featured-card .price {
-  font-size: 1em;
-  font-weight: bold;
+/*****************************************
+ * 3) Servizi / Vantaggi
+ *****************************************/
+.services-section {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  margin: 40px 0;
+  gap: 20px;
+}
+
+.service-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 220px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.service-box img {
+  width: 50px;
   margin-bottom: 10px;
-  color: #ffd700;
 }
 
-.featured-card button {
-  background: #ffd700;
+.service-box h4 {
+  font-size: 1.1rem;
+  color: #002f6c;
+  margin-bottom: 5px;
+}
+
+.service-box p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/*****************************************
+ * 4) Newsletter
+ *****************************************/
+.newsletter-section {
+  background: #002f6c;
+  color: #fff;
+  padding: 30px;
+  text-align: center;
+  border-radius: 8px;
+  margin-bottom: 40px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+.newsletter-section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.newsletter-section p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.newsletter-section form {
+  display: inline-flex;
+  align-items: center;
+}
+
+.newsletter-section input[type="email"] {
+  padding: 10px;
+  font-size: 1rem;
   border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
+  border-radius: 4px 0 0 4px;
+  outline: none;
+  width: 250px;
+}
+
+.newsletter-section button {
+  padding: 10px 20px;
+  background-color: #ffd700;
+  color: #002f6c;
   font-weight: bold;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
 }
 
-.featured-card button:hover {
-  background: #ffcc00;
+.newsletter-section button:hover {
+  background-color: #ffcc00;
 }
 
-/* Sezione Lista Prodotti */
+/*****************************************
+ * Prodotti in Evidenza & Lista Prodotti
+ *****************************************/
+.featured-section,
 .products-section {
-  margin-top: 40px;
   text-align: center;
+  margin-bottom: 30px;
 }
 
+.featured-section h2,
 .products-section h2 {
-  margin-bottom: 20px;
+  font-size: 1.8rem;
+  color: #002f6c;
+  margin-bottom: 15px;
 }
 
+.featured-grid,
 .products-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  justify-items: center;
+  padding: 0 10px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
+.featured-card,
 .product-card {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  width: 200px;
+  background-color: #002f6c;
+  color: #fff;
   padding: 15px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 320px;
   text-align: center;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease;
 }
 
-.product-card:hover {
-  transform: translateY(-5px);
-}
-
+.featured-card img,
 .product-card img {
-  width: 100%;
-  height: 130px;
-  object-fit: cover;
+  max-width: 100%;
+  height: auto;
   border-radius: 5px;
   margin-bottom: 10px;
 }
 
-.product-card h3 {
-  font-size: 1em;
-  margin-bottom: 8px;
-  color: #002f6c;
-}
-
+.featured-card .price,
 .product-card .price {
-  font-size: 0.9em;
-  font-weight: bold;
-  margin-bottom: 10px;
   color: #ffd700;
-}
-
-.product-card button {
-  background: #ffd700;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 5px;
-  cursor: pointer;
   font-weight: bold;
-  font-size: 0.9em;
+  margin: 10px 0;
 }
 
-.product-card button:hover {
-  background: #ffcc00;
+.featured-card:hover,
+.product-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Bottone "Dettagli" per prodotti */
+.details-button {
+  background: linear-gradient(135deg, #ffd700 0%, #ffa500 100%);
+  color: #002f6c;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease;
+  margin-right: 5px;
+}
+
+.details-button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, #ffa500 0%, #ffd700 100%);
+}
+
+/*****************************************
+ * Altri Pulsanti (es. Carrello)
+ *****************************************/
+.cart-button {
+  background-color: #ffd700;
+  color: #002f6c;
+  padding: 8px 16px;
+  border: 2px solid #002f6c;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.cart-button:hover {
+  background-color: #002f6c;
+  color: #ffd700;
+  border-color: #ffd700;
+}
+
+/*****************************************
+ * Layout Responsive (Tablet & Mobile)
+ *****************************************/
+@media (max-width: 992px) {
+  .featured-grid, .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .services-section {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 576px) {
+  .featured-grid, .products-grid {
+    grid-template-columns: 1fr;
+  }
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
 }

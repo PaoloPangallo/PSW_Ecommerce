@@ -8,6 +8,8 @@ import { CartService } from '../../services/cart.service';
 import { CartDTO } from '../../models/cart.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import {Order} from '../../models/order.model';
+import {OrderService} from '../../services/order.service';
 
 @Component({
   selector: 'app-checkout',
@@ -24,6 +26,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   checkoutForm!: FormGroup;
   currentStep = 1;
+  createdOrder: Order | null = null;  // <--- aggiungi questa proprietà
+
   checkoutResponse: CheckoutResponse | null = null;
   loading = false;
   error: string | null = null;
@@ -40,7 +44,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private checkoutService: CheckoutService,
+    private orderService: OrderService,
+
+   private checkoutService: CheckoutService,
     private authService: AuthService,
     private cartService: CartService,
     private cdRef: ChangeDetectorRef
@@ -149,9 +155,24 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
+          // 1. Salva la risposta base (contiene orderId, status, message, ecc.)
           this.checkoutResponse = response;
           this.error = null;
           this.loading = false;
+
+          // 2. Se abbiamo un orderId, recuperiamo l'ordine completo
+          if (response.orderId) {
+            this.orderService.getOrderById(userId, response.orderId).subscribe({
+              next: (order: Order | null) => {
+                this.createdOrder = order; // <--- Salviamo l'ordine (con gli items)
+                this.cdRef.detectChanges();
+              },
+              error: (err) => {
+                console.error('Errore nel recupero dell\'ordine creato:', err);
+              }
+            });
+          }
+
           this.cdRef.detectChanges();
         },
         error: (err) => {
@@ -161,4 +182,5 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         }
       });
   }
+
 }

@@ -12,13 +12,17 @@ import { PaymentListComponent } from './components/payment-list/payment-list.com
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { WishlistComponent } from './components/wishlist/wishlist.component';
 import { OrderDetailsComponent } from './components/order/order-details/order-details.component';
+import {
+  ProductImageGeneratorComponent
+} from './components/product-list/product-image-generator/product-image-generator.component';
+
 
 
 
 export const appRoutes: Routes = [
-  { path: '', component: HomeComponent },  // ✅ HomePage ora mostra HomeComponent
+  { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
-  { path: 'products', component: ProductListComponent },  // ✅ Sposta la lista prodotti in `/products`
+  { path: 'products', component: ProductListComponent },
   { path: 'order-history', component: OrderHistoryComponent },
   { path: 'product/:id', component: ProductDetailsComponent },
   { path: 'category/:categoryName', component: ProductListComponent },
@@ -31,6 +35,10 @@ export const appRoutes: Routes = [
   { path: 'wishlist', component: WishlistComponent },
   { path: 'orders/:id', component: OrderDetailsComponent },
   { path: 'orders', component: OrderHistoryComponent },
+  { path: 'admin/generate-image/:productId', component: ProductImageGeneratorComponent,
+  },
+
+
 
 
 

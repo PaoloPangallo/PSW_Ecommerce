@@ -25,14 +25,7 @@ export class UserService {
     );
   }
 
-  // ✅ Crea un nuovo utente
-  createUser(user: Partial<User>): Observable<User> {
-    return this.http.post<User>(this.apiUrl, user, this.httpOptions()).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  // ✅ Aggiorna un utente
+// ✅ Aggiorna un utente
   updateUser(id: number, user: Partial<User>): Observable<User> {
     return this.http.put<User>(`${this.apiUrl}/${id}`, user, this.httpOptions()).pipe(
       catchError(this.handleError)

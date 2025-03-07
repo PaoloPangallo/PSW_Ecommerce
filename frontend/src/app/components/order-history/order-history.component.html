@@ -45,3 +45,14 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
+
+<!-- Controlli di paginazione -->
+<div class="pagination-controls" *ngIf="orders.length > 0">
+  <button mat-button (click)="goToPreviousPage()" [disabled]="currentPage === 0">
+    Precedente
+  </button>
+  <span>Pagina {{ currentPage + 1 }} di {{ totalPages }}</span>
+  <button mat-button (click)="goToNextPage()" [disabled]="currentPage >= totalPages - 1">
+    Successivo
+  </button>
+</div>

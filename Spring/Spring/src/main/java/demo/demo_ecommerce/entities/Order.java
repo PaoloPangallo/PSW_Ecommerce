@@ -20,6 +20,10 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
+
     @DecimalMin(value = "0.0", inclusive = true, message = "Total must be a positive value")
     private BigDecimal total = BigDecimal.ZERO;
 

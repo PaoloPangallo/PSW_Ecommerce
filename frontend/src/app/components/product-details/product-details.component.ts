@@ -34,7 +34,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
 
     private productService: ProductService,
     private cartService: CartService,
-    private authService: AuthService,
+    protected authService: AuthService,
     private wishlistService: WishlistService
   ) {}
 

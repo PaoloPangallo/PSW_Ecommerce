@@ -1,7 +1,6 @@
 package demo.demo_ecommerce.Controllers;
 
 import demo.demo_ecommerce.dtos.OrderDTO;
-import demo.demo_ecommerce.entities.Order;
 import demo.demo_ecommerce.services.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,7 +35,7 @@ public class OrdersController {
     @PostMapping
     public ResponseEntity<?> createOrder(@PathVariable Long userId) {
         try {
-            OrderDTO orderDto = orderService.createOrder(userId); // Il service restituisce ora un OrderDTO
+            OrderDTO orderDto = orderService.createOrder(userId);
             return ResponseEntity.status(HttpStatus.CREATED).body(orderDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -51,12 +50,8 @@ public class OrdersController {
     @GetMapping
     public ResponseEntity<?> getUserOrders(@PathVariable Long userId,
                                            @PageableDefault(size = 10) Pageable pageable) {
-        Page<Order> ordersPage = orderService.getOrdersByUserId(userId, pageable);
-        // Convertiamo ogni ordine in OrderDTO
-        List<OrderDTO> orderDTOs = ordersPage.getContent().stream()
-                .map(OrderDTO::fromEntity)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(orderDTOs);
+        Page<OrderDTO> ordersPage = orderService.getOrdersByUserId(userId, pageable);
+        return ResponseEntity.ok(ordersPage);
     }
 
     @Operation(summary = "Ottieni i dettagli di un singolo ordine")
@@ -65,8 +60,7 @@ public class OrdersController {
             @ApiResponse(responseCode = "404", description = "Ordine non trovato")
     })
     @GetMapping("/{orderId}")
-    public ResponseEntity<?> getOrderById(@PathVariable Long userId,
-                                          @PathVariable Long orderId) {
+    public ResponseEntity<?> getOrderById(@PathVariable Long userId, @PathVariable Long orderId) {
         try {
             OrderDTO orderDto = orderService.getOrderById(userId, orderId);
             return ResponseEntity.ok(orderDto);

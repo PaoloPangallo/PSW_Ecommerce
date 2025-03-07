@@ -39,11 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String requestURI = request.getRequestURI();
-        if (requestURI.startsWith("/api/cart")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+
 
         String authHeader = request.getHeader("Authorization");
         String token = null;

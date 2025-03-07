@@ -10,6 +10,7 @@ import demo.demo_ecommerce.repositories.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,18 +29,27 @@ public class ProductService {
     /**
      * Crea un nuovo prodotto, assegnando un'immagine predefinita se non presente.
      */
+    @Transactional // scrittura
     public Product createProduct(Product product) {
         if (productRepository.existsByName(product.getName())) {
             throw new IllegalArgumentException("Product with this name already exists");
         }
 
-        // ✅ Se il prodotto non ha un'immagine, assegna una di default
+        // Se il prodotto contiene una Category con un ID, recuperala dal DB
+        if (product.getCategory() != null && product.getCategory().getId() != null) {
+            Category managedCategory = categoryRepository.findById(product.getCategory().getId())
+                    .orElseThrow(() -> new RuntimeException("Categoria non trovata con ID: " + product.getCategory().getId()));
+            product.setCategory(managedCategory);
+        }
+
+        // Se il prodotto non ha un'immagine, assegna una di default
         if (product.getImageUrl() == null || product.getImageUrl().isEmpty()) {
-            product.setImageUrl("https://example.com/default-image.jpg"); // URL immagine predefinita
+            product.setImageUrl("https://example.com/default-image.jpg");
         }
 
         return productRepository.save(product);
     }
+
 
     private final CategoryRepository categoryRepository; // 🔹 Aggiungi il repository delle categorie
 
@@ -47,6 +57,7 @@ public class ProductService {
     /**
      * Ottieni un prodotto per ID.
      */
+    @Transactional(readOnly = true)
     public List<Product> getAllProducts() {
         List<Product> products = productRepository.findAll();
         for (Product product : products) {
@@ -56,7 +67,7 @@ public class ProductService {
         }
         return products;
     }
-
+    @Transactional(readOnly = true)
     public Product getProductById(Long id) {
         logger.info("Fetching product with ID: {}", id);
         Product product = productRepository.findById(id)
@@ -72,6 +83,7 @@ public class ProductService {
     /**
      * Aggiorna un prodotto, mantenendo l'immagine attuale se non viene fornita una nuova.
      */
+    @Transactional // scrittura
     public Product updateProduct(Long id, Product productDetails) {
         logger.info("Updating product with ID: {}", id);
         Product existingProduct = productRepository.findById(id)

@@ -1,0 +1,24 @@
+<div class="image-generator-container">
+  <div class="card">
+    <h1>Genera Immagine per {{ productName }}</h1>
+
+    <div class="form-group">
+      <label for="prompt">Prompt</label>
+      <input id="prompt" type="text" [(ngModel)]="prompt" placeholder="Inserisci prompt..." />
+    </div>
+
+    <button class="generate-btn" (click)="onGenerate()" [disabled]="loading">
+      Genera Immagine
+    </button>
+
+    <div *ngIf="loading" class="loading">⏳ Generazione in corso...</div>
+    <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+
+    <div *ngIf="generatedImageUrl" class="result">
+      <h2>Immagine Generata:</h2>
+      <img [src]="generatedImageUrl" alt="Immagine generata" />
+    </div>
+  </div>
+
+  <button class="back-btn" (click)="goBack()">⬅️ Indietro</button>
+</div>

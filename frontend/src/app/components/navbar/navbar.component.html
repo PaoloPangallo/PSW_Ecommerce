@@ -1,14 +1,20 @@
+<!-- navbar.component.html -->
 <nav class="navbar">
-  <!-- Barra superiore -->
+  <!-- Barra superiore (logo, ricerca, account) -->
   <div class="nav-top">
     <div class="logo">
-      <a routerLink="/"> Unilire</a>
+      <a routerLink="/">Unilire</a>
     </div>
 
     <div class="search-box">
-      <input type="text" placeholder="Cerca un prodotto..." (input)="onSearch($event)">
-      <button (click)="search()">🔍</button>
+      <input
+        type="text"
+        placeholder="Cerca un prodotto..."
+        (input)="onSearch($event)"
+      />
+      <button (click)="search()" class="search-button">🔍</button>
     </div>
+
 
     <div class="user-icons">
       <span>
@@ -17,26 +23,23 @@
       <span>
         <a routerLink="/cart">🛒 Carrello</a>
       </span>
-
-      <!-- ✅ Nuovo link alla Wishlist -->
       <span>
         <a routerLink="/wishlist">❤️ Wishlist</a>
       </span>
-
-      <!-- Link agli ordini: visibili solo se l'utente è loggato -->
       <span *ngIf="isLoggedIn()">
         <a routerLink="/order-history">I miei Ordini</a>
       </span>
-
-      <!-- Mostra il logout se l'utente è loggato -->
       <span *ngIf="isLoggedIn()">
         <a (click)="logout()" style="cursor: pointer;">Logout</a>
       </span>
     </div>
   </div>
+</nav>
 
-  <!-- Barra inferiore con categorie -->
-  <div class="nav-bottom">
+<!-- Struttura a 2 colonne: sidebar a sinistra, contenuto a destra -->
+<div class="page-container">
+  <!-- Sidebar con le categorie -->
+  <aside class="sidebar">
     <ul>
       <li><a routerLink="/category/Smartphone e Telefonia">Smartphone e Telefonia</a></li>
       <li><a routerLink="/category/TV e Home Entertainment">TV e Home Entertainment</a></li>
@@ -49,5 +52,14 @@
       <li><a routerLink="/category/Smartwatch e Wearable">Smartwatch e Wearable</a></li>
       <li><a routerLink="/category/Droni e Mobilità Elettrica">Droni e Mobilità Elettrica</a></li>
     </ul>
+  </aside>
+
+  <!-- Contenuto principale -->
+  <div class="main-content">>
+    <router-outlet></router-outlet>
   </div>
-</nav>
+</div>
+
+
+
+

@@ -1,5 +1,6 @@
 package demo.demo_ecommerce.services;
 
+import demo.demo_ecommerce.dtos.OrderDTO;
 import demo.demo_ecommerce.dtos.ShippingDTO;
 import demo.demo_ecommerce.dtos.TransactionDTO;
 import demo.demo_ecommerce.entities.*;
@@ -7,6 +8,7 @@ import demo.demo_ecommerce.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CheckoutService {
@@ -19,18 +21,26 @@ public class CheckoutService {
     private final ShippingRepository shippingRepository;
     private final PaymentRepository paymentRepository;
 
+    // AGGIUNTO:
+    private final OrderService orderService;
+
+    // Modifichiamo il costruttore per iniettare OrderService
     public CheckoutService(OrderRepository orderRepository,
                            UsersRepository userRepository,
                            TransactionRepository transactionRepository,
                            ShippingRepository shippingRepository,
-                           PaymentRepository paymentRepository) {
+                           PaymentRepository paymentRepository,
+                           OrderService orderService) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.transactionRepository = transactionRepository;
         this.shippingRepository = shippingRepository;
         this.paymentRepository = paymentRepository;
+        this.orderService = orderService;
     }
 
+
+    @Transactional
     public Order processCheckout(Long userId, TransactionDTO transactionDTO, ShippingDTO shippingDTO) {
         logger.info("📥 [CheckoutService] Avviando checkout per userId: {}", userId);
 
@@ -39,13 +49,15 @@ public class CheckoutService {
                 .orElseThrow(() -> new RuntimeException("Utente non trovato per l'ID: " + userId));
         logger.info("✅ [CheckoutService] Utente trovato: {}", user.getUsername());
 
-        // 2. Crea un nuovo Order associato all'utente
-        Order order = Order.builder()
-                .user(user)
-                .total(transactionDTO.getAmount())
-                .status(Order.OrderStatus.CREATED)
-                .build();
-        orderRepository.save(order);
+        // 2. Crea l'ordine utilizzando la logica esistente di OrderService
+        //    (che copia gli item dal carrello nell'ordine e salva gli OrderItem)
+        OrderDTO orderDto = orderService.createOrder(userId);
+
+        // Recuperiamo l'entità Order dal DB (opzionale se vuoi direttamente restituire un DTO)
+        Order order = orderRepository.findById(orderDto.getId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Impossibile trovare l'ordine appena creato con ID: " + orderDto.getId()));
+
         logger.info("✅ [CheckoutService] Ordine creato con ID: {}, Totale: {}", order.getId(), order.getTotal());
 
         // 3. Verifica il metodo di pagamento
@@ -87,7 +99,7 @@ public class CheckoutService {
         shippingRepository.save(shipping);
         logger.info("✅ [CheckoutService] Spedizione salvata per ordine ID: {}", order.getId());
 
-        // 7. Aggiorna lo stato dell'ordine
+        // 7. Aggiorna lo stato dell'ordine (ad esempio, se il pagamento è andato a buon fine)
         order.setStatus(Order.OrderStatus.PAID);
         orderRepository.save(order);
         logger.info("✅ [CheckoutService] Ordine aggiornato a stato: {}", order.getStatus());

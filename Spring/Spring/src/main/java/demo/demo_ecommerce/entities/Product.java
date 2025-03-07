@@ -39,6 +39,8 @@ public class Product {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+
+
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
