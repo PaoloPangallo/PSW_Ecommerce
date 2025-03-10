@@ -1,38 +1,47 @@
 <div class="product-details-wrapper">
+  <!-- Dettagli prodotto, immagine, descrizione, ecc. -->
   <div class="product-details-container" *ngIf="!isLoading && product">
     <div class="image-container">
       <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name">
     </div>
-
     <div class="details-container">
       <h2>{{ product.name }}</h2>
       <p class="description">{{ product.description }}</p>
       <p class="price"><strong>Prezzo:</strong> {{ product.price }} L</p>
-
       <div class="button-container">
         <button class="cart-button" (click)="addToCart()">🛒 Aggiungi al Carrello</button>
         <button class="wishlist-button" (click)="addToWishlist()">❤️ Aggiungi alla Wishlist</button>
       </div>
-
-      <!-- Bottone visibile solo agli admin -->
       <div *ngIf="authService.isAdmin()" class="admin-button-container">
         <button class="admin-generate-button" [routerLink]="['/admin/generate-image', product.id]">
           Genera un'immagine coerente con {{ product.name }}
         </button>
       </div>
-
-      <!-- Messaggio di conferma -->
       <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
     </div>
   </div>
 
+  <!-- Stato di caricamento o prodotto non trovato -->
   <div class="loading-container" *ngIf="isLoading">
     <p class="loading-text">⏳ Caricamento in corso...</p>
   </div>
-
   <div class="notfound-container" *ngIf="!isLoading && !product">
     <p class="not-found">⚠️ Prodotto non trovato.</p>
   </div>
+
+  <!-- Se il prodotto esiste, mostra la lista recensioni e il form condizionato -->
+  <ng-container *ngIf="product && product.id as prodId">
+    <!-- Lista recensioni -->
+    <app-review-list [productId]="prodId"></app-review-list>
+
+    <!-- Form di recensione: visualizzato solo se l'utente non ha già recensito -->
+    <ng-container *ngIf="!userHasReviewed">
+      <app-review-form [productId]="prodId"></app-review-form>
+    </ng-container>
+    <ng-container *ngIf="userHasReviewed">
+      <p>Hai già recensito questo prodotto.</p>
+    </ng-container>
+  </ng-container>
 
   <button class="back-button" (click)="goBack()">⬅️ Indietro</button>
 </div>

@@ -45,7 +45,7 @@ export class UserProfileComponent implements OnInit {
       this.userService.updateUser(this.user.id, this.user).subscribe({
         next: (updatedUser) => {
           console.log('Server ha restituito:', updatedUser);
-          this.user = updatedUser; // Assicurati di assegnare i dati aggiornati
+          this.user = updatedUser;
           this.successMessage = 'Profilo aggiornato con successo!';
           this.errorMessage = '';
         },

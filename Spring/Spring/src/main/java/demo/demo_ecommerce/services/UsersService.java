@@ -102,12 +102,7 @@ public class UsersService {
         return usersRepository.findByRole(role);
     }
 
-    // Helper method to find user by ID
-    private User findUserById(Long id) {
-        return usersRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
-    }
-
+    // Metodo per la ricerca degli utenti
     public Page<User> searchUsers(String username, String email, Pageable pageable) {
         if (username != null && email != null) {
             return usersRepository.findByUsernameContainingAndEmailContaining(username, email, pageable);
@@ -140,8 +135,15 @@ public class UsersService {
         return savedUser;
     }
 
+    // Metodo che restituisce un Optional
     public Optional<User> findByUsername(String username) {
         return usersRepository.findByUsername(username);
+    }
+
+    // Metodo aggiunto: restituisce direttamente l'utente o lancia un'eccezione se non trovato
+    public User getUserByUsername(String username) {
+        return usersRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
     }
 
     public boolean existsByEmail(String email) {
@@ -164,4 +166,9 @@ public class UsersService {
         return dto;
     }
 
+    // Helper method per trovare un utente per ID
+    private User findUserById(Long id) {
+        return usersRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+    }
 }

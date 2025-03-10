@@ -6,8 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -55,6 +58,23 @@ public class GlobalExceptionHandler {
 
         logger.error("Validation error: {}", response);
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ReviewLimitExceededException.class)
+    public ResponseEntity<?> handleReviewLimitExceededException(ReviewLimitExceededException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse() {
+                    @Override
+                    public HttpStatusCode getStatusCode() {
+                        return null;
+                    }
+
+                    @Override
+                    public ProblemDetail getBody() {
+                        return null;
+                    }
+                });
     }
 
     /**

@@ -81,6 +81,13 @@ export class AuthService {
   }
 
   /**
+   * Verifica se l'utente è loggato controllando se esiste un token.
+   */
+  isLoggedIn(): boolean {
+    return this.getToken() !== null;
+  }
+
+  /**
    * Decodifica il token JWT e verifica se il claim "role" è "ADMIN".
    */
   isAdmin(): boolean {

@@ -1,6 +1,7 @@
 package demo.demo_ecommerce.services;
 
 import demo.demo_ecommerce.Utility.ResourceNotFoundException;
+import demo.demo_ecommerce.Utility.ReviewLimitExceededException;
 import demo.demo_ecommerce.dtos.ReviewDTO;
 import demo.demo_ecommerce.entities.Review;
 import demo.demo_ecommerce.repositories.ReviewRepository;
@@ -11,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,7 +22,6 @@ import java.util.List;
 public class ReviewService {
 
     private static final Logger logger = LoggerFactory.getLogger(ReviewService.class);
-
     private final ReviewRepository reviewRepository;
 
     @Autowired
@@ -34,6 +36,16 @@ public class ReviewService {
         }
         if (review.getRating() == null || review.getRating() < 1 || review.getRating() > 5) {
             throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+
+        int existingReviewsCount = reviewRepository.countByUserIdAndProductId(
+                review.getUser().getId(),
+                review.getProduct().getId()
+        );
+
+        // Se l'utente ha già lasciato una recensione per questo prodotto, lanciamo l'eccezione custom
+        if (existingReviewsCount >= 1) {
+            throw new ReviewLimitExceededException("Hai già lasciato una recensione per questo prodotto!");
         }
 
         logger.info("Creating review for product ID: {} and user ID: {}",
@@ -51,7 +63,6 @@ public class ReviewService {
         if (reviews.isEmpty()) {
             throw new ResourceNotFoundException("No reviews found for product ID: " + productId);
         }
-
         return reviews.map(ReviewDTO::fromEntity);
     }
 
@@ -64,17 +75,41 @@ public class ReviewService {
         if (reviews.isEmpty()) {
             throw new ResourceNotFoundException("No reviews found for user ID: " + userId);
         }
-
         return reviews.map(ReviewDTO::fromEntity);
     }
 
-    // Recupera tutte le recensioni di un prodotto senza paginazione
+    @Transactional(readOnly = true)
     public List<ReviewDTO> getAllReviewsByProductId(Long productId) {
         logger.info("Fetching all reviews for product ID: {}", productId);
         List<Review> reviews = reviewRepository.findByProductId(productId);
         if (reviews.isEmpty()) {
             throw new ResourceNotFoundException("No reviews found for product ID: " + productId);
         }
+        // Forza l'inizializzazione della collection upvotes per ogni review
+        reviews.forEach(review -> review.getUpvotes().size());
         return reviews.stream().map(ReviewDTO::fromEntity).toList();
+    }
+
+
+    // Metodo per aggiornare una recensione esistente
+    public ReviewDTO updateReview(Long reviewId, Review reviewDetails) {
+        Review existingReview = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found with id " + reviewId));
+
+        existingReview.setRating(reviewDetails.getRating());
+        existingReview.setComment(reviewDetails.getComment());
+
+        Review updatedReview = reviewRepository.save(existingReview);
+        return ReviewDTO.fromEntity(updatedReview);
+    }
+
+    // Metodo per cancellare una recensione, controllando che appartenga all'utente corrente
+    public void deleteReview(Long reviewId, Long currentUserId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found with id " + reviewId));
+        if (!review.getUser().getId().equals(currentUserId)) {
+            throw new AccessDeniedException("Non hai il permesso di eliminare questa recensione.");
+        }
+        reviewRepository.delete(review);
     }
 }

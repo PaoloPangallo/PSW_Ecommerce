@@ -1,0 +1,54 @@
+<div class="review-form-container">
+  <div class="review-form-card">
+    <div class="review-form-header">
+      <h3>Lascia una Recensione</h3>
+      <p>Facci sapere la tua opinione sul prodotto!</p>
+    </div>
+
+    <!-- Messaggi di successo o errore -->
+    <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+    <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+    <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
+      <!-- Valutazione (rating) -->
+      <div class="form-group">
+        <label for="rating" class="form-label">Valutazione:</label>
+        <select id="rating" formControlName="rating" class="form-control">
+          <option [value]="null" disabled selected>Seleziona un voto</option>
+          <option *ngFor="let num of [1, 2, 3, 4, 5]" [value]="num">
+            {{ num }} ★
+          </option>
+        </select>
+        <div
+          *ngIf="reviewForm.controls['rating'].invalid && reviewForm.controls['rating'].touched"
+          class="error-text"
+        >
+          La valutazione è obbligatoria e deve essere tra 1 e 5.
+        </div>
+      </div>
+
+      <!-- Commento -->
+      <div class="form-group">
+        <label for="comment" class="form-label">Commento:</label>
+        <textarea
+          id="comment"
+          formControlName="comment"
+          rows="4"
+          class="form-control"
+          placeholder="Scrivi qui la tua recensione..."
+        ></textarea>
+        <div
+          *ngIf="reviewForm.controls['comment'].invalid && reviewForm.controls['comment'].touched"
+          class="error-text"
+        >
+          Il commento è obbligatorio (max 1000 caratteri).
+        </div>
+      </div>
+
+      <!-- Bottone di invio -->
+      <button type="submit" class="btn-submit" [disabled]="reviewForm.invalid">
+        Invia Recensione
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,29 @@
+.upvote-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fa-thumbs-up {
+  cursor: pointer;
+  font-size: 1.4rem;
+  transition: color 0.2s, opacity 0.2s;
+}
+
+.upvoted {
+  color: #007bff; /* Colore se già votato */
+}
+
+.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.upvote-count {
+  font-weight: bold;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+}

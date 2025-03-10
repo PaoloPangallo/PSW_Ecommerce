@@ -6,16 +6,19 @@ import { Product } from '../../models/product.model';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Location } from '@angular/common'; // Importa Location
-
+import { Location } from '@angular/common';
 import { AuthService } from '../../services/auth.services';
 import { WishlistService } from '../../services/wishlist.service';
 import { Wishlist } from '../../models/wishlist.model';
+import { ReviewListComponent } from '../review/review-list.component';
+import { ReviewFormComponent } from '../review-form/review-form.component';
+import { ReviewService } from '../../services/review-list.services';
+import { ReviewDTO } from '../../models/review.models';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, ReviewListComponent, ReviewFormComponent],
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.css']
 })
@@ -23,19 +26,23 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   product: Product | null = null;
   isLoading: boolean = false;
   wishlist: Wishlist | null = null;
-  private routeSubscription: Subscription | null = null;
   successMessage: string = '';
   errorMessage: string = '';
+  private routeSubscription: Subscription | null = null;
+
+  // Proprietà per le recensioni
+  reviews: ReviewDTO[] = [];
+  userHasReviewed: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private location: Location, // Iniezione di Location
-
+    private location: Location,
     private productService: ProductService,
     private cartService: CartService,
     protected authService: AuthService,
-    private wishlistService: WishlistService
+    private wishlistService: WishlistService,
+    private reviewService: ReviewService
   ) {}
 
   ngOnInit(): void {
@@ -45,6 +52,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
 
       if (productId) {
         this.loadProduct(productId);
+        this.loadReviewsForProduct(productId);
       } else {
         this.errorMessage = "ID prodotto non valido.";
         this.redirectToHome();
@@ -64,6 +72,19 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       error: () => {
         this.errorMessage = "Errore nel caricamento del prodotto.";
         this.redirectToHome();
+      }
+    });
+  }
+
+  loadReviewsForProduct(productId: number): void {
+    this.reviewService.getReviewsByProductId(productId).subscribe({
+      next: (reviews) => {
+        this.reviews = reviews;
+        const currentUserId = this.authService.getCurrentUserId();
+        this.userHasReviewed = reviews.some(review => review.userId === currentUserId);
+      },
+      error: (err) => {
+        console.error('Errore nel caricamento delle recensioni', err);
       }
     });
   }
@@ -125,7 +146,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.location.back(); // Torna alla pagina precedente
+    this.location.back();
   }
 
   redirectToHome(): void {

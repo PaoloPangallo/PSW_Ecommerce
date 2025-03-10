@@ -35,12 +35,17 @@ public class SecurityConfig {
                 // 3. Configura l'accesso agli endpoint
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()
-                        .requestMatchers("/api/users/**").permitAll()
                         .requestMatchers("/api/images/**").permitAll()
-                        .requestMatchers("/api/payments/**").permitAll()
+
+
+                        .requestMatchers("/api/reviews/**").authenticated() // <--- aggiungi questa linea
+                        .requestMatchers("/api/products/featured").permitAll()
+                        .requestMatchers("/api/products").permitAll() // <--- aggiungi questa linea
+
                         .requestMatchers("/checkout/**").authenticated()
                         .anyRequest().authenticated()
+
+
                 )
 
 

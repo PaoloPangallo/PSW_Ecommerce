@@ -1,18 +1,17 @@
 package demo.demo_ecommerce.config;
 
-
-import io.jsonwebtoken.*;
-import org.springframework.stereotype.Component;
-
-import java.util.Date;
-
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Value;
-
-
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import javax.crypto.SecretKey;
+import java.util.Date;
 
 @Component
 public class JwtTokenProvider {
@@ -25,48 +24,80 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long validityInMilliseconds;
 
+    /**
+     * Metodo per ottenere la chiave segreta decodificata
+     */
+    private SecretKey getKey() {
+        try {
+            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (Exception e) {
+            logger.error("Errore nella decodifica della chiave JWT: {}", e.getMessage());
+            throw new RuntimeException("Chiave JWT non valida, verifica jwt.secret in application.properties");
+        }
+    }
+
+    /**
+     * Genera un token JWT per l'utente con il ruolo specificato
+     */
     public String generateToken(String username, String role) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
-        return Jwts.builder()
-                .setSubject(username) // Imposta il nome utente come soggetto
-                .claim("role", role) // Aggiungi il ruolo come claim
-                .setIssuedAt(now) // Data di creazione
-                .setExpiration(validity) // Data di scadenza
-                .signWith(SignatureAlgorithm.HS512, secretKey.getBytes()) // Firma il token
+        String token = Jwts.builder()
+                .setSubject(username)
+                .claim("role", role)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(getKey(), SignatureAlgorithm.HS512)
                 .compact();
+
+        logger.info("JWT generato correttamente per utente: {}", username);
+        return token;
     }
 
+    /**
+     * Verifica se il token è valido
+     */
     public boolean validateToken(String token) {
         try {
-            Jws<Claims> claims = Jwts.parserBuilder()
-                    .setSigningKey(secretKey.getBytes())
+            logger.info("DEBUG JWT: Token ricevuto per validazione = [{}]", token);
+
+            Jwts.parserBuilder()
+                    .setSigningKey(getKey())
                     .build()
                     .parseClaimsJws(token);
+            return true;
 
-            return !claims.getBody().getExpiration().before(new Date());
-        } catch (SignatureException e) {
-            logger.error("Invalid JWT signature: {}", e.getMessage());
-            return false;
-        } catch (ExpiredJwtException e) {
-            logger.error("Expired JWT token: {}", e.getMessage());
-            return false;
-        } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
-            return false;
-        } catch (Exception e) {
-            logger.error("Error validating JWT token: {}", e.getMessage());
-            return false;
+        } catch (io.jsonwebtoken.security.SignatureException e) {
+            logger.error("Firma JWT non valida: {}", e.getMessage());
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            logger.error("Token JWT scaduto: {}", e.getMessage());
+        } catch (io.jsonwebtoken.MalformedJwtException e) {
+            logger.error("Token JWT malformato: {}", e.getMessage());
+        } catch (io.jsonwebtoken.UnsupportedJwtException e) {
+            logger.error("Token JWT non supportato: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.error("Stringa del token JWT vuota: {}", e.getMessage());
         }
+        return false;
     }
 
-
+    /**
+     * Estrae le Claims (informazioni) dal token JWT
+     */
     public Claims getClaimsFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey.getBytes())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            logger.info("DEBUG JWT: Token ricevuto per estrazione claims = [{}]", token);
+
+            return Jwts.parserBuilder()
+                    .setSigningKey(getKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (Exception e) {
+            logger.error("Errore nell'estrazione delle claims dal JWT: {}", e.getMessage());
+            throw new RuntimeException("Token JWT non valido.");
+        }
     }
 }

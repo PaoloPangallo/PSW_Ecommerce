@@ -35,12 +35,6 @@ export const appRoutes: Routes = [
   { path: 'wishlist', component: WishlistComponent },
   { path: 'orders/:id', component: OrderDetailsComponent },
   { path: 'orders', component: OrderHistoryComponent },
-  { path: 'admin/generate-image/:productId', component: ProductImageGeneratorComponent,
-  },
-
-
-
-
-
+  { path: 'admin/generate-image/:productId', component: ProductImageGeneratorComponent,},
   { path: '**', redirectTo: '' }, // Se la rotta non esiste, torna alla home
 ];

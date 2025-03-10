@@ -5,6 +5,8 @@ import { Product } from '../../models/product.model';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { combineLatest } from 'rxjs';
+import {CartService} from '../../services/cart.service';
+import {AuthService} from '../../services/auth.services';
 
 @Component({
   selector: 'app-product-list',
@@ -22,7 +24,10 @@ export class ProductListComponent implements OnInit {
 
   private route = inject(ActivatedRoute);
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService,
+  private cartService: CartService,       // <-- aggiungi
+  private authService: AuthService) {}
 
   ngOnInit(): void {
     combineLatest([this.route.paramMap, this.route.queryParams]).subscribe(
@@ -65,9 +70,25 @@ export class ProductListComponent implements OnInit {
       : data;
   }
 
+
+
+
   addToCart(product: Product): void {
-    console.log(`🛒 Aggiunto al carrello: ${product.name}`);
-    // Qui possiamo chiamare il servizio del carrello
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) return;
+
+    this.cartService.updateItemQuantity(userId, product.id!, 1).subscribe({
+      next: () => {
+        this.successMessage = "🛒 Prodotto aggiunto al carrello!";
+        // fai sparire il messaggio dopo qualche secondo, se vuoi
+        setTimeout(() => this.successMessage = '', 4000);
+      },
+      error: (error: any) => console.error("Errore nell'aggiunta al carrello:", error)
+    });
   }
+
+
+  successMessage: string = '';
+
 
 }

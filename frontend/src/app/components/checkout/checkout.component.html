@@ -12,13 +12,12 @@
             {{ item.productName }} ({{ item.quantity }}x)
           </span>
           <span class="item-price">
-            {{ item.price }} L
+            {{ item.price | lire }}
           </span>
         </li>
       </ul>
       <p class="cart-total">
-        <strong>Totale:</strong> {{ getCartTotal() | number:'1.2-2' }}
-        L
+        <strong>Totale:</strong> {{ getCartTotal() | lire }}
       </p>
 
       <!-- Pulsante per passare allo step successivo -->
@@ -97,8 +96,7 @@
       <h3>Riepilogo Ordine</h3>
       <p><strong>Indirizzo:</strong> {{ checkoutForm.get('shipping')?.value | json }}</p>
       <p><strong>Metodo di Pagamento:</strong> {{ checkoutForm.get('transaction.paymentMethod')?.value }}</p>
-      <p><strong>Totale Carrello:</strong> <p><strong>Totale Carrello:</strong> {{ getCartTotal() | number:'1.2-2' }} L</p>
-
+      <p><strong>Totale Carrello:</strong> {{ getCartTotal() | lire }}</p>
 
       <div class="btn-group">
         <button type="button" class="back-button" (click)="previousStep()">Indietro</button>
@@ -120,7 +118,7 @@
   <!-- Dettaglio dell'ordine creato (con i prodotti) -->
   <div *ngIf="createdOrder as order">
     <h3>Dettagli Ordine #{{ order.id }}</h3>
-    <p><strong>Totale:</strong> {{ order.total | number:'1.2-2' }} L</p>
+    <p><strong>Totale:</strong> {{ order.total | lire }}</p>
     <p><strong>Creato il:</strong> {{ order.createdAt | date:'short' }}</p>
 
     <h4>Prodotti nell'ordine:</h4>
@@ -137,18 +135,12 @@
       <tr *ngFor="let item of order.items">
         <td>{{ item.productName }}</td>
         <td>{{ item.quantity }}</td>
-        <td>{{ item.price | number:'1.2-2' }} L</td>
-        <td>{{ (item.price * item.quantity) | number:'1.2-2' }} L</td>
+        <td>{{ item.price | lire }}</td>
+        <td>{{ (item.price * item.quantity) | lire }}</td>
       </tr>
       </tbody>
     </table>
   </div>
-
-  <!-- Messaggio di errore -->
-  <div *ngIf="error" class="order-error">
-    <p>❌ Errore: {{ error }}</p>
-  </div>
-
 
   <!-- Messaggio di errore -->
   <div *ngIf="error" class="order-error">

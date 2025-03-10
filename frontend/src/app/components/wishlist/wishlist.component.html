@@ -18,10 +18,10 @@
       <li *ngFor="let product of wishlist.products" class="wishlist-item">
         <div class="item-info">
           <span class="product-name">{{ product.name }}</span>
-          <span class="product-price">{{ product.price | currency:'EUR':'symbol' }}</span>
+          <!-- Utilizza la pipe "lire" per convertire e formattare il prezzo -->
+          <span class="product-price">{{ product.price | lire }}</span>
         </div>
         <button (click)="removeProduct(product.id!)">❌ Rimuovi</button>
-
       </li>
     </ul>
 

@@ -1,6 +1,11 @@
 <div class="product-section">
   <h2>Lista Prodotti</h2>
 
+  <!-- Messaggio di successo -->
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+
   <!-- Messaggio se non ci sono prodotti -->
   <div *ngIf="products.length === 0">
     <p class="empty-message">Nessun prodotto disponibile.</p>

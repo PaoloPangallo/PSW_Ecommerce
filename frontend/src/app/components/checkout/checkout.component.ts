@@ -8,8 +8,9 @@ import { CartService } from '../../services/cart.service';
 import { CartDTO } from '../../models/cart.model';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import {Order} from '../../models/order.model';
-import {OrderService} from '../../services/order.service';
+import { Order } from '../../models/order.model';
+import { OrderService } from '../../services/order.service';
+import {LirePipe} from '../../services/lire.pipe';
 
 @Component({
   selector: 'app-checkout',
@@ -17,7 +18,8 @@ import {OrderService} from '../../services/order.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    LirePipe  // Importiamo il pipe per formattare i prezzi in lire
   ],
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css']
@@ -26,7 +28,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   checkoutForm!: FormGroup;
   currentStep = 1;
-  createdOrder: Order | null = null;  // <--- aggiungi questa proprietà
+  createdOrder: Order | null = null;
 
   checkoutResponse: CheckoutResponse | null = null;
   loading = false;
@@ -45,8 +47,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private orderService: OrderService,
-
-   private checkoutService: CheckoutService,
+    private checkoutService: CheckoutService,
     private authService: AuthService,
     private cartService: CartService,
     private cdRef: ChangeDetectorRef
@@ -71,7 +72,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         zipCode: ['', Validators.required],
         shippingMethod: ['STANDARD', Validators.required]
       }),
-      // Struttura appiattita per transaction:
       transaction: this.fb.group({
         paymentMethod: ['', Validators.required],
         amount: [this.getCartTotal(), [Validators.required, Validators.min(0)]],
@@ -155,16 +155,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe({
         next: (response) => {
-          // 1. Salva la risposta base (contiene orderId, status, message, ecc.)
           this.checkoutResponse = response;
           this.error = null;
           this.loading = false;
 
-          // 2. Se abbiamo un orderId, recuperiamo l'ordine completo
           if (response.orderId) {
             this.orderService.getOrderById(userId, response.orderId).subscribe({
               next: (order: Order | null) => {
-                this.createdOrder = order; // <--- Salviamo l'ordine (con gli items)
+                this.createdOrder = order;
                 this.cdRef.detectChanges();
               },
               error: (err) => {
@@ -182,5 +180,4 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         }
       });
   }
-
 }

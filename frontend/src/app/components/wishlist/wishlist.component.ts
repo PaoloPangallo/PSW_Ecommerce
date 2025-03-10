@@ -3,14 +3,16 @@ import { CommonModule, CurrencyPipe, NgIf, NgFor } from '@angular/common';
 import { Wishlist } from '../../models/wishlist.model';
 import { WishlistService } from '../../services/wishlist.service';
 import { AuthService } from '../../services/auth.services';
+import {LirePipe} from '../../services/lire.pipe';
+// Importa la pipe: assicurati che il path sia corretto
 
 @Component({
   selector: 'app-wishlist',
   standalone: true,
   templateUrl: './wishlist.component.html',
   styleUrls: ['./wishlist.component.css'],
-  imports: [CommonModule, NgIf, NgFor, CurrencyPipe], // ✅ Aggiunti NgIf e NgFor!
-})
+  // Aggiungi la pipe all'array imports
+  imports: [CommonModule, NgIf, NgFor, LirePipe],})
 export class WishlistComponent implements OnInit {
   wishlist: Wishlist | null = null;
   isLoading = false;

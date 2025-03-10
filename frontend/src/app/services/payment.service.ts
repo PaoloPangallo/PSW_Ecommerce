@@ -9,7 +9,7 @@ import { PaymentRequestDTO, PaymentResponse } from '../models/payment.models';
   providedIn: 'root'
 })
 export class PaymentService {
-  private baseUrl = 'http://localhost:8080/api/payments'; // Modifica se necessario
+  private baseUrl = 'http://localhost:8080/api/payments';
 
   constructor(private http: HttpClient) {}
 
