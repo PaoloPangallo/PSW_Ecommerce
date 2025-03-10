@@ -11,12 +11,3 @@ export interface CartDTO {
   userId: number;
   items: CartItemDTO[];
 }
-
-export class CartItem {
-  constructor(
-    public productId: number,
-    public productName: string,
-    public price: number,
-    public quantity: number
-  ) {}
-}

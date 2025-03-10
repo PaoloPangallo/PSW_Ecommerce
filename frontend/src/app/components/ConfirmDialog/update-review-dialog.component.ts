@@ -70,7 +70,7 @@ export class UpdateReviewDialogComponent {
 
   onSave(): void {
     if (this.form.valid) {
-      // Chiudiamo il dialogo ritornando i dati aggiornati
+      // Chiudiamo il dialog ritornando i dati aggiornati
       this.dialogRef.close(this.form.value);
     }
   }

@@ -2,10 +2,14 @@ import { Component, OnInit, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { ReviewUpvoteComponent } from '../upvote/review-upvote.component'; // <-- percorso corretto
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+
+import { ReviewUpvoteComponent } from '../upvote/review-upvote.component';
+
 import { ReviewDTO } from '../../models/review.models';
 import { ReviewService } from '../../services/review-list.services';
 import { AuthService } from '../../services/auth.services';
+import {UpdateReviewDialogComponent} from '../ConfirmDialog/update-review-dialog.component';
 
 @Component({
   selector: 'app-review-list',
@@ -14,7 +18,9 @@ import { AuthService } from '../../services/auth.services';
     CommonModule,
     MatCardModule,
     MatProgressSpinnerModule,
-    ReviewUpvoteComponent // <-- aggiunto qui
+    MatDialogModule,
+    ReviewUpvoteComponent,       // Componente per gli upvote
+    UpdateReviewDialogComponent  // Dialog di modifica (se anch'esso è standalone)
   ],
   templateUrl: './review-list.component.html',
   styleUrls: ['./review-list.component.css']
@@ -28,7 +34,8 @@ export class ReviewListComponent implements OnInit {
 
   constructor(
     private reviewService: ReviewService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -50,11 +57,55 @@ export class ReviewListComponent implements OnInit {
     });
   }
 
+  /**
+   * Apre una finestra di dialogo per modificare la recensione selezionata.
+   */
   onUpdateReview(review: ReviewDTO): void {
-    // ...
+    const dialogRef = this.dialog.open(UpdateReviewDialogComponent, {
+      width: '500px',
+      data: review // Passiamo la recensione da modificare
+    });
+
+    // Quando la dialog si chiude, recuperiamo i dati aggiornati (rating, comment) se l'utente ha salvato
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // result = { rating: X, comment: '...' }
+        const updatedReview = {
+          rating: result.rating,
+          comment: result.comment
+        };
+
+        // Chiamiamo il service per aggiornare la recensione nel backend
+        this.reviewService.updateReview(review.id, updatedReview).subscribe({
+          next: (response) => {
+            // Aggiorna la recensione anche nella lista locale
+            const index = this.reviews.findIndex(r => r.id === review.id);
+            if (index !== -1) {
+              this.reviews[index] = response;
+            }
+          },
+          error: (err) => {
+            console.error('Errore nell\'aggiornamento della recensione', err);
+          }
+        });
+      }
+    });
   }
 
+  /**
+   * Elimina la recensione dopo una conferma
+   */
   onDeleteReview(reviewId: number): void {
-    // ...
+    if (confirm("Sei sicuro di voler eliminare questa recensione?")) {
+      this.reviewService.deleteReview(reviewId).subscribe({
+        next: () => {
+          // Rimuoviamo la recensione dalla lista locale
+          this.reviews = this.reviews.filter(r => r.id !== reviewId);
+        },
+        error: (err) => {
+          console.error("Errore nella cancellazione della recensione", err);
+        }
+      });
+    }
   }
 }

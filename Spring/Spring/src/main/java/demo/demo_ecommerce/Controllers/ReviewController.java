@@ -95,9 +95,7 @@ public class ReviewController {
     // Endpoint per cancellare una recensione (solo se appartiene all'utente corrente)
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId, Principal principal) {
-        // Recupera l'username dal Principal (gestito da Spring Security)
         String username = principal.getName();
-        // Ottieni l'ID dell'utente corrente tramite il servizio (assicurati di averlo implementato)
         Long userId = userService.getUserByUsername(username).getId();
 
         reviewService.deleteReview(reviewId, userId);

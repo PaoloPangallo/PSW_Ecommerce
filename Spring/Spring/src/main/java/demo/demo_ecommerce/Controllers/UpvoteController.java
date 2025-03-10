@@ -16,9 +16,16 @@ public class UpvoteController {
     // Endpoint per aggiungere un upvote a una recensione
     @PostMapping("/review/{reviewId}/user/{userId}")
     public ResponseEntity<String> addUpvote(@PathVariable Long reviewId, @PathVariable Long userId) {
-        upvoteService.addUpvote(reviewId, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Upvote added successfully.");
+        try {
+            upvoteService.addUpvote(reviewId, userId);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Upvote added successfully.");
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected error");
+        }
     }
+
 
     // Endpoint per rimuovere un upvote
     @DeleteMapping("/review/{reviewId}/user/{userId}")
