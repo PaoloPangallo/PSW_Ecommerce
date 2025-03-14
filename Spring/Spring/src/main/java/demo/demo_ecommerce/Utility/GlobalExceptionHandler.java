@@ -61,18 +61,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ReviewLimitExceededException.class)
-    public ResponseEntity<?> handleReviewLimitExceededException(ReviewLimitExceededException ex) {
+    public ResponseEntity<ErrorResponse> handleReviewLimitExceededException(ReviewLimitExceededException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse() {
                     @Override
                     public HttpStatusCode getStatusCode() {
-                        return null;
+                        // Invece di null, restituisci uno status valido
+                        return HttpStatus.BAD_REQUEST;
                     }
 
                     @Override
                     public ProblemDetail getBody() {
-                        return null;
+                        // Crea un ProblemDetail con i dettagli dell’errore
+                        ProblemDetail detail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+                        detail.setDetail(ex.getMessage());
+                        return detail;
                     }
                 });
     }

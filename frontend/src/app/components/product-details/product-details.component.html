@@ -1,5 +1,5 @@
 <div class="product-details-wrapper">
-  <!-- Dettagli prodotto, immagine, descrizione, ecc. -->
+  <!-- Dettagli prodotto: immagine, nome, descrizione, prezzo, ecc. -->
   <div class="product-details-container" *ngIf="!isLoading && product">
     <div class="image-container">
       <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name">
@@ -21,6 +21,34 @@
     </div>
   </div>
 
+  <!-- Sezione per i coupon applicabili al prodotto -->
+  <div class="coupon-section" *ngIf="coupons && coupons.length > 0">
+    <h3>Coupon Applicabili</h3>
+    <ul>
+      <li *ngFor="let coupon of coupons">
+        <strong>{{ coupon.code }}</strong> - {{ coupon.discountPercentage }}% di sconto
+        - Scade il: {{ coupon.expirationDate | date:'short' }}
+        <button (click)="applyCouponToProduct(coupon.code)">Applica Coupon</button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Sezione per i coupon applicabili al prodotto -->
+  <div class="coupon-section" *ngIf="coupons && coupons.length > 0">
+    <h3>Coupon Applicabili</h3>
+    <ul>
+      <li *ngFor="let coupon of coupons">
+        <strong>{{ coupon.code }}</strong> - {{ coupon.discountPercentage }}% di sconto
+        - Scade il: {{ coupon.expirationDate | date:'short' }}
+        <button (click)="copyCouponCode(coupon.code)">📋 Copia Codice</button>
+      </li>
+    </ul>
+    <p *ngIf="couponMessage" class="coupon-message">{{ couponMessage }}</p>
+  </div>
+
+
+
+
   <!-- Stato di caricamento o prodotto non trovato -->
   <div class="loading-container" *ngIf="isLoading">
     <p class="loading-text">⏳ Caricamento in corso...</p>
@@ -29,12 +57,9 @@
     <p class="not-found">⚠️ Prodotto non trovato.</p>
   </div>
 
-  <!-- Se il prodotto esiste, mostra la lista recensioni e il form condizionato -->
+  <!-- Se il prodotto esiste, mostra le recensioni e il form (condizionato) -->
   <ng-container *ngIf="product && product.id as prodId">
-    <!-- Lista recensioni -->
     <app-review-list [productId]="prodId"></app-review-list>
-
-    <!-- Form di recensione: visualizzato solo se l'utente non ha già recensito -->
     <ng-container *ngIf="!userHasReviewed">
       <app-review-form [productId]="prodId"></app-review-form>
     </ng-container>

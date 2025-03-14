@@ -3,6 +3,7 @@ package demo.demo_ecommerce.entities;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.util.List;
@@ -34,15 +35,26 @@ public class Category {
     private Long version;
 
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;
-        Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
-        Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
-        if (thisEffectiveClass != oEffectiveClass) return false;
-        Category category = (Category) o;
-        return getId() != null && Objects.equals(getId(), category.getId());
+
+        // S-proxiamo entrambi gli oggetti, così ci liberiamo del check su HibernateProxy
+        Category that = (Category) Hibernate.unproxy(o);
+        Category me = (Category) Hibernate.unproxy(this);
+
+        // Se una delle due è null dopo unproxy (o non è nemmeno un Category), false
+        if (!(that instanceof Category)) return false;
+
+        // Se entrambi hanno un ID, confrontiamo quelli
+        if (this.id != null && that.id != null) {
+            return this.id.equals(that.id);
+        }
+
+        // Se arrivi qui, almeno uno dei due ID è null => fallback (o considerali diversi)
+        return false;
     }
+
 
     @Override
     public final int hashCode() {

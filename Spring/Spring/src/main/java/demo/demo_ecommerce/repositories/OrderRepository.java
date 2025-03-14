@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 
@@ -18,7 +17,7 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // Metodo originale per la paginazione (senza fetch degli items)
-    Page<Order> findByUserId(Long userId, Pageable pageable);
+    List<Order> findByUserId(Long userId);
 
     // Metodo per ottenere l'ordine per ID e user (con join fetch per il dettaglio)
     Optional<Order> findByIdAndUserId(Long orderId, Long userId);

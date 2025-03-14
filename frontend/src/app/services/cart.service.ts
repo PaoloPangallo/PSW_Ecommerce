@@ -27,17 +27,6 @@ export class CartService {
     );
   }
 
-  // Metodo privato per gestire gli errori
-  private handleError(error: any): Observable<never> {
-    console.error("❌ Errore HTTP:", error);
-
-    // Se il backend restituisce un JSON con { error, message }, lo recuperiamo
-    const errorMsg = error?.error?.message || "Si è verificato un errore imprevisto.";
-
-    // Ritorniamo un errore che includa il messaggio
-    return throwError(() => new Error(errorMsg));
-  }
-
   updateItemQuantity(userId: number, productId: number, quantity: number): Observable<CartDTO> {
     return this.http.patch<CartDTO>(
       `${this.baseUrl}/${userId}/items/${productId}`,
@@ -74,5 +63,25 @@ export class CartService {
   resetCart(): void {
     console.log("Resetto il carrello nel CartService.");
     this.cartSubject.next(null);
+  }
+
+  // Nuovo metodo per applicare un coupon a un item del carrello
+  applyCouponToItem(cartItemId: number, couponCode: string): Observable<CartDTO> {
+    return this.http.post<CartDTO>(
+      `${this.baseUrl}/apply-coupon-to-item/${cartItemId}/${couponCode}`,
+      {}
+    ).pipe(
+      tap(cart => {
+        console.log("✅ Coupon applicato, carrello aggiornato:", cart);
+        this.cartSubject.next(cart);
+      }),
+      catchError(error => this.handleError(error))
+    );
+  }
+
+  private handleError(error: any): Observable<never> {
+    console.error("❌ Errore HTTP:", error);
+    const errorMsg = error?.error?.message || "Si è verificato un errore imprevisto.";
+    return throwError(() => new Error(errorMsg));
   }
 }

@@ -7,7 +7,6 @@ import demo.demo_ecommerce.entities.OrderItem;
 import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.repositories.CartRepository;
 import demo.demo_ecommerce.repositories.OrderRepository;
-import demo.demo_ecommerce.repositories.ProductRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
@@ -25,16 +24,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UsersRepository userRepository;
     private final CartRepository cartRepository;
-    private final ProductRepository productRepository;
 
     public OrderService(OrderRepository orderRepository,
                         UsersRepository userRepository,
-                        CartRepository cartRepository,
-                        ProductRepository productRepository) {
+                        CartRepository cartRepository) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
-        this.productRepository = productRepository;
     }
 
     @Transactional
@@ -49,8 +45,19 @@ public class OrderService {
             throw new IllegalArgumentException("Il carrello è vuoto, impossibile creare un ordine");
         }
 
+        // Calcoliamo il totale sommando il prezzo di ogni prodotto, applicando il coupon se presente
         BigDecimal totalBD = cart.getItems().stream()
-                .map(ci -> ci.getProduct().getPrice().multiply(BigDecimal.valueOf(ci.getQuantity())))
+                .map(cartItem -> {
+                    BigDecimal price = cartItem.getProduct().getPrice();
+                    if (cartItem.getAppliedCoupon() != null) {
+                        double discount = cartItem.getAppliedCoupon().getDiscountPercentage();
+                        // Calcolo: prezzo scontato = prezzo * (1 - discount/100)
+                        BigDecimal discountMultiplier = BigDecimal.valueOf(100 - discount)
+                                .divide(BigDecimal.valueOf(100));
+                        price = price.multiply(discountMultiplier);
+                    }
+                    return price.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+                })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         if (totalBD.compareTo(BigDecimal.ZERO) <= 0) {
@@ -64,22 +71,33 @@ public class OrderService {
 
         Order finalOrder = order;
         List<OrderItem> orderItems = cart.getItems().stream()
-                .map(cartItem -> OrderItem.builder()
-                        .order(finalOrder)
-                        .product(cartItem.getProduct())
-                        .quantity(cartItem.getQuantity())
-                        .price(cartItem.getProduct().getPrice())
-                        .build())
+                .map(cartItem -> {
+                    BigDecimal productPrice = cartItem.getProduct().getPrice();
+                    if (cartItem.getAppliedCoupon() != null) {
+                        double discount = cartItem.getAppliedCoupon().getDiscountPercentage();
+                        BigDecimal discountMultiplier = BigDecimal.valueOf(100 - discount)
+                                .divide(BigDecimal.valueOf(100));
+                        productPrice = productPrice.multiply(discountMultiplier);
+                    }
+                    return OrderItem.builder()
+                            .order(finalOrder)
+                            .product(cartItem.getProduct())
+                            .quantity(cartItem.getQuantity())
+                            .price(productPrice)
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         order.setOrderItems(orderItems);
         order = orderRepository.save(order);
 
+        // Svuota il carrello dopo la creazione dell'ordine
         cart.getItems().clear();
         cartRepository.save(cart);
 
         return OrderDTO.fromEntity(order);
     }
+
 
     // Metodo aggiornato per recuperare gli ordini con join fetch degli orderItems
     @Transactional
@@ -100,4 +118,8 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Ordine non trovato: " + orderId));
         return OrderDTO.fromEntity(order);
     }
+
+
+
+
 }

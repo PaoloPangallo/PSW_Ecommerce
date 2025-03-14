@@ -142,6 +142,13 @@
     </table>
   </div>
 
+  <p class="cart-total">
+    <strong>Totale:</strong> {{ getCartTotal() | lire }}
+  </p>
+
+
+
+
   <!-- Messaggio di errore -->
   <div *ngIf="error" class="order-error">
     <p>❌ Errore: {{ error }}</p>

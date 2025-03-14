@@ -3,10 +3,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ProductService } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
 import { Product } from '../../models/product.model';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Location } from '@angular/common';
 import { AuthService } from '../../services/auth.services';
 import { WishlistService } from '../../services/wishlist.service';
 import { Wishlist } from '../../models/wishlist.model';
@@ -14,6 +13,8 @@ import { ReviewListComponent } from '../review/review-list.component';
 import { ReviewFormComponent } from '../review-form/review-form.component';
 import { ReviewService } from '../../services/review-list.services';
 import { ReviewDTO } from '../../models/review.models';
+import { CouponService } from '../../services/coupon.service';
+import { Coupon } from '../../models/coupon.model';
 
 @Component({
   selector: 'app-product-details',
@@ -28,10 +29,13 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   wishlist: Wishlist | null = null;
   successMessage: string = '';
   errorMessage: string = '';
+  coupons: Coupon[] = [];
   private routeSubscription: Subscription | null = null;
 
   // Proprietà per le recensioni
   reviews: ReviewDTO[] = [];
+  couponMessage: string = '';
+
   userHasReviewed: boolean = false;
 
   constructor(
@@ -42,7 +46,8 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     protected authService: AuthService,
     private wishlistService: WishlistService,
-    private reviewService: ReviewService
+    private reviewService: ReviewService,
+    private couponService: CouponService
   ) {}
 
   ngOnInit(): void {
@@ -53,6 +58,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       if (productId) {
         this.loadProduct(productId);
         this.loadReviewsForProduct(productId);
+        this.loadApplicableCoupons(productId);
       } else {
         this.errorMessage = "ID prodotto non valido.";
         this.redirectToHome();
@@ -145,6 +151,43 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadApplicableCoupons(productId: number): void {
+    this.couponService.getCouponsForProduct(productId).subscribe({
+      next: (coupons: Coupon[]) => {
+        this.coupons = coupons;
+      },
+      error: (err: any) => {
+        console.error("Errore nel caricamento dei coupon applicabili:", err);
+      }
+    });
+  }
+
+  // Metodo per applicare il coupon al prodotto corrente
+  applyCouponToProduct(couponCode: string): void {
+    if (!this.product) return;
+
+    // Esempio: validiamo il coupon confrontando il prezzo del prodotto.
+    // Se il coupon è valido per il prodotto (oppure puoi chiamare un endpoint specifico per applicare il coupon),
+    // mostra un messaggio di successo o aggiorna il carrello.
+    this.couponService.validateCoupon(couponCode, this.product.price).subscribe({
+      next: (isValid: boolean) => {
+        if (isValid) {
+          this.couponMessage = `Coupon ${couponCode} applicato al prodotto!`;
+          // Qui potresti, ad esempio, chiamare un metodo del cartService per aggiornare l'item con il coupon:
+          // this.cartService.applyCouponToItem(cartItemId, couponCode).subscribe(...);
+        } else {
+          this.couponMessage = `Coupon ${couponCode} non valido per questo prodotto.`;
+        }
+        setTimeout(() => this.couponMessage = '', 4000);
+      },
+      error: (err: any) => {
+        console.error("Errore applicando il coupon:", err);
+        this.couponMessage = "Errore nell'applicazione del coupon.";
+        setTimeout(() => this.couponMessage = '', 4000);
+      }
+    });
+  }
+
   goBack(): void {
     this.location.back();
   }
@@ -156,4 +199,17 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.routeSubscription?.unsubscribe();
   }
+
+
+  copyCouponCode(code: string): void {
+    navigator.clipboard.writeText(code).then(() => {
+      this.couponMessage = `✅ Coupon "${code}" copiato negli appunti! Incollalo nel carrello.`;
+      setTimeout(() => this.couponMessage = '', 4000);
+    }).catch(err => {
+      console.error("Errore nella copia del coupon:", err);
+      this.couponMessage = "❌ Errore nella copia del coupon.";
+      setTimeout(() => this.couponMessage = '', 4000);
+    });
+  }
+
 }

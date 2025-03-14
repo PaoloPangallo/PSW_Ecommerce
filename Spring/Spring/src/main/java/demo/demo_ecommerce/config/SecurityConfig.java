@@ -28,52 +28,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-
-                // 2. Sessione stateless
+                // Sessione stateless
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // 3. Configura l'accesso agli endpoint
+                // Configura l'accesso agli endpoint
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/images/**").permitAll()
-
-
-                        .requestMatchers("/api/reviews/**").authenticated() // <--- aggiungi questa linea
+                        .requestMatchers("/api/reviews/**").authenticated()
                         .requestMatchers("/api/products/featured").permitAll()
-                        .requestMatchers("/api/products").permitAll() // <--- aggiungi questa linea
-
                         .requestMatchers("/checkout/**").authenticated()
                         .anyRequest().authenticated()
-
-
                 )
-
-
-
-
-
-
-
-                // 4. Aggiungi il tuo filtro JWT
+                // Aggiungi il filtro JWT prima del filtro di autenticazione standard
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // 5. Configurazione CORS
+    // Configurazione CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Aggiungi l'origine del tuo frontend
         configuration.setAllowedOrigins(List.of("http://localhost:4200"));
-        // Metodi permessi
         configuration.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
-        // Header permessi
         configuration.setAllowedHeaders(List.of("*"));
-        // Se hai bisogno di inviare cookie o credenziali
         configuration.setAllowCredentials(true);
 
-        // Applica questa configurazione a tutti i path
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

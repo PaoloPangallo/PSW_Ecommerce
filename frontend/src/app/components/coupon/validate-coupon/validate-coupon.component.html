@@ -1,0 +1,20 @@
+<h2>Validate Coupon</h2>
+<form [formGroup]="validateForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label for="code">Coupon Code:</label>
+    <input id="code" formControlName="code" placeholder="Inserisci il codice coupon" />
+  </div>
+  <div>
+    <label for="orderValue">Order Value:</label>
+    <input id="orderValue" formControlName="orderValue" type="number" placeholder="Inserisci il valore dell'ordine" />
+  </div>
+  <button type="submit">Validate Coupon</button>
+</form>
+<div *ngIf="isValid !== null">
+  <p *ngIf="isValid; else invalidTemplate">
+    Coupon is <strong>Valid!</strong>
+  </p>
+  <ng-template #invalidTemplate>
+    <p>Coupon is <strong>Invalid!</strong></p>
+  </ng-template>
+</div>

@@ -23,7 +23,6 @@ public class Order {
     @Version
     private Long version;
 
-
     @DecimalMin(value = "0.0", inclusive = true, message = "Total must be a positive value")
     private BigDecimal total = BigDecimal.ZERO;
 
@@ -41,6 +40,11 @@ public class Order {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private OrderStatus status;
+
+    // Nuovo campo per salvare il coupon applicato all'ordine (opzionale)
+    @ManyToOne
+    @JoinColumn(name = "coupon_id")
+    private Coupon coupon;
 
     @PrePersist
     public void prePersist() {

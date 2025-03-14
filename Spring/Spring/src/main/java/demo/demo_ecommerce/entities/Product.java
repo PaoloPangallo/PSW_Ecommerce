@@ -48,8 +48,9 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Column(length = 255)
+    @Column(name = "image_url", length = 512) // o un valore adeguato alle tue necessità
     private String imageUrl;
+
 
     // Nuovo campo per identificare i prodotti in evidenza
     @Column(nullable = false)

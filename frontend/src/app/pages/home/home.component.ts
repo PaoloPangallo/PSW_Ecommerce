@@ -16,13 +16,6 @@ export class HomeComponent implements OnInit {
   allProducts: Product[] = []; // Aggiunto per la lista completa di prodotti
 
   // Dati statici per categorie e servizi
-  categories = [
-    { name: 'Smartphone e Telefonia', icon: 'assets/icons/smartphone-icon.png', link: '/category/Smartphone e Telefonia' },
-    { name: 'TV e Home Entertainment', icon: 'assets/icons/tv-icon.png', link: '/category/TV e Home Entertainment' },
-    { name: 'Informatica e Accessori', icon: 'assets/icons/laptop-icon.png', link: '/category/Informatica e Accessori' },
-    { name: 'Elettrodomestici', icon: 'assets/icons/home-icon.png', link: '/category/Elettrodomestici' }
-  ];
-
   services = [
     { title: 'Spedizione Gratis', description: 'Per ordini sopra i 50€', icon: 'assets/icons/shipping-icon.png' },
     { title: 'Assistenza 24/7', description: 'Chat o telefono sempre attivi', icon: 'assets/icons/support-icon.png' },

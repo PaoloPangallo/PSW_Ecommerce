@@ -20,11 +20,14 @@ public class ShoppingCartItem {
     private Long id;
 
     @ManyToOne
-    @JsonIgnore  // 🔥 Evitiamo il ciclo di serializzazione JSON
+    @JsonIgnore
     private Cart cart;
 
     @ManyToOne
     private Product product;
 
     private int quantity;
+
+    @ManyToOne
+    private Coupon appliedCoupon;
 }

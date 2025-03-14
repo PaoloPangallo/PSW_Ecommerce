@@ -10,7 +10,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import {LirePipe} from '../../services/lire.pipe';
+import { LirePipe } from '../../services/lire.pipe';
+import {FormsModule} from '@angular/forms';
 
 @Component({
   selector: 'app-cart',
@@ -23,14 +24,17 @@ import {LirePipe} from '../../services/lire.pipe';
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    LirePipe
+    LirePipe,
+    FormsModule
   ],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })
 export class CartComponent implements OnInit {
   cart: CartDTO | null = null;
-  displayedColumns: string[] = ['productName', 'quantity', 'price', 'total', 'actions'];
+  displayedColumns: string[] = ['productName', 'quantity', 'price', 'total', 'coupon', 'actions'];
+  // Oggetto per tenere traccia del coupon inserito per ogni item (chiave = cartItem ID)
+  couponCodes: { [key: number]: string } = {};
 
   private cartService = inject(CartService);
   private authService = inject(AuthService);
@@ -91,6 +95,7 @@ export class CartComponent implements OnInit {
     });
   }
 
+
   clear(): void {
     const userId = this.checkUserLoggedIn();
     if (!userId) return;
@@ -104,22 +109,6 @@ export class CartComponent implements OnInit {
       }
     });
   }
-
-  createOrder(): void {
-    const userId = this.checkUserLoggedIn();
-    if (!userId) return;
-    this.orderService.createOrder(userId).subscribe({
-      next: (order) => {
-        this.showSnack(`Ordine creato con successo. ID: ${order.id}`, 3000);
-        this.clear();
-      },
-      error: (err) => {
-        console.error('Errore nella creazione dell\'ordine:', err);
-        this.showSnack(err.error || err.message, 5000);
-      }
-    });
-  }
-
   goToCheckout(): void {
     this.router.navigate(['/checkout']);
   }
@@ -140,6 +129,34 @@ export class CartComponent implements OnInit {
       }
     });
   }
+
+  // Metodo per applicare il coupon ad un item, usando il suo ID e il codice inserito
+  applyCoupon(cartItemId: number): void {
+    if (!cartItemId) {
+      this.showSnack("Errore: ID item non definito.", 3000);
+      return;
+    }
+
+    const couponCode = this.couponCodes[cartItemId]; // Recupera il codice coupon associato all'elemento del carrello
+    if (!couponCode) {
+      this.showSnack("⚠️ Inserisci un codice coupon", 3000);
+      return;
+    }
+
+    this.cartService.applyCouponToItem(cartItemId, couponCode).subscribe({
+      next: (cart) => {
+        this.showSnack("🎉 Coupon applicato con successo!", 3000);
+        this.loadCart(this.authService.getCurrentUserId()!);
+      },
+      error: (err) => {
+        console.error("Errore nell'applicazione del coupon:", err);
+        this.showSnack(err.error?.message || "Errore nell'applicazione del coupon", 5000);
+      }
+    });
+  }
+
+
+
 
   private checkUserLoggedIn(): number | null {
     const userId = this.authService.getCurrentUserId();

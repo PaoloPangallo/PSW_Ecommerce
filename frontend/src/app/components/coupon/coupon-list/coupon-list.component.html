@@ -1,0 +1,9 @@
+<h2>Coupon List</h2>
+<ul>
+  <li *ngFor="let coupon of coupons">
+    <strong>{{ coupon.code }}</strong> - {{ coupon.discountPercentage }}% Off -
+    Expires: {{ coupon.expirationDate | date:'short' }} -
+    Active: {{ coupon.isActive ? 'Yes' : 'No' }} -
+    Min Order Value: {{ coupon.minOrderValue | number:'1.2-2' }}
+  </li>
+</ul>

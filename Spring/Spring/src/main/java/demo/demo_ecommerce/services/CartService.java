@@ -1,16 +1,11 @@
 package demo.demo_ecommerce.services;
 
-import demo.demo_ecommerce.entities.Cart;
-import demo.demo_ecommerce.entities.Product;
-import demo.demo_ecommerce.entities.ShoppingCartItem;
-import demo.demo_ecommerce.entities.User;
-import demo.demo_ecommerce.repositories.CartRepository;
-import demo.demo_ecommerce.repositories.ProductRepository;
-import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
-import demo.demo_ecommerce.repositories.UsersRepository;
+import demo.demo_ecommerce.entities.*;
+import demo.demo_ecommerce.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -19,16 +14,22 @@ public class CartService {
     private final CartRepository cartRepository;
     private final UsersRepository usersRepository;
     private final ProductRepository productRepository;
-    private final ShoppingCartItemRepository shoppingCartItemRepository; // Aggiunto repository
+    private final ShoppingCartItemRepository shoppingCartItemRepository;
+    private final CouponRepository couponRepository;
+
+   private final CouponService couponService;
+// Aggiunto repository
 
     public CartService(CartRepository cartRepository,
                        UsersRepository usersRepository,
                        ProductRepository productRepository,
-                       ShoppingCartItemRepository shoppingCartItemRepository) { // Aggiunto repository nel costruttore
+                       ShoppingCartItemRepository shoppingCartItemRepository, CouponRepository couponRepository, CouponService couponService) { // Aggiunto repository nel costruttore
         this.cartRepository = cartRepository;
         this.usersRepository = usersRepository;
         this.productRepository = productRepository;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
+        this.couponRepository = couponRepository;
+        this.couponService = couponService;
     }
 
     @Transactional
@@ -59,6 +60,36 @@ public class CartService {
     }
 
 
+    @Transactional
+    public boolean applyCouponToCartItem(Long cartItemId, String couponCode) {
+        ShoppingCartItem item = shoppingCartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart item not found with ID: " + cartItemId));
+
+        // Se lo stesso coupon è già applicato, non fare nulla
+        if (item.getAppliedCoupon() != null && item.getAppliedCoupon().getCode().equals(couponCode)) {
+            return false;
+        }
+
+        BigDecimal productPrice = item.getProduct().getPrice();
+        boolean isValid = couponService.validateCouponForProduct(couponCode, productPrice);
+        if (!isValid) {
+            return false;
+        }
+
+        Coupon coupon = couponRepository.findByCode(couponCode)
+                .orElseThrow(() -> new IllegalArgumentException("Coupon not found with code: " + couponCode));
+
+        // Applica il coupon all'item del carrello
+        item.setAppliedCoupon(coupon);
+        shoppingCartItemRepository.save(item);
+
+        // Aggiorna anche la preferenza nel carrello
+        Cart cart = item.getCart();
+        cart.getSelectedCoupons().put(item.getProduct().getId(), couponCode);
+        cartRepository.save(cart);
+
+        return true;
+    }
 
 
 

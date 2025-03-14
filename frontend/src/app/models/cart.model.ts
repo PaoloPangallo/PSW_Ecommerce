@@ -1,11 +1,13 @@
 // src/app/models/cart.model.ts
 
 export interface CartItemDTO {
-  productId: number;
+  id: number;         // Identificativo univoco dell'item nel carrello
+  productId: number;  // Identificativo del prodotto
   productName: string;
   price: number;
   quantity: number;
 }
+
 
 export interface CartDTO {
   userId: number;

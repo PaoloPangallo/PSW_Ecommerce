@@ -24,21 +24,27 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long validityInMilliseconds;
 
+    // Variabile per il caching della chiave segreta
+    private SecretKey cachedKey;
+
     /**
-     * Metodo per ottenere la chiave segreta decodificata
+     * Restituisce la chiave segreta decodificata, utilizzando il caching.
      */
     private SecretKey getKey() {
-        try {
-            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-            return Keys.hmacShaKeyFor(keyBytes);
-        } catch (Exception e) {
-            logger.error("Errore nella decodifica della chiave JWT: {}", e.getMessage());
-            throw new RuntimeException("Chiave JWT non valida, verifica jwt.secret in application.properties");
+        if (cachedKey == null) {
+            try {
+                byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+                cachedKey = Keys.hmacShaKeyFor(keyBytes);
+            } catch (Exception e) {
+                logger.error("Errore nella decodifica della chiave JWT: {}", e.getMessage());
+                throw new RuntimeException("Chiave JWT non valida, verifica jwt.secret in application.properties");
+            }
         }
+        return cachedKey;
     }
 
     /**
-     * Genera un token JWT per l'utente con il ruolo specificato
+     * Genera un token JWT per l'utente con il ruolo specificato.
      */
     public String generateToken(String username, String role) {
         Date now = new Date();
@@ -57,18 +63,16 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Verifica se il token è valido
+     * Verifica se il token è valido.
      */
     public boolean validateToken(String token) {
         try {
-            logger.info("DEBUG JWT: Token ricevuto per validazione = [{}]", token);
-
+            logger.debug("Token ricevuto per validazione = [{}]", token);
             Jwts.parserBuilder()
                     .setSigningKey(getKey())
                     .build()
                     .parseClaimsJws(token);
             return true;
-
         } catch (io.jsonwebtoken.security.SignatureException e) {
             logger.error("Firma JWT non valida: {}", e.getMessage());
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
@@ -84,12 +88,11 @@ public class JwtTokenProvider {
     }
 
     /**
-     * Estrae le Claims (informazioni) dal token JWT
+     * Estrae le claims dal token JWT.
      */
     public Claims getClaimsFromToken(String token) {
         try {
-            logger.info("DEBUG JWT: Token ricevuto per estrazione claims = [{}]", token);
-
+            logger.debug("Token ricevuto per estrazione claims = [{}]", token);
             return Jwts.parserBuilder()
                     .setSigningKey(getKey())
                     .build()

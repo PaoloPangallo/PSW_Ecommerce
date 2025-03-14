@@ -22,10 +22,14 @@ public class ShoppingCartItemDTO {
     @NotNull
     private final int quantity;
 
+    private final Long id;
+
     public ShoppingCartItemDTO(ShoppingCartItem item) {
+        this.id = item.getId(); // <-- ID univoco dell'elemento
         this.productId = item.getProduct().getId();
         this.productName = item.getProduct().getName();
         this.price = item.getProduct().getPrice();
         this.quantity = item.getQuantity();
     }
+
 }

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
@@ -16,18 +17,20 @@ public class CartDTO {
 
     @NotNull
     private final List<ShoppingCartItemDTO> items;
+    private final Map<Long, String> selectedCoupons; // productId -> couponCode
 
-    public CartDTO(Long id, List<ShoppingCartItemDTO> items) {
+
+    public CartDTO(Long id, List<ShoppingCartItemDTO> items, Map<Long, String> selectedCoupons) {
         this.id = id;
         this.items = items;
+        this.selectedCoupons = selectedCoupons;
     }
-
     public static CartDTO fromEntity(Cart cart) {
         List<ShoppingCartItemDTO> itemsList = cart.getItems().stream()
                 .filter(item -> item.getProduct() != null)
                 .map(ShoppingCartItemDTO::new)
                 .collect(Collectors.toList());
-        return new CartDTO(cart.getId(), itemsList);
+        return new CartDTO(cart.getId(), itemsList, cart.getSelectedCoupons());
     }
 
 }

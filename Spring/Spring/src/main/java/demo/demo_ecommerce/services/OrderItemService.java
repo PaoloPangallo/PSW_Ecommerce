@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -52,8 +51,4 @@ public class OrderItemService {
         orderItemRepository.deleteById(id);
     }
 
-    // Calcola il totale del prezzo per un ordine
-    public BigDecimal getTotalPriceByOrderId(Long orderId) {
-        return orderItemRepository.findTotalPriceByOrderId(orderId);
-    }
 }

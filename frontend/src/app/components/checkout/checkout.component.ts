@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule} from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CheckoutService, CheckoutRequest, CheckoutResponse } from '../../services/checkout.service';
 import { AuthService } from '../../services/auth.services';
@@ -19,7 +19,9 @@ import {LirePipe} from '../../services/lire.pipe';
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    LirePipe  // Importiamo il pipe per formattare i prezzi in lire
+    LirePipe,
+    FormsModule,
+    // Importiamo il pipe per formattare i prezzi in lire
   ],
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css']
