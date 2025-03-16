@@ -1,23 +1,19 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
-import { ProductListComponent } from './components/product-list/product-list.component';
-import { ProductDetailsComponent } from './components/product-details/product-details.component';
-import { OrderHistoryComponent } from './components/order-history/order-history.component';
-import { UserProfileComponent } from './components/user-profile/user-profile.component';
-import { CartComponent } from './components/cart/cart.component';
 import { LoginComponent } from './components/login/login.component';
-import { RegisterComponent } from './components/register/register.component';
+import { ProductListComponent } from './components/product-list/product-list.component';
+import { OrderHistoryComponent } from './components/order-history/order-history.component';
+import { ProductDetailsComponent } from './components/product-details/product-details.component';
 import { CreatePaymentComponent } from './components/create-payment/create-payment.component';
 import { PaymentListComponent } from './components/payment-list/payment-list.component';
+import { CartComponent } from './components/cart/cart.component';
+import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { RegisterComponent } from './components/register/register.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
 import { WishlistComponent } from './components/wishlist/wishlist.component';
 import { OrderDetailsComponent } from './components/order/order-details/order-details.component';
-import {
-  ProductImageGeneratorComponent
-} from './components/product-list/product-image-generator/product-image-generator.component';
-
-
-
+import { AdminGuard } from './guards/admin.guard';
+import {AdminComponent} from './pages/admin.component';
 
 export const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -35,6 +31,12 @@ export const appRoutes: Routes = [
   { path: 'wishlist', component: WishlistComponent },
   { path: 'orders/:id', component: OrderDetailsComponent },
   { path: 'orders', component: OrderHistoryComponent },
-  { path: 'admin/generate-image/:productId', component: ProductImageGeneratorComponent,},
-  { path: '**', redirectTo: '' }, // Se la rotta non esiste, torna alla home
+  // Rotte admin: accessibili solo se AdminGuard restituisce true
+  {
+    path: 'admin',
+    canActivate: [AdminGuard],
+    loadChildren: () =>
+      import('./pages/admin/admin.routes').then(m => m.ADMIN_ROUTES)
+  },
+  { path: '**', redirectTo: '' } // Se la rotta non esiste, torna alla home
 ];

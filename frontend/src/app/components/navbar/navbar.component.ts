@@ -15,7 +15,7 @@ export class NavbarComponent {
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    protected authService: AuthService
   ) {}
 
   onSearch(event: Event): void {

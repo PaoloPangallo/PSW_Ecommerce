@@ -26,8 +26,9 @@ export class UserProfileComponent implements OnInit {
     const userId = this.authService.getCurrentUserId();
     if (userId !== null) {
       this.userService.getUserById(userId).subscribe({
-        next: (user: User) => {
-          this.user = user;
+        next: (serverUser: any) => {
+          // Mappiamo i dati dal server (in inglese) al nostro modello User
+          this.user = this.mapServerUser(serverUser);
         },
         error: (err) => {
           this.errorMessage = 'Errore nel caricamento del profilo';
@@ -42,10 +43,13 @@ export class UserProfileComponent implements OnInit {
   updateProfile(): void {
     if (this.user) {
       console.log('Aggiornamento profilo con dati:', this.user);
-      this.userService.updateUser(this.user.id, this.user).subscribe({
-        next: (updatedUser) => {
-          console.log('Server ha restituito:', updatedUser);
-          this.user = updatedUser;
+      // Mappiamo l'oggetto user nel formato richiesto dal server
+      const serverUserPayload = this.mapUserToServerUser(this.user);
+      this.userService.updateUser(this.user.id, serverUserPayload).subscribe({
+        next: (updatedServerUser: any) => {
+          console.log('Server ha restituito:', updatedServerUser);
+          // Aggiorniamo l'oggetto user mappando i dati restituiti dal server
+          this.user = this.mapServerUser(updatedServerUser);
           this.successMessage = 'Profilo aggiornato con successo!';
           this.errorMessage = '';
         },
@@ -58,5 +62,38 @@ export class UserProfileComponent implements OnInit {
     }
   }
 
+  /**
+   * Mappa i dati provenienti dal server (che ora usa nomi in inglese)
+   * nel nostro modello User (stesso naming in inglese).
+   */
+  private mapServerUser(serverUser: any): User {
+    return {
+      id: serverUser.id,
+      username: serverUser.username,
+      email: serverUser.email,
+      role: serverUser.role,
+      phone: serverUser.phone,       // <-- Usiamo 'phone', NON 'telefono'
+      address: serverUser.address,   // <-- Usiamo 'address', NON 'indirizzo'
+      cap: serverUser.cap,
+      city: serverUser.city,         // <-- Usiamo 'city', NON 'citta'
+      region: serverUser.region,     // <-- Usiamo 'region', NON 'regione'
+      country: serverUser.country    // <-- Usiamo 'country', NON 'paese'
+    };
+  }
 
+  /**
+   * Mappa l'oggetto User nel formato richiesto dal server per l'update,
+   * ovvero con campi in inglese.
+   */
+  private mapUserToServerUser(user: User): any {
+    return {
+      email: user.email,
+      phone: user.phone,
+      address: user.address,
+      cap: user.cap,
+      city: user.city,
+      region: user.region,
+      country: user.country
+    };
+  }
 }

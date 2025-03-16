@@ -31,7 +31,7 @@ export class CouponService {
     return this.http.get<Coupon[]>(this.baseUrl);
   }
 
-  // Metodo aggiuntivo per recuperare i coupon applicabili a un prodotto
+  // Recupera i coupon applicabili a un prodotto
   getCouponsForProduct(productId: number): Observable<Coupon[]> {
     return this.http.get<Coupon[]>(`${this.baseUrl}/applicable/${productId}`);
   }

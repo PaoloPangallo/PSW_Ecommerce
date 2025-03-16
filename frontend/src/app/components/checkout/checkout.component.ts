@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule} from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CheckoutService, CheckoutRequest, CheckoutResponse } from '../../services/checkout.service';
 import { AuthService } from '../../services/auth.services';
@@ -10,7 +10,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Order } from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
-import {LirePipe} from '../../services/lire.pipe';
+import { LirePipe } from '../../services/lire.pipe';
 
 @Component({
   selector: 'app-checkout',
@@ -20,8 +20,7 @@ import {LirePipe} from '../../services/lire.pipe';
     ReactiveFormsModule,
     RouterModule,
     LirePipe,
-    FormsModule,
-    // Importiamo il pipe per formattare i prezzi in lire
+    FormsModule
   ],
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css']
@@ -37,7 +36,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   error: string | null = null;
   cart: CartDTO | null = null;
 
-  // Metodi di pagamento disponibili
   paymentMethods = [
     { value: 'Visa', label: 'Visa' },
     { value: 'PayPal', label: 'PayPal' },
@@ -66,6 +64,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   private initializeForm(): void {
+    // Form che rispecchia la struttura di CheckoutRequest:
+    // shipping: { ... }
+    // transaction: { paymentMethod, amount, status }
     this.checkoutForm = this.fb.group({
       shipping: this.fb.group({
         address: ['', Validators.required],
@@ -75,7 +76,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         shippingMethod: ['STANDARD', Validators.required]
       }),
       transaction: this.fb.group({
-        paymentMethod: ['', Validators.required],
+        paymentMethod: ['', Validators.required],  // <-- Campo di primo livello
         amount: [this.getCartTotal(), [Validators.required, Validators.min(0)]],
         status: ['PENDING', Validators.required]
       })
@@ -90,7 +91,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         .subscribe({
           next: (cart) => {
             this.cart = cart;
-            // Aggiorna il campo "amount" nel form con il totale aggiornato
+            // Aggiorna il campo "amount" con il totale
             this.checkoutForm.get('transaction.amount')?.setValue(this.getCartTotal());
             this.cdRef.detectChanges();
           },
@@ -108,7 +109,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return this.cart.items.reduce((acc, item) => acc + (item.price * item.quantity), 0);
   }
 
-  // Getter per i gruppi del form
   get shippingGroup(): FormGroup {
     return this.checkoutForm.get('shipping') as FormGroup;
   }
@@ -151,7 +151,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
 
     this.loading = true;
-    const checkoutData: CheckoutRequest = this.checkoutForm.getRawValue();
+    const checkoutData: CheckoutRequest = this.checkoutForm.getRawValue(); // shipping + transaction
 
     this.checkoutService.processCheckout(userId, checkoutData, token)
       .pipe(takeUntil(this.unsubscribe$))

@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Order } from '../../../models/order.model';
 import { OrderService } from '../../../services/order.service';
 import { AuthService } from '../../../services/auth.services';
+import { LirePipe } from '../../../services/lire.pipe';
 
 @Component({
   selector: 'app-order-details',
@@ -18,7 +19,8 @@ import { AuthService } from '../../../services/auth.services';
     MatCardModule,
     MatListModule,
     MatButtonModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    LirePipe  // Importa il pipe per la conversione in lire
   ],
   templateUrl: './order-details.component.html',
   styleUrls: ['./order-details.component.css']
@@ -50,8 +52,7 @@ export class OrderDetailsComponent implements OnInit {
 
     this.orderService.getOrderById(userId, orderId).subscribe({
       next: (data) => {
-        console.log('Risposta dal backend:', data); // <--- LOGGA QUI
-
+        console.log('Risposta dal backend:', data);
         this.order = data;
         this.isLoading = false;
       },

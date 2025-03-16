@@ -4,7 +4,6 @@ import { Wishlist } from '../../models/wishlist.model';
 import { WishlistService } from '../../services/wishlist.service';
 import { AuthService } from '../../services/auth.services';
 import {LirePipe} from '../../services/lire.pipe';
-// Importa la pipe: assicurati che il path sia corretto
 
 @Component({
   selector: 'app-wishlist',

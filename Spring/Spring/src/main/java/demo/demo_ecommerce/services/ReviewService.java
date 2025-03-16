@@ -5,7 +5,6 @@ import demo.demo_ecommerce.Utility.ReviewLimitExceededException;
 import demo.demo_ecommerce.dtos.ReviewDTO;
 import demo.demo_ecommerce.entities.Review;
 import demo.demo_ecommerce.repositories.ReviewRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -60,8 +58,9 @@ public class ReviewService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Review> reviews = reviewRepository.findByProductId(productId, pageable);
 
+        // Se non ci sono recensioni, restituiamo una pagina vuota
         if (reviews.isEmpty()) {
-            throw new ResourceNotFoundException("No reviews found for product ID: " + productId);
+            return Page.empty(pageable);
         }
         return reviews.map(ReviewDTO::fromEntity);
     }
@@ -72,24 +71,27 @@ public class ReviewService {
         Pageable pageable = PageRequest.of(page, size);
         Page<Review> reviews = reviewRepository.findByUserId(userId, pageable);
 
+        // Se non ci sono recensioni, restituiamo una pagina vuota
         if (reviews.isEmpty()) {
-            throw new ResourceNotFoundException("No reviews found for user ID: " + userId);
+            return Page.empty(pageable);
         }
         return reviews.map(ReviewDTO::fromEntity);
     }
 
+    // Recupera tutte le recensioni di un prodotto senza paginazione
     @Transactional(readOnly = true)
     public List<ReviewDTO> getAllReviewsByProductId(Long productId) {
         logger.info("Fetching all reviews for product ID: {}", productId);
         List<Review> reviews = reviewRepository.findByProductId(productId);
+
+        // Se non ci sono recensioni, restituiamo una lista vuota
         if (reviews.isEmpty()) {
-            throw new ResourceNotFoundException("No reviews found for product ID: " + productId);
+            return List.of();
         }
         // Forza l'inizializzazione della collection upvotes per ogni review
         reviews.forEach(review -> review.getUpvotes().size());
         return reviews.stream().map(ReviewDTO::fromEntity).toList();
     }
-
 
     // Metodo per aggiornare una recensione esistente
     public ReviewDTO updateReview(Long reviewId, Review reviewDetails) {

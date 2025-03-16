@@ -15,11 +15,12 @@ import { ReviewService } from '../../services/review-list.services';
 import { ReviewDTO } from '../../models/review.models';
 import { CouponService } from '../../services/coupon.service';
 import { Coupon } from '../../models/coupon.model';
+import { LirePipe } from '../../services/lire.pipe';
 
 @Component({
   selector: 'app-product-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReviewListComponent, ReviewFormComponent],
+  imports: [CommonModule, RouterModule, ReviewListComponent, ReviewFormComponent, LirePipe],
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.css']
 })
@@ -32,10 +33,12 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   coupons: Coupon[] = [];
   private routeSubscription: Subscription | null = null;
 
+  // 🔹 Per la selezione del file
+  selectedFile: File | null = null;
+
   // Proprietà per le recensioni
   reviews: ReviewDTO[] = [];
   couponMessage: string = '';
-
   userHasReviewed: boolean = false;
 
   constructor(
@@ -68,6 +71,38 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     this.loadWishlist();
   }
 
+  // ===========================
+  // = UPLOAD IMMAGINE LOGICA =
+  // ===========================
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      this.selectedFile = input.files[0];
+    }
+  }
+
+  uploadImage(): void {
+    if (this.product && this.selectedFile) {
+      this.productService.uploadProductImage(this.product.id!, this.selectedFile)
+        .subscribe({
+          next: (updatedProduct: Product) => {
+            // Aggiorniamo il product locale con l'URL appena generato
+            this.product = updatedProduct;
+            this.successMessage = "Immagine caricata con successo!";
+            // Reset del file selezionato (opzionale)
+            this.selectedFile = null;
+          },
+          error: (err) => {
+            console.error("Errore durante l'upload dell'immagine:", err);
+            this.errorMessage = "Errore nell'upload dell'immagine.";
+          }
+        });
+    }
+  }
+
+  // ===========================
+  // = METODI DI GESTIONE PRODOTTO, COUPON, REVIEW, ECC. =
+  // ===========================
   loadProduct(productId: number): void {
     this.isLoading = true;
     this.productService.getProductById(productId).subscribe({
@@ -162,19 +197,12 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Metodo per applicare il coupon al prodotto corrente
   applyCouponToProduct(couponCode: string): void {
     if (!this.product) return;
-
-    // Esempio: validiamo il coupon confrontando il prezzo del prodotto.
-    // Se il coupon è valido per il prodotto (oppure puoi chiamare un endpoint specifico per applicare il coupon),
-    // mostra un messaggio di successo o aggiorna il carrello.
     this.couponService.validateCoupon(couponCode, this.product.price).subscribe({
       next: (isValid: boolean) => {
         if (isValid) {
           this.couponMessage = `Coupon ${couponCode} applicato al prodotto!`;
-          // Qui potresti, ad esempio, chiamare un metodo del cartService per aggiornare l'item con il coupon:
-          // this.cartService.applyCouponToItem(cartItemId, couponCode).subscribe(...);
         } else {
           this.couponMessage = `Coupon ${couponCode} non valido per questo prodotto.`;
         }
@@ -200,7 +228,6 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
     this.routeSubscription?.unsubscribe();
   }
 
-
   copyCouponCode(code: string): void {
     navigator.clipboard.writeText(code).then(() => {
       this.couponMessage = `✅ Coupon "${code}" copiato negli appunti! Incollalo nel carrello.`;
@@ -211,5 +238,4 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       setTimeout(() => this.couponMessage = '', 4000);
     });
   }
-
 }

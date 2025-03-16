@@ -11,7 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { LirePipe } from '../../services/lire.pipe';
-import {FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-cart',
@@ -55,6 +55,7 @@ export class CartComponent implements OnInit {
     this.cartService.getCart(userId).subscribe({
       next: (cart) => {
         this.cart = cart;
+        console.log('Carrello caricato:', cart);
       },
       error: (err) => {
         console.error('Errore nel caricamento del carrello:', err);
@@ -95,7 +96,6 @@ export class CartComponent implements OnInit {
     });
   }
 
-
   clear(): void {
     const userId = this.checkUserLoggedIn();
     if (!userId) return;
@@ -109,6 +109,7 @@ export class CartComponent implements OnInit {
       }
     });
   }
+
   goToCheckout(): void {
     this.router.navigate(['/checkout']);
   }
@@ -130,23 +131,21 @@ export class CartComponent implements OnInit {
     });
   }
 
-  // Metodo per applicare il coupon ad un item, usando il suo ID e il codice inserito
+  // Metodo per applicare il coupon a un item
   applyCoupon(cartItemId: number): void {
-    if (!cartItemId) {
-      this.showSnack("Errore: ID item non definito.", 3000);
-      return;
-    }
-
-    const couponCode = this.couponCodes[cartItemId]; // Recupera il codice coupon associato all'elemento del carrello
+    const couponCode = this.couponCodes[cartItemId];
     if (!couponCode) {
       this.showSnack("⚠️ Inserisci un codice coupon", 3000);
       return;
     }
-
     this.cartService.applyCouponToItem(cartItemId, couponCode).subscribe({
       next: (cart) => {
         this.showSnack("🎉 Coupon applicato con successo!", 3000);
-        this.loadCart(this.authService.getCurrentUserId()!);
+        // Ricarica il carrello per visualizzare i prezzi aggiornati
+        const userId = this.authService.getCurrentUserId();
+        if (userId) {
+          this.loadCart(userId);
+        }
       },
       error: (err) => {
         console.error("Errore nell'applicazione del coupon:", err);
@@ -154,9 +153,6 @@ export class CartComponent implements OnInit {
       }
     });
   }
-
-
-
 
   private checkUserLoggedIn(): number | null {
     const userId = this.authService.getCurrentUserId();

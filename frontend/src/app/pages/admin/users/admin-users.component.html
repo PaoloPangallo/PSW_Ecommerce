@@ -1,0 +1,50 @@
+<div class="admin-users-container">
+  <h1>Gestione Utenti</h1>
+
+  <!-- Tabella utenti -->
+  <table class="users-table">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Ruolo</th>
+      <th>Telefono</th>
+      <th>Indirizzo</th>
+      <th>Azioni</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let user of users">
+      <td>{{ user.id }}</td>
+      <td>{{ user.username }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.role }}</td>
+      <td>{{ user.phone }}</td>
+      <td>{{ user.address }}</td>
+      <td>
+        <button class="action-btn edit" (click)="onEdit(user)">Aggiorna</button>
+        <button class="action-btn delete" (click)="onDelete(user)">Elimina</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- Modale per l'aggiornamento utente -->
+  <div *ngIf="editingUser" class="modal-overlay">
+    <div class="modal">
+      <h2>Aggiorna Utente: {{ editingUser.username }}</h2>
+      <form (ngSubmit)="onSubmitUpdate()">
+        <div class="form-group">
+          <label for="phone">Telefono:</label>
+          <input id="phone" type="text" [(ngModel)]="editingUser.phone" name="phone" required />
+        </div>
+        <!-- Puoi aggiungere altri campi qui -->
+        <div class="modal-actions">
+          <button type="submit" class="action-btn save">Salva</button>
+          <button type="button" class="action-btn cancel" (click)="cancelEdit()">Annulla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -145,4 +145,16 @@ public class ProductService {
         return productRepository.findByFeaturedTrue();
     }
 
+    @Transactional
+    public Product updateProductImage(Long id, String imageUrl) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException("Prodotto non trovato con ID: " + id));
+        product.setImageUrl(imageUrl);
+        return productRepository.save(product);
+    }
+
+
+
+
+
 }

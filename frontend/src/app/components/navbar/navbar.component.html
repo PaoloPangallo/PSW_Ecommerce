@@ -15,6 +15,14 @@
       <button (click)="search()" class="search-button">🔍</button>
     </div>
 
+    <button
+      *ngIf="authService.isAdmin()"
+      class="search-button"
+      routerLink="/admin"
+    >
+      Console Admin
+    </button>
+
 
     <div class="user-icons">
       <span>

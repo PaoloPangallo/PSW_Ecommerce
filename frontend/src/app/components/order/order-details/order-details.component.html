@@ -5,7 +5,7 @@
   </mat-card-header>
 
   <mat-card-content>
-    <p><strong>Totale:</strong> {{ order.total | number:'1.2-2' }} L</p>
+    <p><strong>Totale:</strong> {{ order.total | lire }}</p>
     <p><strong>Data:</strong> {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
 
     <!-- Mostra i prodotti acquistati se order.items esiste e contiene elementi -->
@@ -15,7 +15,7 @@
         <mat-list-item *ngFor="let item of order.items">
           <div mat-line><strong>{{ item.productName }}</strong></div>
           <div mat-line>
-            Quantità: {{ item.quantity }} - Prezzo: {{ item.price | currency:'EUR' }}
+            Quantità: {{ item.quantity }} - Prezzo: {{ item.price | lire }}
           </div>
         </mat-list-item>
       </mat-list>

@@ -1,135 +1,314 @@
-/* Layout generale del contenitore */
+/* Contenitore generale */
 .product-details-wrapper {
-  max-width: 1200px;       /* Aumentiamo la larghezza massima per un layout più ampio */
-  margin: 20px auto;       /* Centra il contenitore */
-  padding: 20px;           /* Spazio interno */
-  background-color: #f8f9fa; /* Grigio chiaro di sfondo per la pagina */
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f8f9fa;
 }
 
-/* La “card” principale che racchiude i dettagli del prodotto */
-.product-details-container {
+/* Card del prodotto */
+.product-card {
   display: flex;
-  flex-direction: row;
+  flex-wrap: wrap;
   gap: 30px;
-  background-color: #fff;          /* Sfondo bianco */
-  border-radius: 8px;             /* Angoli arrotondati */
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Ombreggiatura leggera */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
   margin-bottom: 20px;
 }
 
 /* Contenitore dell'immagine */
 .image-container {
-  flex: 1; /* Occupa 1 parte della larghezza */
+  flex: 1 1 300px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid #e0e0e0; /* Separatore verticale */
+  border-right: 1px solid #e0e0e0;
   padding-right: 20px;
 }
 
 .image-container img {
   max-width: 100%;
   border-radius: 8px;
-  object-fit: cover; /* Ritaglia l'immagine in caso di dimensioni diverse */
+  object-fit: cover;
 }
 
-/* Contenitore dei dettagli (testo, pulsanti, messaggi) */
+/* Contenitore dei dettagli */
 .details-container {
-  flex: 2; /* Occupa 2 parti della larghezza */
+  flex: 2 1 500px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 /* Titolo del prodotto */
-.details-container h2 {
-  font-size: 1.5rem;
+.product-title {
+  font-size: 1.8rem;
   margin: 0 0 10px;
   color: #333;
 }
 
-/* Descrizione del prodotto */
-.details-container .description {
+/* Descrizione */
+.description {
   font-size: 1rem;
   color: #555;
   margin-bottom: 15px;
   line-height: 1.4;
 }
 
-/* Prezzo del prodotto */
-.details-container .price {
-  font-size: 1.2rem;
+/* Prezzo */
+.price {
+  font-size: 1.3rem;
   font-weight: 600;
+  margin-bottom: 15px;
+  color: #2e7d32;
+}
+
+/* Contenitore dei pulsanti (Carrello e Wishlist) */
+.button-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 15px;
 }
 
-/* Pulsanti */
-.details-container button {
-  display: inline-block;
-  margin-right: 10px;
-  margin-bottom: 10px; /* Distanza dal pulsante successivo in verticale */
-  padding: 8px 16px;
+.button-container button {
+  padding: 10px 15px;
   font-size: 0.9rem;
-  font-weight: 600;
-  color: #fff;
-  background-color: #0069d9; /* Blu in stile “bootstrap-like” */
   border: none;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  text-decoration: none; /* Rimuove eventuali sottolineature se si tratta di un link */
+  color: #fff;
 }
 
-.details-container button:hover {
-  background-color: #0053a6; /* Blu più scuro al passaggio del mouse */
+.cart-button {
+  background-color: #0069d9;
 }
 
-/* Messaggio di conferma per l'aggiunta al carrello */
+.cart-button:hover {
+  background-color: #0053a6;
+}
+
+.wishlist-button {
+  background-color: #e83e8c;
+}
+
+.wishlist-button:hover {
+  background-color: #c82374;
+}
+
+/* Pulsante admin */
+.admin-button-container {
+  margin-top: 15px;
+}
+
+.admin-generate-button {
+  background-color: #28a745;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.admin-generate-button:hover {
+  background-color: #218838;
+}
+
+/* Messaggio di successo */
 .success-message {
   margin-top: 10px;
   padding: 10px;
-  background-color: #d4edda; /* Verde chiaro */
-  color: #155724;           /* Testo verde scuro */
+  background-color: #d4edda;
+  color: #155724;
   border: 1px solid #c3e6cb;
   border-radius: 4px;
 }
 
-/* Sezione di caricamento */
-.loading-container {
-  text-align: center;
-  margin-top: 20px;
+/* Sezione Upload Immagine */
+.image-upload-container {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
 }
 
-.loading-container .loading-text {
+.upload-title {
+  margin-top: 0;
+  margin-bottom: 10px;
   font-size: 1.2rem;
   color: #333;
 }
 
-/* Sezione prodotto non trovato */
-.notfound-container {
+.upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* File Input Personalizzato */
+.file-input-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.file-input-wrapper input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-input-label {
+  background-color: #17a2b8;
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+}
+
+.file-input-label:hover {
+  background-color: #138496;
+}
+
+.upload-button {
+  background-color: #17a2b8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.upload-button:hover {
+  background-color: #138496;
+}
+
+/* Sezione Coupon */
+.coupon-section {
+  background-color: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.coupon-section h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.coupon-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.coupon-item {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.coupon-code {
+  font-weight: bold;
+  color: #0069d9;
+}
+
+.coupon-discount,
+.coupon-expiry {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.copy-coupon-button {
+  background-color: #17a2b8;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.copy-coupon-button:hover {
+  background-color: #138496;
+}
+
+.coupon-message {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #28a745;
+}
+
+/* Sezione Recensioni */
+.reviews-section {
+  margin-top: 30px;
+}
+
+/* Pulsante Indietro */
+.back-button-container {
   text-align: center;
   margin-top: 20px;
 }
 
-.notfound-container .not-found {
-  font-size: 1.2rem;
-  color: #e74c3c;
-}
-
-/* Pulsante "Indietro" */
 .back-button {
-  padding: 10px 15px;
-  background-color: #6c757d; /* Grigio bootstrap-like */
+  background-color: #6c757d;
+  color: #fff;
   border: none;
+  padding: 10px 15px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #fff;
   transition: background-color 0.3s ease;
 }
 
 .back-button:hover {
   background-color: #5a6268;
+}
+
+/* Caricamento e Not Found */
+.loading-container,
+.notfound-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.loading-text {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.not-found {
+  font-size: 1.2rem;
+  color: #e74c3c;
+}
+
+/* Responsività */
+@media (max-width: 768px) {
+  .product-card {
+    flex-direction: column;
+    gap: 20px;
+  }
+  .image-container {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 20px;
+  }
+  .details-container {
+    flex: 1 1 auto;
+  }
 }

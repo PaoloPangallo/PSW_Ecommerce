@@ -1,58 +1,59 @@
-<h2>📦 Storico Ordini</h2>
+<div class="order-history-container" *ngIf="!isLoading; else loadingTemplate">
+  <h2>Storico Ordini</h2>
 
-<!-- Stato di caricamento -->
-<div *ngIf="isLoading">Caricamento...</div>
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
 
-<!-- Mostra errori -->
-<div *ngIf="error" class="error-message">{{ error }}</div>
+  <table mat-table [dataSource]="orders" class="mat-elevation-z8" *ngIf="orders.length > 0">
+    <!-- ID Column -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef>ID Ordine</th>
+      <td mat-cell *matCellDef="let order">{{ order.id }}</td>
+    </ng-container>
 
-<!-- Se non ci sono ordini -->
-<div *ngIf="!isLoading && orders.length === 0" class="no-orders">
-  ❌ Nessun ordine trovato.
+    <!-- Total Column -->
+    <ng-container matColumnDef="total">
+      <th mat-header-cell *matHeaderCellDef>Totale</th>
+      <td mat-cell *matCellDef="let order">
+        <ng-container *ngIf="order.oldTotal && order.oldTotal > order.total; else finalTotal">
+          <del>{{ order.oldTotal | currency:'EUR':'symbol':'1.2-2' }}</del>
+          <span>{{ order.total | lire }}</span>
+        </ng-container>
+        <ng-template #finalTotal>
+          {{ order.total | lire }}
+        </ng-template>
+      </td>
+    </ng-container>
+
+    <!-- Date Column -->
+    <ng-container matColumnDef="date">
+      <th mat-header-cell *matHeaderCellDef>Data</th>
+      <td mat-cell *matCellDef="let order">
+        {{ order.createdAt | date:'short' }}
+      </td>
+    </ng-container>
+
+    <!-- Actions Column -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Azioni</th>
+      <td mat-cell *matCellDef="let order">
+        <button mat-button [routerLink]="['/orders', order.id]">Dettagli</button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <!-- Navigazione Pagine -->
+  <div class="pagination-buttons" *ngIf="orders.length > 0 && totalPages > 1">
+    <button mat-button (click)="goToPreviousPage()" [disabled]="currentPage === 0">Precedente</button>
+    <span>Pagina {{ currentPage + 1 }} di {{ totalPages }}</span>
+    <button mat-button (click)="goToNextPage()" [disabled]="currentPage === totalPages - 1">Successiva</button>
+  </div>
 </div>
 
-<!-- Tabella degli ordini -->
-<table mat-table [dataSource]="orders" class="mat-elevation-z8" *ngIf="orders.length > 0">
-  <!-- Colonna ID -->
-  <ng-container matColumnDef="id">
-    <th mat-header-cell *matHeaderCellDef>ID</th>
-    <td mat-cell *matCellDef="let order">{{ order.id }}</td>
-  </ng-container>
-
-  <!-- Colonna Totale -->
-  <ng-container matColumnDef="total">
-    <th mat-header-cell *matHeaderCellDef>Totale</th>
-    <td mat-cell *matCellDef="let order">{{ order.total | number:'1.2-2' }} L</td>
-  </ng-container>
-
-  <!-- Colonna Data -->
-  <ng-container matColumnDef="date">
-    <th mat-header-cell *matHeaderCellDef>Data</th>
-    <td mat-cell *matCellDef="let order">{{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
-  </ng-container>
-
-  <!-- Colonna Azioni -->
-  <ng-container matColumnDef="actions">
-    <th mat-header-cell *matHeaderCellDef>Azioni</th>
-    <td mat-cell *matCellDef="let order">
-      <button mat-button color="primary" [routerLink]="['/orders', order.id]">
-        Dettagli
-      </button>
-    </td>
-  </ng-container>
-
-  <!-- Righe della tabella -->
-  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-</table>
-
-<!-- Controlli di paginazione -->
-<div class="pagination-controls" *ngIf="orders.length > 0">
-  <button mat-button (click)="goToPreviousPage()" [disabled]="currentPage === 0">
-    Precedente
-  </button>
-  <span>Pagina {{ currentPage + 1 }} di {{ totalPages }}</span>
-  <button mat-button (click)="goToNextPage()" [disabled]="currentPage >= totalPages - 1">
-    Successivo
-  </button>
-</div>
+<ng-template #loadingTemplate>
+  <p>Caricamento in corso...</p>
+</ng-template>

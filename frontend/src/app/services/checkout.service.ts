@@ -3,17 +3,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-export interface Payment {
-  paymentMethod: string;
-}
-
-
 export interface Transaction {
-  payment: Payment;
-  amount: number;    // Aggiungi questo campo per l'importo
+  paymentMethod: string;  // <-- Campo direttamente in Transaction
+  amount: number;
   status: string;
 }
-
 
 export interface Shipping {
   address: string;
@@ -38,7 +32,6 @@ export interface CheckoutResponse {
   providedIn: 'root'
 })
 export class CheckoutService {
-
   private apiUrl = 'http://localhost:8080/checkout';
 
   constructor(private http: HttpClient) {}

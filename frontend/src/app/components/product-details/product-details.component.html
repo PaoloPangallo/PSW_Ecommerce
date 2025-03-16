@@ -1,72 +1,92 @@
 <div class="product-details-wrapper">
-  <!-- Dettagli prodotto: immagine, nome, descrizione, prezzo, ecc. -->
-  <div class="product-details-container" *ngIf="!isLoading && product">
-    <div class="image-container">
-      <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name">
-    </div>
-    <div class="details-container">
-      <h2>{{ product.name }}</h2>
-      <p class="description">{{ product.description }}</p>
-      <p class="price"><strong>Prezzo:</strong> {{ product.price }} L</p>
-      <div class="button-container">
-        <button class="cart-button" (click)="addToCart()">🛒 Aggiungi al Carrello</button>
-        <button class="wishlist-button" (click)="addToWishlist()">❤️ Aggiungi alla Wishlist</button>
-      </div>
-      <div *ngIf="authService.isAdmin()" class="admin-button-container">
-        <button class="admin-generate-button" [routerLink]="['/admin/generate-image', product.id]">
-          Genera un'immagine coerente con {{ product.name }}
-        </button>
-      </div>
-      <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
-    </div>
-  </div>
-
-  <!-- Sezione per i coupon applicabili al prodotto -->
-  <div class="coupon-section" *ngIf="coupons && coupons.length > 0">
-    <h3>Coupon Applicabili</h3>
-    <ul>
-      <li *ngFor="let coupon of coupons">
-        <strong>{{ coupon.code }}</strong> - {{ coupon.discountPercentage }}% di sconto
-        - Scade il: {{ coupon.expirationDate | date:'short' }}
-        <button (click)="applyCouponToProduct(coupon.code)">Applica Coupon</button>
-      </li>
-    </ul>
-  </div>
-
-  <!-- Sezione per i coupon applicabili al prodotto -->
-  <div class="coupon-section" *ngIf="coupons && coupons.length > 0">
-    <h3>Coupon Applicabili</h3>
-    <ul>
-      <li *ngFor="let coupon of coupons">
-        <strong>{{ coupon.code }}</strong> - {{ coupon.discountPercentage }}% di sconto
-        - Scade il: {{ coupon.expirationDate | date:'short' }}
-        <button (click)="copyCouponCode(coupon.code)">📋 Copia Codice</button>
-      </li>
-    </ul>
-    <p *ngIf="couponMessage" class="coupon-message">{{ couponMessage }}</p>
-  </div>
-
-
-
-
   <!-- Stato di caricamento o prodotto non trovato -->
-  <div class="loading-container" *ngIf="isLoading">
-    <p class="loading-text">⏳ Caricamento in corso...</p>
-  </div>
-  <div class="notfound-container" *ngIf="!isLoading && !product">
-    <p class="not-found">⚠️ Prodotto non trovato.</p>
-  </div>
-
-  <!-- Se il prodotto esiste, mostra le recensioni e il form (condizionato) -->
-  <ng-container *ngIf="product && product.id as prodId">
-    <app-review-list [productId]="prodId"></app-review-list>
-    <ng-container *ngIf="!userHasReviewed">
-      <app-review-form [productId]="prodId"></app-review-form>
-    </ng-container>
-    <ng-container *ngIf="userHasReviewed">
-      <p>Hai già recensito questo prodotto.</p>
-    </ng-container>
+  <ng-container *ngIf="isLoading; else content">
+    <div class="loading-container">
+      <p class="loading-text">⏳ Caricamento in corso...</p>
+    </div>
   </ng-container>
 
-  <button class="back-button" (click)="goBack()">⬅️ Indietro</button>
+  <ng-template #content>
+    <ng-container *ngIf="product; else notFound">
+      <!-- CARD del Prodotto -->
+      <section class="product-card">
+        <!-- Immagine del prodotto -->
+        <div class="image-container">
+          <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name" />
+        </div>
+
+        <!-- Dettagli del prodotto -->
+        <div class="details-container">
+          <h2 class="product-title">{{ product.name }}</h2>
+          <p class="description">{{ product.description }}</p>
+          <p class="price">
+            <strong>Prezzo:</strong> {{ product.price | lire }}
+          </p>
+
+          <div class="button-container">
+            <button class="cart-button" (click)="addToCart()">🛒 Aggiungi al Carrello</button>
+            <button class="wishlist-button" (click)="addToWishlist()">❤️ Aggiungi alla Wishlist</button>
+          </div>
+
+          <div *ngIf="authService.isAdmin()" class="admin-button-container">
+            <button class="admin-generate-button" [routerLink]="['/admin/generate-image', product.id]">
+              Genera un'immagine coerente con {{ product.name }}
+            </button>
+          </div>
+
+          <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
+        </div>
+      </section>
+
+      <!-- Sezione Upload Immagine -->
+      <section class="image-upload-container">
+        <h3 class="upload-title">Carica una nuova immagine</h3>
+        <div class="upload-controls">
+          <div class="file-input-wrapper">
+            <label class="file-input-label" for="fileInput">Scegli File</label>
+            <input id="fileInput" type="file" (change)="onFileSelected($event)" />
+          </div>
+          <button class="upload-button" (click)="uploadImage()" [disabled]="!selectedFile">
+            Carica Nuova Immagine
+          </button>
+        </div>
+      </section>
+
+      <!-- Sezione Coupon Applicabili -->
+      <section class="coupon-section" *ngIf="coupons && coupons.length > 0">
+        <h3>Coupon Applicabili</h3>
+        <ul>
+          <li *ngFor="let coupon of coupons" class="coupon-item">
+            <span class="coupon-code"><strong>{{ coupon.code }}</strong></span>
+            <span class="coupon-discount">{{ coupon.discountPercentage }}% di sconto</span>
+            <span class="coupon-expiry">Scade il: {{ coupon.expirationDate | date:'short' }}</span>
+            <button class="copy-coupon-button" (click)="copyCouponCode(coupon.code)">📋 Copia Codice</button>
+          </li>
+        </ul>
+        <p *ngIf="couponMessage" class="coupon-message">{{ couponMessage }}</p>
+      </section>
+
+      <!-- Sezione Recensioni -->
+      <section class="reviews-section" *ngIf="product && product.id as prodId">
+        <app-review-list [productId]="prodId"></app-review-list>
+        <ng-container *ngIf="!userHasReviewed; else alreadyReviewed">
+          <app-review-form [productId]="prodId"></app-review-form>
+        </ng-container>
+        <ng-template #alreadyReviewed>
+          <p class="review-info">Hai già recensito questo prodotto.</p>
+        </ng-template>
+      </section>
+    </ng-container>
+
+    <ng-template #notFound>
+      <div class="notfound-container">
+        <p class="not-found">⚠️ Prodotto non trovato.</p>
+      </div>
+    </ng-template>
+
+    <!-- Pulsante per tornare indietro -->
+    <div class="back-button-container">
+      <button class="back-button" (click)="goBack()">⬅️ Indietro</button>
+    </div>
+  </ng-template>
 </div>

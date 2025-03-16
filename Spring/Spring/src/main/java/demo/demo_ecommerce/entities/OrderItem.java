@@ -37,11 +37,6 @@ public class OrderItem {
     @DecimalMin(value = "0.0", message = "The price must be 0 or greater")
     private BigDecimal price;
 
-    @Transient
-    public BigDecimal getTotalPrice() {
-        return price.multiply(BigDecimal.valueOf(quantity));
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

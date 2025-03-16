@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -39,6 +40,8 @@ public class ReviewController {
         this.userService = userService;
     }
 
+    // Qualsiasi utente autenticato può creare una recensione
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public ResponseEntity<?> createReview(@Valid @RequestBody Review review) {
         try {
@@ -50,7 +53,7 @@ public class ReviewController {
         }
     }
 
-    // Recupera tutte le recensioni di un prodotto con paginazione
+    // Recupera tutte le recensioni di un prodotto con paginazione (accesso pubblico)
     @GetMapping("/product/{productId}")
     public ResponseEntity<Page<ReviewDTO>> getReviewsByProductId(
             @PathVariable Long productId,
@@ -63,6 +66,8 @@ public class ReviewController {
     }
 
     // Recupera tutte le recensioni di un utente con paginazione
+    // Permette l'accesso se l'utente autenticato è ADMIN o se l'ID utente passato corrisponde a quello dell'utente autenticato
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @GetMapping("/user/{userId}")
     public ResponseEntity<Page<ReviewDTO>> getReviewsByUserId(
             @PathVariable Long userId,
@@ -74,6 +79,8 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
+    // Permette l'aggiornamento della recensione solo se l'utente è ADMIN o se è l'autore della recensione
+    @PreAuthorize("hasRole('ADMIN') or @reviewService.isReviewOwner(#reviewId, principal.username)")
     @PutMapping("/{reviewId}")
     public ResponseEntity<ReviewDTO> updateReview(
             @PathVariable Long reviewId,
@@ -84,7 +91,7 @@ public class ReviewController {
         return ResponseEntity.ok(updatedReview);
     }
 
-    // Recupera tutte le recensioni di un prodotto senza paginazione
+    // Recupera tutte le recensioni di un prodotto senza paginazione (accesso pubblico)
     @GetMapping("/product/{productId}/all")
     public ResponseEntity<List<ReviewDTO>> getAllReviewsByProductId(@PathVariable Long productId) {
         logger.info("Fetching all reviews for product ID: {}", productId);
@@ -92,15 +99,13 @@ public class ReviewController {
         return ResponseEntity.ok(reviews);
     }
 
-    // Endpoint per cancellare una recensione (solo se appartiene all'utente corrente)
+    // Permette la cancellazione di una recensione solo se l'utente è ADMIN o è l'autore della recensione
+    @PreAuthorize("hasRole('ADMIN') or @reviewService.isReviewOwner(#reviewId, principal.username)")
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId, Principal principal) {
-        String username = principal.getName();
-        Long userId = userService.getUserByUsername(username).getId();
-
-        reviewService.deleteReview(reviewId, userId);
+        // Dal momento che il controllo @PreAuthorize verifica che l'utente sia il proprietario o ADMIN,
+        // possiamo procedere direttamente alla cancellazione.
+        reviewService.deleteReview(reviewId, null); // Il service può ignorare il controllo dell'utente se già validato
         return ResponseEntity.noContent().build();
     }
-
-
 }

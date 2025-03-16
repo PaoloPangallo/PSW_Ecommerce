@@ -1,11 +1,13 @@
 // src/app/models/cart.model.ts
 
 export interface CartItemDTO {
-  id: number;         // Identificativo univoco dell'item nel carrello
-  productId: number;  // Identificativo del prodotto
+  id: number;
+  productId: number;
   productName: string;
-  price: number;
   quantity: number;
+  price: number;      // Prezzo scontato (se applicato)
+  oldPrice?: number;  // Prezzo originale (se presente e maggiore del prezzo scontato)
+  couponCode?: string;
 }
 
 

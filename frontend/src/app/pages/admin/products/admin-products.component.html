@@ -1,0 +1,68 @@
+<h1>Gestione Prodotti</h1>
+
+<!-- Bottone per aprire il form di creazione -->
+<button class="action-btn create" (click)="onCreate()">Crea Prodotto</button>
+
+<table class="products-table">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Nome</th>
+    <th>Prezzo</th>
+    <th>Quantità</th>
+    <th>Azioni</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let product of products">
+    <td>{{ product.id }}</td>
+    <td>{{ product.name }}</td>
+    <td>{{ product.price | currency }}</td>
+    <td>{{ product.stock }}</td>
+    <td>
+      <button class="action-btn edit" (click)="onEdit(product)">Modifica</button>
+      <button class="action-btn delete" (click)="onDelete(product)">Elimina</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<!-- Modale per la modifica del prodotto -->
+<div *ngIf="editingProduct" class="modal-overlay">
+  <div class="modal">
+    <h2>Modifica Prodotto: {{ editingProduct.name }}</h2>
+    <form (ngSubmit)="onSubmitUpdate()">
+      <label>Nome:</label>
+      <input [(ngModel)]="editingProduct.name" name="editName" required>
+      <label>Prezzo:</label>
+      <input [(ngModel)]="editingProduct.price" name="editPrice" type="number" required>
+      <label>Quantità:</label>
+      <input [(ngModel)]="editingProduct.stock" name="editStock" type="number" required>
+      <div class="modal-actions">
+        <button type="submit" class="action-btn save">Salva</button>
+        <button type="button" class="action-btn cancel" (click)="cancelEdit()">Annulla</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modale per la creazione di un nuovo prodotto -->
+<div *ngIf="createMode" class="modal-overlay">
+  <div class="modal">
+    <h2>Crea Nuovo Prodotto</h2>
+    <form (ngSubmit)="onSubmitCreate()">
+      <label>Nome:</label>
+      <input [(ngModel)]="newProduct.name" name="newName" required>
+      <label>Prezzo:</label>
+      <input [(ngModel)]="newProduct.price" name="newPrice" type="number" required>
+      <label>Descrizione:</label>
+      <input [(ngModel)]="newProduct.description" name="newDescription">
+      <label>Quantità:</label>
+      <input [(ngModel)]="newProduct.stock" name="newStock" type="number" required>
+      <div class="modal-actions">
+        <button type="submit" class="action-btn save">Crea</button>
+        <button type="button" class="action-btn cancel" (click)="cancelCreate()">Annulla</button>
+      </div>
+    </form>
+  </div>
+</div>

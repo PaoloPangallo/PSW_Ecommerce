@@ -1,5 +1,6 @@
 package demo.demo_ecommerce.Controllers;
 
+import demo.demo_ecommerce.dtos.UpdateUserDTO;
 import demo.demo_ecommerce.dtos.UserDTO;
 import demo.demo_ecommerce.dtos.UserResponseDTO;
 import demo.demo_ecommerce.entities.Role;
@@ -70,14 +71,17 @@ public class UsersController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
+    // Endpoint aggiornato per l'update: ora accetta un UserDTO
     @Operation(summary = "Aggiorna un utente esistente", description = "Modifica i dettagli di un utente specifico tramite ID.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Utente aggiornato con successo."),
             @ApiResponse(responseCode = "404", description = "Utente non trovato.")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
-        UserResponseDTO updatedUser = usersService.updateUser(id, user);
+    public ResponseEntity<UserResponseDTO> updateUser(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateUserDTO updateUserDTO) {
+        UserResponseDTO updatedUser = usersService.updateUser(id, updateUserDTO);
         return ResponseEntity.ok(updatedUser);
     }
 

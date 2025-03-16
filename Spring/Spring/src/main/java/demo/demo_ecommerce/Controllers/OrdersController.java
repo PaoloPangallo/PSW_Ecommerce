@@ -12,10 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users/{userId}/orders")
@@ -32,6 +31,7 @@ public class OrdersController {
             @ApiResponse(responseCode = "201", description = "Ordine creato con successo", content = @Content(schema = @Schema(implementation = OrderDTO.class))),
             @ApiResponse(responseCode = "400", description = "Errore nella richiesta")
     })
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @PostMapping
     public ResponseEntity<?> createOrder(@PathVariable Long userId) {
         try {
@@ -47,6 +47,7 @@ public class OrdersController {
             @ApiResponse(responseCode = "200", description = "Lista di ordini recuperata con successo", content = @Content(schema = @Schema(implementation = Page.class))),
             @ApiResponse(responseCode = "404", description = "Utente non trovato")
     })
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @GetMapping
     public ResponseEntity<?> getUserOrders(@PathVariable Long userId,
                                            @PageableDefault(size = 10) Pageable pageable) {
@@ -59,6 +60,7 @@ public class OrdersController {
             @ApiResponse(responseCode = "200", description = "Dettagli dell'ordine recuperati con successo", content = @Content(schema = @Schema(implementation = OrderDTO.class))),
             @ApiResponse(responseCode = "404", description = "Ordine non trovato")
     })
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @GetMapping("/{orderId}")
     public ResponseEntity<?> getOrderById(@PathVariable Long userId, @PathVariable Long orderId) {
         try {

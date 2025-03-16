@@ -1,9 +1,7 @@
 <mat-card class="cart-wrapper" *ngIf="cart && cart.items.length > 0; else emptyCart">
   <mat-card-title>Il tuo Carrello</mat-card-title>
   <mat-card-content>
-    <!-- Tabella con i prodotti -->
     <table mat-table [dataSource]="cart.items" class="mat-elevation-z8">
-
       <!-- Colonna Prodotto -->
       <ng-container matColumnDef="productName">
         <th mat-header-cell *matHeaderCellDef>Prodotto</th>
@@ -28,16 +26,21 @@
       <ng-container matColumnDef="price">
         <th mat-header-cell *matHeaderCellDef>Prezzo Unitario</th>
         <td mat-cell *matCellDef="let item">
-          {{ item.price | lire }}
+          <ng-container *ngIf="item.oldPrice && item.oldPrice > item.price; else normalPrice">
+            <del class="old-price">{{ item.oldPrice | lire }}</del>
+            <span class="new-price">{{ item.price | lire }}</span>
+          </ng-container>
+          <ng-template #normalPrice>
+            {{ item.price | lire }}
+          </ng-template>
         </td>
       </ng-container>
+
 
       <!-- Colonna Totale per Prodotto -->
       <ng-container matColumnDef="total">
         <th mat-header-cell *matHeaderCellDef>Totale</th>
-        <td mat-cell *matCellDef="let item">
-          {{ (item.price * item.quantity) | lire }}
-        </td>
+        <td mat-cell *matCellDef="let item">{{ (item.price * item.quantity) | lire }}</td>
       </ng-container>
 
       <!-- Colonna Coupon -->
@@ -49,23 +52,19 @@
         </td>
       </ng-container>
 
-
       <!-- Colonna Azioni -->
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Azioni</th>
         <td mat-cell *matCellDef="let item">
-          <!-- Per rimuovere, usiamo item.productId (se il backend si aspetta productId) -->
           <button mat-button color="warn" (click)="remove(item.productId)">Rimuovi</button>
         </td>
       </ng-container>
 
-
-      <!-- Header e righe della tabella -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 
-    <!-- Totale dell'ordine -->
+    <!-- Totale Ordine -->
     <div class="cart-total">
       <p><strong>Totale Ordine:</strong> {{ getTotalPrice() | lire }}</p>
     </div>
@@ -77,12 +76,10 @@
   </mat-card-content>
 </mat-card>
 
-<!-- Pulsante per il checkout -->
 <div class="cart-summary" *ngIf="cart && cart.items.length > 0">
   <button mat-raised-button color="primary" (click)="goToCheckout()">Procedi al Checkout</button>
 </div>
 
-<!-- Messaggio Carrello Vuoto -->
 <ng-template #emptyCart>
   <mat-card class="cart-wrapper">
     <mat-card-content>

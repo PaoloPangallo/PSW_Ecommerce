@@ -2,6 +2,7 @@ package demo.demo_ecommerce.services;
 
 import demo.demo_ecommerce.entities.Coupon;
 import demo.demo_ecommerce.repositories.CouponRepository;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
@@ -41,10 +42,17 @@ public class CouponService {
         Optional<Coupon> couponOpt = couponRepository.findByCode(code);
         if (couponOpt.isPresent()) {
             Coupon coupon = couponOpt.get();
-            return coupon.getIsActive() &&
-                    coupon.getExpirationDate().isAfter(LocalDateTime.now()) &&
-                    productPrice.compareTo(coupon.getMinOrderValue()) >= 0;
+            boolean isActive = coupon.getIsActive();
+            boolean notExpired = coupon.getExpirationDate().isAfter(LocalDateTime.now());
+            boolean meetsMinValue = productPrice.compareTo(coupon.getMinOrderValue()) >= 0;
+
+            LoggerFactory.getLogger(getClass()).info("Validating coupon {}: isActive={}, notExpired={}, productPrice={}, minOrderValue={} -> meetsMinValue={}",
+                    code, isActive, notExpired, productPrice, coupon.getMinOrderValue(), meetsMinValue);
+
+            return isActive && notExpired && meetsMinValue;
         }
+        LoggerFactory.getLogger(getClass()).info("Coupon with code {} not found in validateCouponForProduct", code);
         return false;
     }
+
 }

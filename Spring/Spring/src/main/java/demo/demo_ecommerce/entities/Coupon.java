@@ -20,8 +20,9 @@ public class Coupon {
     @Column(unique = true, nullable = false)
     private String code;
 
+    // Modificato da Double a BigDecimal per una maggiore precisione
     @Column(nullable = false)
-    private Double discountPercentage;
+    private BigDecimal discountPercentage;
 
     @Column(nullable = false)
     private LocalDateTime expirationDate;
@@ -32,7 +33,6 @@ public class Coupon {
     @Column(nullable = false)
     private BigDecimal minOrderValue;
 
-    // Relazione ManyToMany con Product
     @ManyToMany
     @JoinTable(
             name = "coupon_products",
@@ -43,11 +43,4 @@ public class Coupon {
 
     public Coupon() {}
 
-    public Coupon(String code, Double discountPercentage, LocalDateTime expirationDate, Boolean isActive, BigDecimal minOrderValue) {
-        this.code = code;
-        this.discountPercentage = discountPercentage;
-        this.expirationDate = expirationDate;
-        this.isActive = isActive;
-        this.minOrderValue = minOrderValue;
-    }
 }

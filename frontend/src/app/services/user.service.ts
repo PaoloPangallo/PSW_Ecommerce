@@ -33,13 +33,7 @@ export class UserService {
   }
 
   // ✅ Elimina un utente
-  deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
-      catchError(this.handleError)
-    );
-  }
-
-  // ✅ Opzioni HTTP per richieste con JSON
+// ✅ Opzioni HTTP per richieste con JSON
   private httpOptions() {
     return {
       headers: new HttpHeaders({ 'Content-Type': 'application/json' })

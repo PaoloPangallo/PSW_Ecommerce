@@ -1,8 +1,9 @@
 package demo.demo_ecommerce.services;
 
 import demo.demo_ecommerce.Utility.UserNotFoundException;
+import demo.demo_ecommerce.dtos.UpdateUserDTO;
 import demo.demo_ecommerce.dtos.UserDTO;
-import demo.demo_ecommerce.dtos.UserResponseDTO;  // Assicurati di creare questa classe DTO
+import demo.demo_ecommerce.dtos.UserResponseDTO;
 import demo.demo_ecommerce.entities.Cart;
 import demo.demo_ecommerce.entities.Role;
 import demo.demo_ecommerce.entities.User;
@@ -42,45 +43,54 @@ public class UsersService {
         return usersRepository.findAll(pageable);
     }
 
-    // Fetch user by ID
     public User getUserById(Long id) {
         logger.info("Fetching user with ID: {}", id);
         return findUserById(id);
     }
 
-    // Crea un nuovo utente con i nuovi campi phone e address
-    public User createUser(@Valid UserDTO userDTO) {
+    public User createUser(@Valid demo.demo_ecommerce.dtos.UserDTO userDTO) {
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(userDTO.getRole() != null ? userDTO.getRole() : Role.USER);
-        // Imposta i nuovi campi
+        // Imposta i nuovi campi se presenti
         user.setPhone(userDTO.getPhone());
         user.setAddress(userDTO.getAddress());
+        user.setCap(userDTO.getCap());
+        user.setCity(userDTO.getCity());
+        user.setRegion(userDTO.getRegion());
+        user.setCountry(userDTO.getCountry());
         return usersRepository.save(user);
     }
 
-    // Aggiorna un utente esistente (inclusi i nuovi campi) e restituisce un DTO di risposta
+    // Metodo update aggiornato per utilizzare il DTO dedicato UpdateUserDTO
     @Transactional
-    public UserResponseDTO updateUser(Long id, @Valid User userDetails) {
+    public UserResponseDTO updateUser(Long id, @Valid UpdateUserDTO updateUserDTO) {
         logger.info("Updating user with ID: {}", id);
         User existingUser = findUserById(id);
 
-        existingUser.setUsername(userDetails.getUsername());
-        existingUser.setEmail(userDetails.getEmail());
-        // Aggiorna i nuovi campi se forniti
-        existingUser.setPhone(userDetails.getPhone());
-        existingUser.setAddress(userDetails.getAddress());
-
-        // Aggiorna la password solo se fornita
-        if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
-            existingUser.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+        // Aggiorniamo solo i campi relativi a recapiti ed indirizzi se forniti
+        if (updateUserDTO.getEmail() != null) {
+            existingUser.setEmail(updateUserDTO.getEmail());
         }
-
-        // Aggiorna il ruolo solo se fornito
-        if (userDetails.getRole() != null) {
-            existingUser.setRole(userDetails.getRole());
+        if (updateUserDTO.getPhone() != null) {
+            existingUser.setPhone(updateUserDTO.getPhone());
+        }
+        if (updateUserDTO.getAddress() != null) {
+            existingUser.setAddress(updateUserDTO.getAddress());
+        }
+        if (updateUserDTO.getCap() != null) {
+            existingUser.setCap(updateUserDTO.getCap());
+        }
+        if (updateUserDTO.getCity() != null) {
+            existingUser.setCity(updateUserDTO.getCity());
+        }
+        if (updateUserDTO.getRegion() != null) {
+            existingUser.setRegion(updateUserDTO.getRegion());
+        }
+        if (updateUserDTO.getCountry() != null) {
+            existingUser.setCountry(updateUserDTO.getCountry());
         }
 
         User savedUser = usersRepository.save(existingUser);
@@ -96,13 +106,11 @@ public class UsersService {
         usersRepository.deleteById(id);
     }
 
-    // Get users by role
     public List<User> getUsersByRole(Role role) {
         logger.info("Fetching users with role: {}", role);
         return usersRepository.findByRole(role);
     }
 
-    // Metodo per la ricerca degli utenti
     public Page<User> searchUsers(String username, String email, Pageable pageable) {
         if (username != null && email != null) {
             return usersRepository.findByUsernameContainingAndEmailContaining(username, email, pageable);
@@ -115,17 +123,19 @@ public class UsersService {
         }
     }
 
-    // Metodo per registrare un utente (usato dall'endpoint di registrazione)
     @Transactional
-    public User registerUser(UserDTO userDTO) {
+    public User registerUser(demo.demo_ecommerce.dtos.UserDTO userDTO) {
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(userDTO.getRole() != null ? userDTO.getRole() : Role.USER);
-        // Imposta i nuovi campi
         user.setPhone(userDTO.getPhone());
         user.setAddress(userDTO.getAddress());
+        user.setCap(userDTO.getCap());
+        user.setCity(userDTO.getCity());
+        user.setRegion(userDTO.getRegion());
+        user.setCountry(userDTO.getCountry());
 
         User savedUser = usersRepository.save(user);
         // Crea il carrello associato al nuovo utente
@@ -135,12 +145,10 @@ public class UsersService {
         return savedUser;
     }
 
-    // Metodo che restituisce un Optional
     public Optional<User> findByUsername(String username) {
         return usersRepository.findByUsername(username);
     }
 
-    // Metodo aggiunto: restituisce direttamente l'utente o lancia un'eccezione se non trovato
     public User getUserByUsername(String username) {
         return usersRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
@@ -150,7 +158,7 @@ public class UsersService {
         return usersRepository.existsByEmail(email);
     }
 
-    // Helper method per convertire un'entità User in un DTO di risposta
+    // Helper per convertire un'entità User in UserResponseDTO
     private UserResponseDTO toResponseDTO(User user) {
         UserResponseDTO dto = new UserResponseDTO();
         dto.setId(user.getId());
@@ -166,7 +174,7 @@ public class UsersService {
         return dto;
     }
 
-    // Helper method per trovare un utente per ID
+    // Helper per trovare un utente per ID
     private User findUserById(Long id) {
         return usersRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));

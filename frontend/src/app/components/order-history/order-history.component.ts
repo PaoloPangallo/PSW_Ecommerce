@@ -1,28 +1,35 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {Order, Page} from '../../models/order.model';
+import { Order, Page } from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
 import { AuthService } from '../../services/auth.services';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
+import { LirePipe } from '../../services/lire.pipe';
 
 @Component({
   selector: 'app-order-history',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, RouterLink],
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatButtonModule,
+    RouterLink,
+    LirePipe
+  ],
   templateUrl: './order-history.component.html',
   styleUrls: ['./order-history.component.css']
 })
 export class OrderHistoryComponent implements OnInit {
-  orders: Order[] = [];  // Array estratto da data.content
+  orders: Order[] = [];
   error = '';
   isLoading = true;
   displayedColumns: string[] = ['id', 'total', 'date', 'actions'];
 
   // Proprietà per la paginazione
   currentPage = 0;
-  pageSize = 5;  // Numero di ordini per pagina
+  pageSize = 5;
   totalPages = 0;
 
   private orderService = inject(OrderService);
