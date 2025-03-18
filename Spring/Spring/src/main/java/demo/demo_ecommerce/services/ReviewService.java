@@ -106,12 +106,20 @@ public class ReviewService {
     }
 
     // Metodo per cancellare una recensione, controllando che appartenga all'utente corrente
-    public void deleteReview(Long reviewId, Long currentUserId) {
+    public void deleteReview(Long reviewId, String username) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResourceNotFoundException("Review not found with id " + reviewId));
-        if (!review.getUser().getId().equals(currentUserId)) {
+        if (username != null && !review.getUser().getUsername().equals(username)) {
             throw new AccessDeniedException("Non hai il permesso di eliminare questa recensione.");
         }
         reviewRepository.delete(review);
     }
+
+
+    public boolean isReviewOwner(Long reviewId, String username) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Review not found with id " + reviewId));
+        return review.getUser().getUsername().equals(username);
+    }
+
 }

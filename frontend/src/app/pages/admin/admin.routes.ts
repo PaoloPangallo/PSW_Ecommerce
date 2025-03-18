@@ -1,8 +1,7 @@
 // src/app/pages/admin/admin.routes.ts
 import { Routes } from '@angular/router';
-import {AdminComponent} from '../admin.component';
-import {AdminGuard} from '../../guards/admin.guard';
-
+import { AdminComponent } from '../admin.component';
+import { AdminGuard } from '../../guards/admin.guard';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -10,28 +9,48 @@ export const ADMIN_ROUTES: Routes = [
     component: AdminComponent,
     canActivate: [AdminGuard],
     children: [
-      // Se l'utente digita /admin senza nulla, lo reindirizzi a /admin/dashboard
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
-      // Carica la Dashboard
+      // Dashboard
       {
         path: 'dashboard',
         loadComponent: () =>
           import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
 
-      // Carica la pagina di gestione utenti
+      // Gestione utenti
       {
         path: 'users',
         loadComponent: () =>
           import('./users/admin-users.component').then(m => m.AdminUsersComponent)
       },
 
-      // Carica la pagina di gestione prodotti
+      // Gestione prodotti
       {
         path: 'products',
         loadComponent: () =>
           import('./products/admin-products.component').then(m => m.AdminProductsComponent)
+      },
+
+      // Gestione coupon
+      {
+        path: 'coupons',
+        loadComponent: () =>
+          import('./coupon/admin-coupons.component').then(m => m.AdminCouponsComponent)
+      },
+
+      // Generazione immagine per prodotto (già esistente)
+      {
+        path: 'generate-image/:productId',
+        loadComponent: () =>
+          import('./product-image-generator/product-image-generator.component')
+            .then(m => m.ProductImageGeneratorComponent)
+      },
+
+      {
+        path: 'home-photo',
+        loadComponent: () =>
+          import('./photo/admin-home-photo.component').then(m => m.AdminHomePhotoComponent)
       }
     ]
   }

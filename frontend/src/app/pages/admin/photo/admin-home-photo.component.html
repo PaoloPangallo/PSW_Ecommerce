@@ -1,0 +1,13 @@
+<div class="admin-upload-container">
+  <h2>Carica foto per la Home (solo Admin)</h2>
+  <input type="file" (change)="onFileSelected($event)" accept="image/*">
+  <button (click)="onUpload()" [disabled]="loading">Carica Immagine</button>
+
+  <div *ngIf="loading">Caricamento in corso...</div>
+  <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+
+  <div *ngIf="imageUrl" class="uploaded-image">
+    <h3>Immagine Caricata:</h3>
+    <img [src]="imageUrl" alt="Foto della home">
+  </div>
+</div>

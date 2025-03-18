@@ -4,23 +4,33 @@
   <div *ngIf="reviews.length > 0; else noReviews">
     <mat-card *ngFor="let review of reviews" class="review-card">
       <mat-card-header>
+        <div mat-card-avatar class="review-avatar">
+          <span>{{ review.userName | slice:0:1 }}</span>
+        </div>
+
         <mat-card-title>{{ review.userName }}</mat-card-title>
         <mat-card-subtitle>{{ review.createdDate | date:'short' }}</mat-card-subtitle>
       </mat-card-header>
       <mat-card-content>
-        <p>Rating: {{ review.rating }} / 5</p>
-        <p>{{ review.comment }}</p>
+        <div class="rating-container">
+          <!-- Mostra 5 icone, evidenziando quante "stelle" corrispondono al rating -->
+          <mat-icon *ngFor="let star of [].constructor(5); let i = index" [class.filled]="i < review.rating">
+            star
+          </mat-icon>
+          <span class="rating-value">{{ review.rating }} / 5</span>
+        </div>
+        <p class="review-comment">{{ review.comment }}</p>
       </mat-card-content>
-      <mat-card-actions>
-        <!-- Mostra "Modifica" solo se l'utente corrente è il proprietario della recensione -->
-        <button class="btn-edit" *ngIf="review.userId === (currentUserId ?? 0)" (click)="onUpdateReview(review)">
-          Modifica
-        </button>
-        <!-- Mostra "Elimina" solo se l'utente corrente è il proprietario della recensione -->
-        <button class="btn-delete" *ngIf="review.userId === (currentUserId ?? 0)" (click)="onDeleteReview(review.id)">
-          Elimina
-        </button>
-
+      <mat-card-actions class="card-actions">
+        <div class="action-buttons">
+          <!-- Mostra "Modifica" e "Elimina" solo se l'utente corrente è il proprietario -->
+          <button mat-raised-button color="primary" class="btn-edit" *ngIf="review.userId === (currentUserId ?? 0)" (click)="onUpdateReview(review)">
+            Modifica
+          </button>
+          <button mat-raised-button color="warn" class="btn-delete" *ngIf="review.userId === (currentUserId ?? 0)" (click)="onDeleteReview(review.id)">
+            Elimina
+          </button>
+        </div>
         <!-- Componente per gestire gli upvote -->
         <app-review-upvote
           [reviewId]="review.id"
@@ -33,7 +43,7 @@
   </div>
 
   <ng-template #noReviews>
-    <p>Nessuna recensione disponibile per questo prodotto.</p>
+    <p class="no-reviews-text">Nessuna recensione disponibile per questo prodotto.</p>
   </ng-template>
 </div>
 

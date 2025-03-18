@@ -103,8 +103,7 @@ public class ReviewController {
     @PreAuthorize("hasRole('ADMIN') or @reviewService.isReviewOwner(#reviewId, principal.username)")
     @DeleteMapping("/{reviewId}")
     public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId, Principal principal) {
-        // Dal momento che il controllo @PreAuthorize verifica che l'utente sia il proprietario o ADMIN,
-        // possiamo procedere direttamente alla cancellazione.
+
         reviewService.deleteReview(reviewId, null); // Il service può ignorare il controllo dell'utente se già validato
         return ResponseEntity.noContent().build();
     }

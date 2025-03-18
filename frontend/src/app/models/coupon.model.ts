@@ -5,6 +5,17 @@ export interface Coupon {
   expirationDate: string;   // Puoi usare Date se gestisci la conversione
   isActive: boolean;
   minOrderValue: number;
-  // Se il coupon è applicabile a determinati prodotti, puoi aggiungere ad esempio:
-  productIds?: number[]; // Lista degli ID dei prodotti applicabili
+  productNames?: string[]; // Aggiungi questo
+}
+
+
+
+
+export interface CouponCreationDTO {
+  code: string;
+  discountPercentage: number;  // Usa number se preferisci
+  expirationDate: string;      // ISO string (es. "2025-12-31T23:59:59")
+  isActive: boolean;
+  minOrderValue: number;       // Usa number
+  productIds: number[];        // ID dei prodotti a cui associare il coupon
 }

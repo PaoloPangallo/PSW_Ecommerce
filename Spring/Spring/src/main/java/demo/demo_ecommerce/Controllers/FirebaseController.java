@@ -2,6 +2,7 @@ package demo.demo_ecommerce.Controllers;
 
 import demo.demo_ecommerce.services.FirebaseStorageService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,7 @@ public class FirebaseController {
         this.firebaseStorageService = firebaseStorageService;
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
         try {

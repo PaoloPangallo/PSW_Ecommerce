@@ -1,19 +1,31 @@
 package demo.demo_ecommerce.services;
 
+import demo.demo_ecommerce.dtos.CouponCreationDTO;
+import demo.demo_ecommerce.dtos.CouponResponseDTO;
 import demo.demo_ecommerce.entities.Coupon;
+import demo.demo_ecommerce.entities.Product;
 import demo.demo_ecommerce.repositories.CouponRepository;
+import demo.demo_ecommerce.repositories.ProductRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CouponService {
 
     @Autowired
-    private CouponRepository couponRepository;
+    private final CouponRepository couponRepository;
+    private final ProductRepository productRepository;
+
+    public CouponService(CouponRepository couponRepository, ProductRepository productRepository) {
+        this.couponRepository = couponRepository;
+        this.productRepository = productRepository;
+    }
 
 
     public Optional<Coupon> findByCode(String code) {
@@ -53,6 +65,48 @@ public class CouponService {
         }
         LoggerFactory.getLogger(getClass()).info("Coupon with code {} not found in validateCouponForProduct", code);
         return false;
+    }
+
+    public Coupon createCouponFromDTO(CouponCreationDTO dto) {
+        Coupon coupon = new Coupon();
+        coupon.setCode(dto.getCode());
+        coupon.setDiscountPercentage(dto.getDiscountPercentage());
+        coupon.setExpirationDate(dto.getExpirationDate());
+        coupon.setIsActive(dto.getIsActive());
+        coupon.setMinOrderValue(dto.getMinOrderValue());
+
+        // Carica i prodotti associati
+        List<Product> products = productRepository.findAllById(dto.getProductIds());
+        coupon.setProducts(products);
+
+        return couponRepository.save(coupon);
+    }
+    public List<CouponResponseDTO> getAllCoupons() {
+        // Carichiamo i coupon con i prodotti associati
+        List<Coupon> coupons = couponRepository.findAllWithProducts();
+
+        return coupons.stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    // Esempio di mappatura
+    private CouponResponseDTO toResponseDTO(Coupon coupon) {
+        CouponResponseDTO dto = new CouponResponseDTO();
+        dto.setId(coupon.getId());
+        dto.setCode(coupon.getCode());
+        dto.setDiscountPercentage(coupon.getDiscountPercentage());
+        dto.setExpirationDate(coupon.getExpirationDate());
+        dto.setIsActive(coupon.getIsActive());
+        dto.setMinOrderValue(coupon.getMinOrderValue());
+
+        // Mappiamo i prodotti associati (in questo esempio, solo i nomi)
+        List<String> productNames = coupon.getProducts().stream()
+                .map(Product::getName)
+                .collect(Collectors.toList());
+        dto.setProductNames(productNames);
+
+        return dto;
     }
 
 }

@@ -27,5 +27,4 @@ public class Upvote {
     private User user;
 
 
-    // Altri campi (es. data del voto) se necessari
 }

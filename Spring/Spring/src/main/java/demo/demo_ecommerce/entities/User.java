@@ -1,6 +1,7 @@
 package demo.demo_ecommerce.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Setter
 @Getter
@@ -33,9 +35,19 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    // Relazione OneToOne con il carrello: cancellazione in cascata
     @OneToOne(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "cart_id", unique = true)
     private Cart cart;
+
+    // Relazione OneToOne con la wishlist: cancellazione in cascata
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private Wishlist wishlist;
+
+    // Relazione OneToMany con le review: cancellazione in cascata
+    @JsonIgnore // Ignora la serializzazione per evitare LazyInitializationException
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Review> reviews;
 
     // Nuovi campi
     @Column(length = 20)

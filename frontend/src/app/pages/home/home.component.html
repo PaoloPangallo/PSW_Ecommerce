@@ -1,106 +1,121 @@
 <div class="home-container">
 
-  <!-- Hero Section (già esistente) -->
-  <div class="hero-section">
-    <h1>Unilire: Offerte da un'altra epoca!</h1>
-    <p>Scopri i migliori prodotti a prezzi storici!</p>
-    <button routerLink="/products">Scopri di più</button>
-  </div>
+  <!-- Hero Section -->
+  <section class="hero-section" aria-label="Hero Section">
+    <div class="container">
+      <h1>Unilire: Offerte da un'altra epoca!</h1>
+      <p>Scopri i migliori prodotti a prezzi storici!</p>
+      <button routerLink="/products" class="hero-button">Scopri di più</button>
+    </div>
+  </section>
 
-  <!-- 1) Promo/Carousel (base, senza librerie JS) -->
-  <div class="promo-carousel">
-    <div class="slide">
-      <img src="assets/promo1.jpg" alt="Promo 1" />
-      <div class="slide-caption">
-        <h3>Offerta Imperdibile</h3>
-        <p>Fino al 50% di sconto su smartphone!</p>
+  <!-- Promo Carousel -->
+  <section class="promo-carousel" aria-label="Promo Carousel">
+    <div class="container">
+      <div class="carousel-slide">
+        <img src="assets/logo_unilire.svg" alt="Promo: Offerta Imperdibile" width="256" height="256" />
+        <div class="slide-caption">
+          <h3>Offerta Imperdibile</h3>
+          <p>Fino al 50% di sconto su smartphone!</p>
+        </div>
+      </div>
+      <!-- Aggiungi ulteriori slide se necessario -->
+    </div>
+  </section>
+
+  <!-- Categorie in Evidenza -->
+  <section class="categories-highlight" aria-label="Categorie Popolari">
+    <div class="container">
+      <h2 class="section-title">Categorie Popolari</h2>
+      <div class="categories-grid">
+        <div class="category-box" routerLink="/category/Smartphone e Telefonia" tabindex="0">
+          <img src="assets/Telefono.png" alt="Smartphone e Telefonia" />
+          <h3>Smartphone e Telefonia</h3>
+        </div>
+        <div class="category-box" routerLink="/category/TV e Home Entertainment" tabindex="0">
+          <img src="assets/Tv.jpg" alt="TV e Home Entertainment" />
+          <h3>TV e Home Entertainment</h3>
+        </div>
+        <div class="category-box" routerLink="/category/Informatica e Accessori" tabindex="0">
+          <img src="assets/Informatica.png" alt="Informatica e Accessori" />
+          <h3>Informatica e Accessori</h3>
+        </div>
+        <div class="category-box" routerLink="/category/Elettrodomestici" tabindex="0">
+          <img src="assets/Lavatrice.jpg" alt="Elettrodomestici" />
+          <h3>Elettrodomestici</h3>
+        </div>
+        <!-- Aggiungi ulteriori categorie se necessario -->
       </div>
     </div>
+  </section>
 
-  </div>
-
-  <!-- 2) Categorie in evidenza -->
-  <div class="categories-highlight">
-    <h2>Categorie Popolari</h2>
-    <div class="categories-grid">
-      <div class="category-box" routerLink="/category/Smartphone e Telefonia">
-        <img src="assets/smartphone-icon.png" alt="Smartphone" />
-        <h3>Smartphone e Telefonia</h3>
-      </div>
-      <div class="category-box" routerLink="/category/TV e Home Entertainment">
-        <img src="assets/icons/tv-icon.png" alt="TV e Home Entertainment" />
-        <h3>TV e Home Entertainment</h3>
-      </div>
-      <div class="category-box" routerLink="/category/Informatica e Accessori">
-        <img src="assets/icons/laptop-icon.png" alt="Informatica e Accessori" />
-        <h3>Informatica e Accessori</h3>
-      </div>
-      <div class="category-box" routerLink="/category/Elettrodomestici">
-        <img src="assets/icons/home-icon.png" alt="Elettrodomestici" />
-        <h3>Elettrodomestici</h3>
-      </div>
-      <!-- Puoi aggiungere altre category-box se vuoi -->
-    </div>
-  </div>
-
-  <!-- 3) Sezione Servizi/Vantaggi -->
-  <div class="services-section">
-    <div class="service-box">
-      <img src="assets/icons/shipping-icon.png" alt="Spedizione">
-      <h4>Spedizione Gratis</h4>
-      <p>Per ordini sopra i 50€</p>
-    </div>
-    <div class="service-box">
-      <img src="assets/icons/support-icon.png" alt="Supporto">
-      <h4>Assistenza 24/7</h4>
-      <p>Chat o telefono sempre attivi</p>
-    </div>
-    <div class="service-box">
-      <img src="assets/icons/payment-icon.png" alt="Pagamenti Sicuri">
-      <h4>Pagamenti Sicuri</h4>
-      <p>Criptati e protetti</p>
-    </div>
-  </div>
-
-  <!-- 4) Sezione Newsletter -->
-  <div class="newsletter-section">
-    <h2>Iscriviti alla Newsletter</h2>
-    <p>Rimani aggiornato sulle ultime offerte</p>
-    <!-- Esempio di form, puoi gestire la logica in TS -->
-    <form (submit)="subscribeToNewsletter($event)">
-      <input type="email" placeholder="Inserisci la tua email" required />
-      <button type="submit">Iscriviti</button>
-    </form>
-  </div>
-
-  <!-- Sezione Prodotti in Evidenza (già presente) -->
-  <div class="featured-section" *ngIf="featuredProducts && featuredProducts.length > 0">
-    <h2>Prodotti in Evidenza</h2>
-    <div class="featured-grid">
-      <div class="featured-card" *ngFor="let product of featuredProducts">
-        <img [src]="product.imageUrl" [alt]="product.name">
-        <h3>{{ product.name }}</h3>
-        <p class="price">Prezzo: {{ product.price }} L</p>
-        <button class="details-button" [routerLink]="['/product', product.id]">
-          Dettagli
-        </button>
+  <!-- Sezione "Perché Sceglierci" -->
+  <section class="why-choose-us" aria-label="Perché Sceglierci">
+    <div class="container">
+      <h2 class="why-title">Perché Sceglierci</h2>
+      <div class="why-grid">
+        <!-- Card 1 -->
+        <div class="why-card">
+          <div class="why-card-image">
+            <img src="assets/SpedizioneVeloce.jpg" alt="Spedizione Veloce" />
+          </div>
+          <div class="why-card-content">
+            <h3>Spedizione Veloce</h3>
+            <p>Consegna rapida in 24/48 ore in tutta Italia.</p>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="why-card">
+          <div class="why-card-image">
+            <img src="assets/Assistenza.jpg" alt="Assistenza 24/7" />
+          </div>
+          <div class="why-card-content">
+            <h3>Assistenza 24/7</h3>
+            <p>Supporto telefonico e chat sempre a disposizione.</p>
+          </div>
+        </div>
+        <!-- Card 3 -->
+        <div class="why-card">
+          <div class="why-card-image">
+            <img src="assets/pagamenti.jpg" alt="Pagamenti Sicuri" />
+          </div>
+          <div class="why-card-content">
+            <h3>Pagamenti Sicuri</h3>
+            <p>Transazioni protette e crittografate.</p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Sezione Lista Completa Prodotti (già presente) -->
-  <div class="products-section" *ngIf="allProducts && allProducts.length > 0">
-    <h2>Tutti i Prodotti</h2>
-    <div class="products-grid">
-      <div class="product-card" *ngFor="let product of allProducts">
-        <img [src]="product.imageUrl" [alt]="product.name">
-        <h3>{{ product.name }}</h3>
-        <p class="price">Prezzo: {{ product.price }} L</p>
-        <button class="details-button" [routerLink]="['/product', product.id]">
-          Dettagli
-        </button>
+  <!-- Prodotti in Evidenza -->
+  <section class="featured-section" *ngIf="featuredProducts && featuredProducts.length > 0" aria-label="Prodotti in Evidenza">
+    <div class="container">
+      <h2>Prodotti in Evidenza</h2>
+      <div class="featured-grid">
+        <div class="featured-card" *ngFor="let product of featuredProducts" tabindex="0">
+          <img [src]="product.imageUrl" [alt]="product.name" />
+          <h3>{{ product.name }}</h3>
+          <p class="price">Prezzo: {{ product.price }} L</p>
+          <button class="details-button" [routerLink]="['/product', product.id]">Dettagli</button>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- Lista Completa Prodotti -->
+  <section class="products-section" *ngIf="allProducts && allProducts.length > 0" aria-label="Tutti i Prodotti">
+    <div class="container">
+      <h2>Tutti i Prodotti</h2>
+      <div class="products-grid">
+        <div class="product-card" *ngFor="let product of allProducts" tabindex="0">
+          <img [src]="product.imageUrl" [alt]="product.name" />
+          <h3>{{ product.name }}</h3>
+          <p class="price">Prezzo: {{ product.price }} L</p>
+          <button class="details-button" [routerLink]="['/product', product.id]">Dettagli</button>
+        </div>
+      </div>
+    </div>
+  </section>
 
 </div>

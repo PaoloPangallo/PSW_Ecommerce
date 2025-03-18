@@ -1,9 +1,8 @@
 package demo.demo_ecommerce.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,11 +20,13 @@ public class Wishlist {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = true)
-    @JoinColumn(name = "user_id", nullable = true)
+    // Lato "figlio": non serializziamo l'utente per evitare il loop.
+    @OneToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JsonBackReference
     private User user;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "wishlist_products",
             joinColumns = @JoinColumn(name = "wishlist_id"),

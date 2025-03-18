@@ -1,9 +1,16 @@
-<!-- navbar.component.html -->
 <nav class="navbar">
   <!-- Barra superiore (logo, ricerca, account) -->
   <div class="nav-top">
     <div class="logo">
-      <a routerLink="/">Unilire</a>
+      <a routerLink="/">
+        <!-- Specifica width e height per evitare l'errore NG02954 -->
+        <img
+          src="assets/logo_unilire.svg"
+          alt="Unilire"
+          width="200"
+          height="60"
+        />
+      </a>
     </div>
 
     <div class="search-box">
@@ -22,7 +29,6 @@
     >
       Console Admin
     </button>
-
 
     <div class="user-icons">
       <span>
@@ -44,7 +50,7 @@
   </div>
 </nav>
 
-<!-- Struttura a 2 colonne: sidebar a sinistra, contenuto a destra -->
+<!-- Layout a 2 colonne: sidebar a sinistra, contenuto a destra -->
 <div class="page-container">
   <!-- Sidebar con le categorie -->
   <aside class="sidebar">
@@ -63,11 +69,7 @@
   </aside>
 
   <!-- Contenuto principale -->
-  <div class="main-content">>
+  <div class="main-content">
     <router-outlet></router-outlet>
   </div>
 </div>
-
-
-
-

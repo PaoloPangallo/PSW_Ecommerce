@@ -17,7 +17,7 @@ public class FirebaseConfig {
         InputStream serviceAccount = getClass().getClassLoader().getResourceAsStream("firebase-key.json");
 
         if (serviceAccount == null) {
-            throw new IOException("File firebase-key.json non trovato. Assicurati che sia in src/main/resources/ e incluso nel classpath.");
+            throw new IOException("File firebase-key.json non trovato.");
         }
 
         return StorageOptions.newBuilder()

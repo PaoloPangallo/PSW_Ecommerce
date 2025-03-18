@@ -13,7 +13,6 @@ import { CheckoutComponent } from './components/checkout/checkout.component';
 import { WishlistComponent } from './components/wishlist/wishlist.component';
 import { OrderDetailsComponent } from './components/order/order-details/order-details.component';
 import { AdminGuard } from './guards/admin.guard';
-import {AdminComponent} from './pages/admin.component';
 
 export const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -31,12 +30,11 @@ export const appRoutes: Routes = [
   { path: 'wishlist', component: WishlistComponent },
   { path: 'orders/:id', component: OrderDetailsComponent },
   { path: 'orders', component: OrderHistoryComponent },
-  // Rotte admin: accessibili solo se AdminGuard restituisce true
   {
     path: 'admin',
     canActivate: [AdminGuard],
     loadChildren: () =>
       import('./pages/admin/admin.routes').then(m => m.ADMIN_ROUTES)
   },
-  { path: '**', redirectTo: '' } // Se la rotta non esiste, torna alla home
+  { path: '**', redirectTo: '' }
 ];

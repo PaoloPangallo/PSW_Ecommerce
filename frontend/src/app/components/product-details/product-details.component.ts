@@ -196,26 +196,6 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-  applyCouponToProduct(couponCode: string): void {
-    if (!this.product) return;
-    this.couponService.validateCoupon(couponCode, this.product.price).subscribe({
-      next: (isValid: boolean) => {
-        if (isValid) {
-          this.couponMessage = `Coupon ${couponCode} applicato al prodotto!`;
-        } else {
-          this.couponMessage = `Coupon ${couponCode} non valido per questo prodotto.`;
-        }
-        setTimeout(() => this.couponMessage = '', 4000);
-      },
-      error: (err: any) => {
-        console.error("Errore applicando il coupon:", err);
-        this.couponMessage = "Errore nell'applicazione del coupon.";
-        setTimeout(() => this.couponMessage = '', 4000);
-      }
-    });
-  }
-
   goBack(): void {
     this.location.back();
   }

@@ -40,7 +40,6 @@ public class SecurityConfig {
                         .requestMatchers("/checkout/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                // Aggiungi il filtro JWT prima del filtro di autenticazione standard
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

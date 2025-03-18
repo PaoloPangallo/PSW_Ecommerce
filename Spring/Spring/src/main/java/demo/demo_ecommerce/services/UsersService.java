@@ -5,10 +5,10 @@ import demo.demo_ecommerce.dtos.UpdateUserDTO;
 import demo.demo_ecommerce.dtos.UserDTO;
 import demo.demo_ecommerce.dtos.UserResponseDTO;
 import demo.demo_ecommerce.entities.Cart;
+import demo.demo_ecommerce.entities.Order;
 import demo.demo_ecommerce.entities.Role;
 import demo.demo_ecommerce.entities.User;
-import demo.demo_ecommerce.repositories.CartRepository;
-import demo.demo_ecommerce.repositories.UsersRepository;
+import demo.demo_ecommerce.repositories.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -29,13 +29,27 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
+    private final OrderRepository orderRepository;
+    private final ShoppingCartItemRepository shoppingCartItemRepository;
+    private final ReviewRepository reviewRepository;
+    private final UpvoteRepository upvoteRepository;
+    private final WishlistRepository wishlistRepository;
+
 
     public UsersService(UsersRepository usersRepository,
                         PasswordEncoder passwordEncoder,
-                        CartRepository cartRepository) {
+                        CartRepository cartRepository,
+                        OrderRepository orderRepository,
+                        ShoppingCartItemRepository shoppingCartItemRepository,
+                        WishlistRepository wishlistRepository, ReviewRepository reviewRepository, UpvoteRepository upvoteRepository) {
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
         this.cartRepository = cartRepository;
+        this.orderRepository = orderRepository;
+        this.shoppingCartItemRepository = shoppingCartItemRepository;
+        this.reviewRepository = reviewRepository;
+        this.upvoteRepository = upvoteRepository;
+        this.wishlistRepository = wishlistRepository;
     }
 
     public Page<User> getAllUsers(Pageable pageable) {
@@ -54,7 +68,6 @@ public class UsersService {
         user.setEmail(userDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(userDTO.getRole() != null ? userDTO.getRole() : Role.USER);
-        // Imposta i nuovi campi se presenti
         user.setPhone(userDTO.getPhone());
         user.setAddress(userDTO.getAddress());
         user.setCap(userDTO.getCap());
@@ -64,13 +77,11 @@ public class UsersService {
         return usersRepository.save(user);
     }
 
-    // Metodo update aggiornato per utilizzare il DTO dedicato UpdateUserDTO
     @Transactional
     public UserResponseDTO updateUser(Long id, @Valid UpdateUserDTO updateUserDTO) {
         logger.info("Updating user with ID: {}", id);
         User existingUser = findUserById(id);
 
-        // Aggiorniamo solo i campi relativi a recapiti ed indirizzi se forniti
         if (updateUserDTO.getEmail() != null) {
             existingUser.setEmail(updateUserDTO.getEmail());
         }
@@ -97,14 +108,30 @@ public class UsersService {
         return toResponseDTO(savedUser);
     }
 
+
     @Transactional
     public void deleteUser(Long id) {
         logger.info("Deleting user with ID: {}", id);
-        if (!usersRepository.existsById(id)) {
-            throw new UserNotFoundException("User not found with id: " + id);
+
+        // Recupera l'utente (lancia eccezione se non trovato)
+        User user = usersRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
+
+        // Gestione degli ordini: dissocia l'utente dagli ordini associati
+        List<Order> orders = orderRepository.findByUserId(user.getId());
+        for (Order order : orders) {
+            order.setUser(null);
         }
-        usersRepository.deleteById(id);
+        orderRepository.flush();
+
+        // Ora, cancellando l'utente, grazie al cascade e orphanRemoval nelle entità collegate
+        // (cart, wishlist, reviews) JPA si occuperà di eliminare in cascata tutte le entità associate.
+        usersRepository.delete(user);
+        usersRepository.flush();
+
+        logger.info("User with ID {} deleted successfully.", id);
     }
+
 
     public List<User> getUsersByRole(Role role) {
         logger.info("Fetching users with role: {}", role);
@@ -124,7 +151,7 @@ public class UsersService {
     }
 
     @Transactional
-    public User registerUser(demo.demo_ecommerce.dtos.UserDTO userDTO) {
+    public void registerUser(UserDTO userDTO) {
         User user = new User();
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
@@ -142,7 +169,6 @@ public class UsersService {
         Cart newCart = new Cart(savedUser);
         cartRepository.save(newCart);
 
-        return savedUser;
     }
 
     public Optional<User> findByUsername(String username) {

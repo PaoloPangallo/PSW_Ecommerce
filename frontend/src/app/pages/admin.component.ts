@@ -9,7 +9,7 @@ import { RouterModule } from '@angular/router';
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule // per <router-outlet> e [routerLink]
+    RouterModule
   ]
 })
 export class AdminComponent {}

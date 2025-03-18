@@ -53,7 +53,7 @@
 }
 
 /*****************************************
- * 1) Promo/Carousel (Base, effetto fade-in)
+ * Promo Carousel (con effetto fade-in)
  *****************************************/
 .promo-carousel {
   position: relative;
@@ -63,7 +63,7 @@
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
-.promo-carousel .slide {
+.carousel-slide {
   position: relative;
   animation: fadeIn 3s ease-in-out infinite;
 }
@@ -101,22 +101,23 @@
 }
 
 /*****************************************
- * 2) Categorie in evidenza
+ * Categorie in Evidenza
  *****************************************/
 .categories-highlight {
-  margin: 40px 0;
+  margin: 30px 0; /* Ridotto per un layout più compatto */
   text-align: center;
 }
 
-.categories-highlight h2 {
+.categories-highlight .section-title {
   font-size: 1.8rem;
   color: #002f6c;
   margin-bottom: 20px;
 }
 
+/* Layout a griglia con auto-fit */
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   justify-items: center;
 }
@@ -126,7 +127,6 @@
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 20px;
-  max-width: 200px;
   cursor: pointer;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-align: center;
@@ -149,98 +149,73 @@
 }
 
 /*****************************************
- * 3) Servizi / Vantaggi
+ * Sezione "Perché Sceglierci"
  *****************************************/
-.services-section {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  margin: 40px 0;
-  gap: 20px;
-}
-
-.service-box {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  max-width: 220px;
+.why-choose-us {
+  background-color: #f9f9f9; /* opzionale, per dare uno sfondo differente */
+  padding: 60px 0;
   text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.service-box:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-}
-
-.service-box img {
-  width: 50px;
-  margin-bottom: 10px;
-}
-
-.service-box h4 {
-  font-size: 1.1rem;
-  color: #002f6c;
-  margin-bottom: 5px;
-}
-
-.service-box p {
-  font-size: 0.95rem;
-  color: #555;
-}
-
-/*****************************************
- * 4) Newsletter
- *****************************************/
-.newsletter-section {
-  background: #002f6c;
-  color: #fff;
-  padding: 30px;
-  text-align: center;
-  border-radius: 8px;
+.why-title {
+  font-size: 2rem;
+  color: #333;
+  text-align: left; /* oppure center, se preferisci */
   margin-bottom: 40px;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  font-weight: 700;
 }
 
-.newsletter-section h2 {
-  font-size: 1.8rem;
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  justify-items: center;
+}
+
+.why-card {
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column; /* immagine sopra, testo sotto */
+}
+
+.why-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.why-card-image {
+  position: relative;
+  width: 100%;
+  height: 250px; /* altezza fissa per un layout uniforme */
+  overflow: hidden;
+}
+
+.why-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.why-card-content {
+  padding: 20px;
+  text-align: left; /* o center, in base al tuo stile */
+}
+
+.why-card-content h3 {
+  font-size: 1.4rem;
+  color: #002f6c;
   margin-bottom: 10px;
 }
 
-.newsletter-section p {
+.why-card-content p {
   font-size: 1rem;
-  margin-bottom: 20px;
-}
-
-.newsletter-section form {
-  display: inline-flex;
-  align-items: center;
-}
-
-.newsletter-section input[type="email"] {
-  padding: 10px;
-  font-size: 1rem;
-  border: none;
-  border-radius: 4px 0 0 4px;
-  outline: none;
-  width: 250px;
-}
-
-.newsletter-section button {
-  padding: 10px 20px;
-  background-color: #ffd700;
-  color: #002f6c;
-  font-weight: bold;
-  border: none;
-  border-radius: 0 4px 4px 0;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-size: 1rem;
-}
-
-.newsletter-section button:hover {
-  background-color: #ffcc00;
+  color: #555;
+  line-height: 1.4;
 }
 
 /*****************************************
@@ -347,19 +322,20 @@
  * Layout Responsive (Tablet & Mobile)
  *****************************************/
 @media (max-width: 992px) {
-  .featured-grid, .products-grid {
+  /* Prodotti in Evidenza & Lista Prodotti */
+  .featured-grid,
+  .products-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+  /* Categorie in Evidenza */
   .categories-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  .services-section {
-    justify-content: center;
   }
 }
 
 @media (max-width: 576px) {
-  .featured-grid, .products-grid {
+  .featured-grid,
+  .products-grid {
     grid-template-columns: 1fr;
   }
   .categories-grid {

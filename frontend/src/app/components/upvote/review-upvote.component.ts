@@ -47,15 +47,4 @@ export class ReviewUpvoteComponent implements OnInit {
     });
 
 
-
-  this.upvoteService.addUpvote(this.reviewId, this.userId).subscribe({
-      next: () => {
-        this.upvotes++;
-        this.hasUpvoted = true;
-      },
-      error: (err: HttpErrorResponse) => {
-        this.error = err.error?.message || 'Errore durante l\'aggiunta dell\'upvote';
-      }
-    });
-  }
-}
+  }}

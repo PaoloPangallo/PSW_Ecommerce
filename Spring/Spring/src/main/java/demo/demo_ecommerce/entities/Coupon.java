@@ -1,4 +1,6 @@
 package demo.demo_ecommerce.entities;
+import jakarta.validation.constraints.DecimalMax;
+
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -20,7 +22,8 @@ public class Coupon {
     @Column(unique = true, nullable = false)
     private String code;
 
-    // Modificato da Double a BigDecimal per una maggiore precisione
+
+    @DecimalMax(value = "90.0", inclusive = true, message = "Lo sconto massimo è del 90%")
     @Column(nullable = false)
     private BigDecimal discountPercentage;
 

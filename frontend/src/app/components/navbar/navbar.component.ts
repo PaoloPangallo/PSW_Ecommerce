@@ -1,14 +1,15 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth.services'; // Assicurati che il path sia corretto
+import {CommonModule, NgOptimizedImage} from '@angular/common';
+import { AuthService } from '../../services/auth.services';
+// Assicurati che il path sia corretto
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [RouterModule, CommonModule] // Aggiunto CommonModule per usare *ngIf, etc.
+  imports: [RouterModule, CommonModule, NgOptimizedImage] // Aggiunto CommonModule per usare *ngIf, etc.
 })
 export class NavbarComponent {
   searchTerm: string = '';

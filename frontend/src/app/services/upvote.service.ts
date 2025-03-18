@@ -12,6 +12,8 @@ export class UpvoteService {
 
   addUpvote(reviewId: number, userId: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/review/${reviewId}/user/${userId}`, {});
+    responseType: 'text' as 'json'
+
   }
 
   removeUpvote(reviewId: number, userId: number): Observable<any> {

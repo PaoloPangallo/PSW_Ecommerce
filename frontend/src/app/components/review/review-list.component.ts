@@ -10,6 +10,7 @@ import { ReviewDTO } from '../../models/review.models';
 import { ReviewService } from '../../services/review-list.services';
 import { AuthService } from '../../services/auth.services';
 import {UpdateReviewDialogComponent} from '../ConfirmDialog/update-review-dialog.component';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
   selector: 'app-review-list',
@@ -20,7 +21,9 @@ import {UpdateReviewDialogComponent} from '../ConfirmDialog/update-review-dialog
     MatProgressSpinnerModule,
     MatDialogModule,
     ReviewUpvoteComponent,       // Componente per gli upvote
-    UpdateReviewDialogComponent  // Dialog di modifica (se anch'esso è standalone)
+    UpdateReviewDialogComponent,
+    MatIcon,
+    // Dialog di modifica (se anch'esso è standalone)
   ],
   templateUrl: './review-list.component.html',
   styleUrls: ['./review-list.component.css']

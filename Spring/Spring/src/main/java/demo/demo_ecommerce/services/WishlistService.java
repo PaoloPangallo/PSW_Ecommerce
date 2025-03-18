@@ -31,7 +31,7 @@ public class WishlistService {
     }
 
     @Autowired
-    private UsersRepository userRepository; // Assicurati di avere il repository per gli utenti
+    private UsersRepository userRepository;
 
     public WishlistDTO createWishlist(Long userId, @Valid WishlistDTO wishlistDTO) {
         // Controlla se l'utente esiste

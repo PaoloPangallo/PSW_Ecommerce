@@ -24,15 +24,27 @@ public class FirebaseStorageService {
     }
 
     public String uploadFile(MultipartFile file) throws IOException {
-        // Genera un nome unico per il file
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("Il file è vuoto");
+        }
+        // Controlla che il file sia un'immagine
+        if (!file.getContentType().startsWith("image/")) {
+            throw new IllegalArgumentException("Il file deve essere un'immagine");
+        }
+        // Controlla la dimensione (ad esempio, max 5 MB)
+        long maxSize = 5 * 1024 * 1024;
+        if (file.getSize() > maxSize) {
+            throw new IllegalArgumentException("Il file supera la dimensione massima consentita (5MB)");
+        }
+
         String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
         BlobId blobId = BlobId.of(bucketName, fileName);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(file.getContentType()).build();
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
+                .setContentType(file.getContentType())
+                .build();
 
-        // Carica il file su Firebase Storage
         storage.create(blobInfo, file.getBytes());
-
-        // Restituisce l'URL pubblico dell'immagine
         return "https://storage.googleapis.com/" + bucketName + "/" + fileName;
     }
+
 }

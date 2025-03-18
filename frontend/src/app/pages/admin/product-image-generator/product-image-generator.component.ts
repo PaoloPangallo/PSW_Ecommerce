@@ -27,7 +27,7 @@ export class ProductImageGeneratorComponent implements OnInit {
     private route: ActivatedRoute,
     private location: Location,
     private imageService: ImageService,
-    private productService: ProductService  // <-- Iniettiamo il ProductService
+    private productService: ProductService
   ) {}
 
   ngOnInit(): void {

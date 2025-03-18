@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payments")
-@Data  // Lombok per generare automaticamente getter, setter, toString, equals, hashCode
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -46,7 +46,6 @@ public class Payment {
     @Column(nullable = false)
     private LocalDateTime timestamp;
 
-    // Enum per lo stato del pagamento
     public enum PaymentStatus {
         PENDING, COMPLETED, FAILED
     }

@@ -1,0 +1,73 @@
+<div class="admin-coupons-container">
+  <h1>Gestione Coupon</h1>
+
+  <!-- Bottone per aprire il form di creazione -->
+  <button class="action-btn create" (click)="onCreate()">Crea Nuovo Coupon</button>
+
+  <!-- Tabella dei coupon -->
+  <table class="coupons-table">
+    <thead>
+    <tr>
+      <th>ID</th>
+      <th>Codice</th>
+      <th>Sconto (%)</th>
+      <th>Scadenza</th>
+      <th>Attivo</th>
+      <th>Valore Minimo</th>
+      <th>Prodotti Associati</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let coupon of coupons">
+      <td>{{ coupon.id }}</td>
+      <td>{{ coupon.code }}</td>
+      <td>{{ coupon.discountPercentage }}</td>
+      <td>{{ coupon.expirationDate | date:'short' }}</td>
+      <td>{{ coupon.isActive ? 'Si' : 'No' }}</td>
+      <td>{{ coupon.minOrderValue | currency }}</td>
+      <td>
+        <!-- Se productNames è un array di stringhe -->
+        <ng-container *ngIf="coupon.productNames && coupon.productNames.length > 0; else noProducts">
+          {{ coupon.productNames.join(', ') }}
+        </ng-container>
+        <ng-template #noProducts>
+          Nessun prodotto
+        </ng-template>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- Modale per la creazione di un nuovo coupon -->
+  <div *ngIf="createMode" class="modal-overlay">
+    <div class="modal">
+      <h2>Crea Nuovo Coupon</h2>
+      <form (ngSubmit)="onSubmitCreate()">
+        <div class="form-group">
+          <label for="code">Codice:</label>
+          <input id="code" type="text" [(ngModel)]="newCoupon.code" name="code" required>
+        </div>
+        <div class="form-group">
+          <label for="discountPercentage">Sconto (%):</label>
+          <input id="discountPercentage" type="number" [(ngModel)]="newCoupon.discountPercentage" name="discountPercentage" required>
+        </div>
+        <div class="form-group">
+          <label for="expirationDate">Data di Scadenza:</label>
+          <input id="expirationDate" type="datetime-local" [(ngModel)]="newCoupon.expirationDate" name="expirationDate" required>
+        </div>
+        <div class="form-group">
+          <label for="minOrderValue">Valore Minimo Ordine:</label>
+          <input id="minOrderValue" type="number" [(ngModel)]="newCoupon.minOrderValue" name="minOrderValue" required>
+        </div>
+        <div class="form-group">
+          <label for="productIds">ID Prodotti (separati da virgola):</label>
+          <input id="productIds" type="text" [(ngModel)]="productIdsString" name="productIds">
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="action-btn save">Crea</button>
+          <button type="button" class="action-btn cancel" (click)="cancelCreate()">Annulla</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

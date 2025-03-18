@@ -28,6 +28,7 @@
             <button class="wishlist-button" (click)="addToWishlist()">❤️ Aggiungi alla Wishlist</button>
           </div>
 
+          <!-- Pulsante di generazione immagine per admin -->
           <div *ngIf="authService.isAdmin()" class="admin-button-container">
             <button class="admin-generate-button" [routerLink]="['/admin/generate-image', product.id]">
               Genera un'immagine coerente con {{ product.name }}
@@ -38,8 +39,8 @@
         </div>
       </section>
 
-      <!-- Sezione Upload Immagine -->
-      <section class="image-upload-container">
+      <!-- Sezione Upload Immagine, visibile solo agli admin -->
+      <section *ngIf="authService.isAdmin()" class="image-upload-container">
         <h3 class="upload-title">Carica una nuova immagine</h3>
         <div class="upload-controls">
           <div class="file-input-wrapper">
