@@ -30,7 +30,7 @@
     </tbody>
   </table>
 
-  <!-- Modale per l'aggiornamento utente -->
+  <!-- Modale per aggiornare utente -->
   <div *ngIf="editingUser" class="modal-overlay">
     <div class="modal">
       <h2>Aggiorna Utente: {{ editingUser.username }}</h2>
@@ -39,7 +39,10 @@
           <label for="phone">Telefono:</label>
           <input id="phone" type="text" [(ngModel)]="editingUser.phone" name="phone" required />
         </div>
-        <!-- Puoi aggiungere altri campi qui -->
+        <div class="form-group">
+          <label for="address">Indirizzo:</label>
+          <input id="address" type="text" [(ngModel)]="editingUser.address" name="address" required />
+        </div>
         <div class="modal-actions">
           <button type="submit" class="action-btn save">Salva</button>
           <button type="button" class="action-btn cancel" (click)="cancelEdit()">Annulla</button>

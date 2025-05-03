@@ -53,21 +53,6 @@ export class ProductService {
     );
   }
 
-  createProduct(product: Product): Observable<Product> {
-    // Se il prezzo è già in euro, lo inviamo direttamente al backend
-    const productInEuro = { ...product, price: Number((product.price / this.conversionRate).toFixed(2)) };
-    return this.http.post<Product>(this.apiUrl, productInEuro);
-  }
-
-  updateProduct(id: number, product: Product): Observable<Product> {
-    const productInEuro = { ...product, price: Number((product.price / this.conversionRate).toFixed(2)) };
-    return this.http.put<Product>(`${this.apiUrl}/${id}`, productInEuro);
-  }
-
-  deleteProduct(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
 
   uploadProductImage(productId: number, file: File): Observable<Product> {
     const formData = new FormData();

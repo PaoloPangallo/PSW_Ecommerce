@@ -7,7 +7,6 @@ import { Product } from '../models/product.model';
   providedIn: 'root'
 })
 export class AdminProductService {
-  // URL di base corrispondente al controller backend (che gestisce sia operazioni di lettura sia admin)
   private baseUrl = 'http://localhost:8080/api/products';
 
   constructor(private http: HttpClient) {}

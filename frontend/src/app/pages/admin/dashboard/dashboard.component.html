@@ -1,16 +1,23 @@
-<div class="admin-container">
-  <nav class="admin-sidebar">
-    <h2>Area Admin</h2>
-    <ul>
-      <li><a routerLink="dashboard">Dashboard</a></li>
-      <li><a routerLink="users">Utenti</a></li>
-      <li><a routerLink="products">Prodotti</a></li>
-      <li><a routerLink="coupons">Coupon</a></li>
-      <li><a routerLink="/admin/home-photo">Foto Home</a></li>
-    </ul>
-  </nav>
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Console Admin</h2>
+    </div>
+    <nav class="sidebar-menu">
+      <a routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/admin/users" routerLinkActive="active">Utenti</a>
+      <a routerLink="/admin/products" routerLinkActive="active">Prodotti</a>
+      <a routerLink="/admin/coupons" routerLinkActive="active">Coupon</a>
+      <a routerLink="/admin/home-photo" routerLinkActive="active">Foto Home</a>
+    </nav>
+  </aside>
 
+  <!-- Content Area -->
   <main class="admin-content">
-    <router-outlet></router-outlet>
+    <h1>Area Amministrativa</h1>
+    <div class="content-box">
+      <router-outlet></router-outlet>
+    </div>
   </main>
 </div>

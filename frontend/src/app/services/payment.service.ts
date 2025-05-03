@@ -23,17 +23,8 @@ export class PaymentService {
     return this.http.get<PaymentResponse[]>(this.baseUrl);
   }
 
-  // Recupera un pagamento per ID
-  getPaymentById(id: number): Observable<PaymentResponse> {
-    return this.http.get<PaymentResponse>(`${this.baseUrl}/${id}`);
-  }
 
-  // Aggiorna lo stato di un pagamento
-  updatePaymentStatus(id: number, status: string): Observable<PaymentResponse> {
-    return this.http.patch<PaymentResponse>(`${this.baseUrl}/${id}/status?status=${status}`, {});
-  }
-
-  // Elimina un pagamento
+// Elimina un pagamento
   deletePayment(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }

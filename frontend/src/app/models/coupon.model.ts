@@ -13,9 +13,9 @@ export interface Coupon {
 
 export interface CouponCreationDTO {
   code: string;
-  discountPercentage: number;  // Usa number se preferisci
-  expirationDate: string;      // ISO string (es. "2025-12-31T23:59:59")
+  discountPercentage: number;
+  expirationDate: string;
   isActive: boolean;
-  minOrderValue: number;       // Usa number
-  productIds: number[];        // ID dei prodotti a cui associare il coupon
+  minOrderValue: number;
+  productIds: number[];
 }

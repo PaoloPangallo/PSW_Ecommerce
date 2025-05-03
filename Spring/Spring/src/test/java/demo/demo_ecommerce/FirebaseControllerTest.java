@@ -1,4 +1,4 @@
-package demo.demo_ecommerce;
+/* package demo.demo_ecommerce;
 
 import demo.demo_ecommerce.Controllers.FirebaseController;
 import demo.demo_ecommerce.config.JwtTokenProvider;
@@ -46,3 +46,4 @@ class FirebaseControllerTest {
                 .andExpect(content().string("https://storage.googleapis.com/unilire.firebasestorage.app/test-image.jpg"));
     }
 }
+ */

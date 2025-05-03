@@ -12,16 +12,8 @@ export class CouponService {
   constructor(private http: HttpClient) {}
 
   // Creazione di un coupon
-  createCoupon(coupon: Coupon): Observable<Coupon> {
-    return this.http.post<Coupon>(`${this.baseUrl}/create`, coupon);
-  }
-
-  // Recupera un coupon specifico tramite il codice
-  getCouponByCode(code: string): Observable<Coupon> {
-    return this.http.get<Coupon>(`${this.baseUrl}/${code}`);
-  }
-
-  // Validazione di un coupon in base al codice e al valore dell'ordine
+// Recupera un coupon specifico tramite il codice
+// Validazione di un coupon in base al codice e al valore dell'ordine
   validateCoupon(code: string, orderValue: number): Observable<boolean> {
     return this.http.get<boolean>(`${this.baseUrl}/validate/${code}/${orderValue}`);
   }

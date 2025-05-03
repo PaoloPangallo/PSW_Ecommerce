@@ -13,11 +13,11 @@
 /* Container principale */
 .checkout-container {
   max-width: 800px;
-  margin: 20px auto;
-  padding: 20px;
+  margin: 30px auto;
+  padding: 25px;
   background-color: var(--card-bg, #ffffff);
   border-radius: var(--border-radius, 8px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   font-family: var(--font-family, sans-serif);
   color: #333;
 }
@@ -26,12 +26,14 @@
 .checkout-container h2 {
   text-align: center;
   color: var(--primary-color, #1976d2);
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 .checkout-container h3 {
   color: var(--accent-color, #ff9800);
   margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
 }
 
 /* ===================== */
@@ -49,7 +51,7 @@
   background-color: #fff;
   padding: 1rem;
   border-radius: var(--border-radius, 8px);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
 }
 
 .cart-items {
@@ -62,7 +64,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 0;
+  padding: 0.6rem 0;
   border-bottom: 1px solid #eee;
 }
 
@@ -87,13 +89,13 @@
 /*  Step generici        */
 /* ===================== */
 .checkout-step {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 /* Etichette e input */
 .checkout-container label {
   display: block;
-  margin-top: 10px;
+  margin-top: 12px;
   font-weight: 600;
 }
 .checkout-container input,
@@ -125,7 +127,7 @@
 .btn-group {
   display: flex;
   gap: 10px;
-  margin-top: 15px;
+  margin-top: 20px;
 }
 
 /* Bottoni base */
@@ -147,18 +149,12 @@
   background-color: var(--primary-hover, #1565c0);
 }
 
-/* Bottone "Avanti" */
-.next-button {
-  background-color: var(--accent-color, #ff9800);
-}
-.next-button:hover {
-  background-color: var(--accent-hover, #fb8c00);
-}
-
-/* Bottone "Conferma Ordine" */
+/* Bottone "Avanti" e "Conferma Ordine" */
+.next-button,
 .submit-button {
   background-color: var(--accent-color, #ff9800);
 }
+.next-button:hover,
 .submit-button:hover {
   background-color: var(--accent-hover, #fb8c00);
 }
@@ -171,6 +167,7 @@
   border-radius: var(--border-radius, 8px);
   margin-top: 20px;
   text-align: center;
+  color: var(--error-color, #e53935);
 }
 
 /* Responsività */
@@ -182,4 +179,34 @@
     width: 100%;
     margin-bottom: 10px;
   }
+
+
+
 }
+
+.address-summary {
+  background-color: #f5f9ff;
+  padding: 15px 20px;
+  border-radius: var(--border-radius, 8px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  margin-bottom: 1.2rem;
+  border-left: 4px solid var(--primary-color, #1976d2);
+}
+
+.address-summary p {
+  margin: 5px 0;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.address-summary strong {
+  color: var(--primary-color, #1976d2);
+  font-weight: 600;
+}
+
+.address-summary p:first-child {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+

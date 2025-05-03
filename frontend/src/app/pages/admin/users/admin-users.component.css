@@ -1,73 +1,39 @@
-/* Container principale */
 .admin-users-container {
-  max-width: 1200px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-  font-family: Arial, sans-serif;
-  color: #333;
+  padding: 20px;
 }
 
-/* Titolo */
-.admin-users-container h1 {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  color: #002f6c;
-}
-
-/* Tabella utenti */
 .users-table {
   width: 100%;
   border-collapse: collapse;
-  margin-bottom: 2rem;
-}
-
-.users-table thead {
-  background-color: #f0f0f0;
+  margin-bottom: 20px;
 }
 
 .users-table th,
 .users-table td {
-  padding: 0.75rem 1rem;
-  border: 1px solid #ddd;
-  text-align: left;
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
-.users-table th {
-  font-weight: bold;
-  color: #002f6c;
-}
-
-/* Pulsanti azioni */
 .action-btn {
-  padding: 0.5rem 1rem;
+  margin: 0 5px;
+  padding: 8px 12px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
-  transition: background-color 0.3s ease;
-  margin-right: 0.5rem;
+  font-weight: bold;
 }
 
 .action-btn.edit {
-  background-color: #ffd700;
-  color: #002f6c;
-}
-
-.action-btn.edit:hover {
-  background-color: #ffcc00;
+  background-color: #4CAF50;
+  color: white;
 }
 
 .action-btn.delete {
-  background-color: #e74c3c;
-  color: #fff;
+  background-color: #f44336;
+  color: white;
 }
 
-.action-btn.delete:hover {
-  background-color: #c0392b;
-}
-
-/* Modal overlay */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -76,70 +42,53 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
-/* Modal box */
 .modal {
-  background-color: #fff;
-  padding: 2rem;
+  background: white;
+  padding: 30px;
   border-radius: 8px;
-  width: 100%;
-  max-width: 500px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .modal h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: #002f6c;
-}
-
-/* Form nel modal */
-.modal form {
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 20px;
 }
 
 .form-group {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 15px;
+  text-align: left;
 }
 
 .form-group label {
-  margin-bottom: 0.5rem;
-  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
 }
 
 .form-group input {
-  padding: 0.5rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
 }
 
-/* Azioni del modal */
 .modal-actions {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
 }
 
 .action-btn.save {
-  background-color: #2ecc71;
-  color: #fff;
-}
-
-.action-btn.save:hover {
-  background-color: #27ae60;
+  background-color: #2196F3;
+  color: white;
 }
 
 .action-btn.cancel {
-  background-color: #bdc3c7;
-  color: #333;
-}
-
-.action-btn.cancel:hover {
-  background-color: #95a5a6;
+  background-color: #9e9e9e;
+  color: white;
 }

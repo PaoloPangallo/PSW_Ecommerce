@@ -4,7 +4,7 @@ export interface Product {
   description: string;
   price: number;
   stock: number;
-  category?: { name: string };  // ✅ Categoria opzionale
+  category?: { name: string };
   imageUrl?: string;
   featured?: boolean;
 }

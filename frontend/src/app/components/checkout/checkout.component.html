@@ -94,7 +94,18 @@
     <!-- STEP 4: Riepilogo Finale e Conferma -->
     <div *ngIf="currentStep === 4" class="checkout-step step4">
       <h3>Riepilogo Ordine</h3>
-      <p><strong>Indirizzo:</strong> {{ checkoutForm.get('shipping')?.value | json }}</p>
+      <div class="address-summary">
+        <p><strong>Indirizzo:</strong></p>
+        <p>{{ checkoutForm.get('shipping.address')?.value }},
+          {{ checkoutForm.get('shipping.zipCode')?.value }},
+          {{ checkoutForm.get('shipping.city')?.value }},
+          {{ checkoutForm.get('shipping.country')?.value }}
+        </p>
+        <p><strong>Metodo di Spedizione:</strong>
+          {{ checkoutForm.get('shipping.shippingMethod')?.value }}
+        </p>
+      </div>
+
       <p><strong>Metodo di Pagamento:</strong> {{ checkoutForm.get('transaction.paymentMethod')?.value }}</p>
       <p><strong>Totale Carrello:</strong> {{ getCartTotal() | lire }}</p>
 
