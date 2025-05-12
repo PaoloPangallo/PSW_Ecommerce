@@ -154,6 +154,28 @@ public class ProductService {
     }
 
 
+    @Transactional
+    public Product createProductFromDTO(ProductDTO dto) {
+        if (productRepository.existsByName(dto.getName())) {
+            throw new IllegalArgumentException("Product with this name already exists");
+        }
+
+        Product product = new Product();
+        product.setName(dto.getName());
+        product.setPrice(dto.getPrice());
+        product.setFeatured(dto.isFeatured());
+
+        // Se desideri assegnare una categoria predefinita, puoi farlo qui
+        // oppure lasciare null per ora
+
+        // Immagine predefinita
+        product.setImageUrl("https://example.com/default-image.jpg");
+
+        return productRepository.save(product);
+    }
+
+
+
 
 
 

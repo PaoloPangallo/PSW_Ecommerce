@@ -117,3 +117,43 @@ button[routerLink="/admin"]:hover {
   background-color: #ffffff;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
 }
+
+.sidebar.modern {
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 20px;
+}
+
+.category-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.2s ease;
+}
+
+.category-box img {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  background-color: #eaeaea;
+}
+
+.category-box span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.category-box:hover {
+  transform: scale(1.05);
+}
+

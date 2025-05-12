@@ -28,22 +28,32 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                // Sessione stateless
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                // Configura l'accesso agli endpoint
                 .authorizeHttpRequests(auth -> auth
+                        // Accesso pubblico
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/images/**").permitAll()
-                        .requestMatchers("/api/reviews/**").authenticated()
                         .requestMatchers("/api/products/featured").permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                         .requestMatchers("/api/storage/**").permitAll()
+
+                        // Accesso autenticato
+                        .requestMatchers("/api/reviews/**").authenticated()
                         .requestMatchers("/checkout/**").authenticated()
+
+                        // Solo ADMIN per POST/PUT/DELETE su prodotti
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/products").hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+
+                        // Tutto il resto richiede autenticazione
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     // Configurazione CORS
     @Bean

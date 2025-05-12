@@ -118,6 +118,10 @@ public class CartService {
      */
     @Transactional
     public Cart addItemToCart(Long userId, Long productId, int quantity) {
+        if (userId == null) {
+            throw new IllegalStateException("Devi essere loggato per aggiungere prodotti al carrello.");
+        }
+
         if (quantity <= 0) {
             throw new IllegalArgumentException("La quantità deve essere maggiore di zero.");
         }
@@ -145,7 +149,6 @@ public class CartService {
             newItem.setCart(cart);
             newItem.setProduct(product);
             newItem.setQuantity(quantity);
-            // Inizializza i campi di prezzo: price ed oldPrice
             newItem.setPrice(product.getPrice());
             newItem.setOldPrice(product.getPrice());
             shoppingCartItemRepository.save(newItem);
@@ -154,6 +157,7 @@ public class CartService {
         cartRepository.save(cart);
         return getCartByUserId(userId);
     }
+
 
     /**
      * Aggiorna la quantità di un item nel carrello.

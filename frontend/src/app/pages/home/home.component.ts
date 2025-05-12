@@ -82,4 +82,25 @@ export class HomeComponent implements OnInit {
   goBack(): void {
     window.history.back();
   }
+
+
+  // home.component.ts (ngAfterViewInit)
+  ngAfterViewInit() {
+    const video = document.getElementById('promoVideo') as HTMLVideoElement;
+    const button = document.getElementById('replayButton') as HTMLButtonElement;
+
+    video.addEventListener('ended', () => {
+      button.style.display = 'block';
+    });
+
+    button.addEventListener('click', () => {
+      video.currentTime = 0;
+      video.play();
+      button.style.display = 'none';
+    });
+  }
+
+
+
+
 }

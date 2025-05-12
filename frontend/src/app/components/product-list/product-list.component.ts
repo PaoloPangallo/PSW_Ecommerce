@@ -75,17 +75,27 @@ export class ProductListComponent implements OnInit {
 
   addToCart(product: Product): void {
     const userId = this.authService.getCurrentUserId();
-    if (!userId) return;
+    if (!userId) {
+      alert('🔒 Devi effettuare il login per aggiungere un prodotto al carrello.');
+      this.authService.logout(); // opzionale: rimuovi token se scaduto
+      this.successMessage = ''; // reset messaggio
+      location.href = `/login?returnUrl=${encodeURIComponent(location.pathname)}`;
+      return;
+    }
 
     this.cartService.updateItemQuantity(userId, product.id!, 1).subscribe({
       next: () => {
         this.successMessage = "🛒 Prodotto aggiunto al carrello!";
-        // fai sparire il messaggio dopo qualche secondo, se vuoi
         setTimeout(() => this.successMessage = '', 4000);
       },
-      error: (error: any) => console.error("Errore nell'aggiunta al carrello:", error)
+      error: (error: any) => {
+        console.error("Errore nell'aggiunta al carrello:", error);
+        this.successMessage = "❌ Errore durante l'aggiunta al carrello.";
+        setTimeout(() => this.successMessage = '', 4000);
+      }
     });
   }
+
 
 
   successMessage: string = '';

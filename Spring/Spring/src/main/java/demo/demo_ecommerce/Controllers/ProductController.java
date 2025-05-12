@@ -67,15 +67,16 @@ public class ProductController {
     // POST /api/products - Crea un nuovo prodotto (solo ADMIN)
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<?> createProduct(@Valid @RequestBody Product product) {
+    public ResponseEntity<?> createProduct(@Valid @RequestBody ProductDTO productDTO) {
         try {
-            logger.info("Creating product: {}", product.getName());
-            Product createdProduct = productService.createProduct(product);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+            logger.info("Creating product: {}", productDTO.getName());
+            Product createdProduct = productService.createProductFromDTO(productDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(ProductDTO.fromEntity(createdProduct));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
 
     // PUT /api/products/{id} - Aggiorna un prodotto (solo ADMIN)
     @PreAuthorize("hasRole('ADMIN')")

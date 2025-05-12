@@ -1,73 +1,80 @@
+<!-- NAVBAR (una sola, pulita) -->
 <nav class="navbar">
-  <!-- Barra superiore (logo, ricerca, account) -->
   <div class="nav-top">
     <div class="logo">
       <a routerLink="/">
-        <img
-          ngSrc="assets/logo_unilire.svg"
-          alt="Unilire"
-          width="200"
-          height="60"
-        />
+        <img ngSrc="assets/logo_unilire.svg" alt="Unilire" width="200" height="60" />
       </a>
     </div>
 
     <div class="search-box">
-      <input
-        type="text"
-        placeholder="Cerca un prodotto..."
-        (input)="onSearch($event)"
-      />
+      <input type="text" placeholder="Cerca un prodotto..." (input)="onSearch($event)" />
       <button (click)="search()" class="search-button">🔍</button>
     </div>
 
-    <button
-      *ngIf="authService.isAdmin()"
-      class="search-button"
-      routerLink="/admin"
-    >
+    <button *ngIf="authService.isAdmin()" class="search-button" routerLink="/admin">
       Console Admin
     </button>
 
     <div class="user-icons">
-      <span>
-        <a (click)="handleAccount()">👤 Account</a>
-      </span>
-      <span>
-        <a routerLink="/cart">🛒 Carrello</a>
-      </span>
-      <span>
-        <a routerLink="/wishlist">❤️ Wishlist</a>
-      </span>
-      <span *ngIf="isLoggedIn()">
-        <a routerLink="/order-history">I miei Ordini</a>
-      </span>
-      <span *ngIf="isLoggedIn()">
-        <a (click)="logout()" style="cursor: pointer;">Logout</a>
-      </span>
+      <span><a (click)="handleAccount()">👤 Account</a></span>
+      <span><a routerLink="/cart">🛒 Carrello</a></span>
+      <span><a routerLink="/wishlist">❤️ Wishlist</a></span>
+      <span *ngIf="isLoggedIn()"><a routerLink="/order-history">I miei Ordini</a></span>
+      <span *ngIf="isLoggedIn()"><a (click)="logout()" style="cursor: pointer;">Logout</a></span>
     </div>
   </div>
 </nav>
 
-<!-- Layout a 2 colonne: sidebar a sinistra, contenuto a destra -->
+<!-- LAYOUT A 2 COLONNE -->
 <div class="page-container">
-  <!-- Sidebar con le categorie -->
-  <aside class="sidebar">
-    <ul>
-      <li><a routerLink="/category/Smartphone e Telefonia">Smartphone e Telefonia</a></li>
-      <li><a routerLink="/category/TV e Home Entertainment">TV e Home Entertainment</a></li>
-      <li><a routerLink="/category/Informatica e Accessori">Informatica e Accessori</a></li>
-      <li><a routerLink="/category/Elettrodomestici">Elettrodomestici</a></li>
-      <li><a routerLink="/category/Gaming e Console">Gaming e Console</a></li>
-      <li><a routerLink="/category/Audio e Hi-Fi">Audio e Hi-Fi</a></li>
-      <li><a routerLink="/category/Fotocamere e Videocamere">Fotocamere e Videocamere</a></li>
-      <li><a routerLink="/category/Climatizzazione e Riscaldamento">Climatizzazione e Riscaldamento</a></li>
-      <li><a routerLink="/category/Smartwatch e Wearable">Smartwatch e Wearable</a></li>
-      <li><a routerLink="/category/Droni e Mobilità Elettrica">Droni e Mobilità Elettrica</a></li>
-    </ul>
+  <!-- SIDEBAR MODERNA CON CATEGORIE -->
+  <aside class="sidebar modern">
+    <div class="category-grid">
+      <a class="category-box" routerLink="/category/Smartphone e Telefonia">
+        <img ngSrc="assets/icons/telefonia.jpg" alt="Smartphone e Telefonia" height="1200" width="1200"/>
+        <span>Smartphone</span>
+      </a>
+      <a class="category-box" routerLink="/category/TV e Home Entertainment">
+        <img ngSrc="assets/icons/tv.jpg" alt="TV e Home Entertainment" height="980" width="1540"/>
+        <span>TV e Home</span>
+      </a>
+      <a class="category-box" routerLink="/category/Informatica e Accessori">
+        <img src="assets/icons/informatica.png" alt="Informatica e Accessori" />
+        <span>Informatica</span>
+      </a>
+      <a class="category-box" routerLink="/category/Elettrodomestici">
+        <img src="assets/icons/elettrodomestici.png" alt="Elettrodomestici" />
+        <span>Elettrodomestici</span>
+      </a>
+      <a class="category-box" routerLink="/category/Gaming e Console">
+        <img ngSrc="assets/icons/console.jpg" alt="Gaming e Console" height="360" width="360"/>
+        <span>Gaming</span>
+      </a>
+      <a class="category-box" routerLink="/category/Audio e Hi-Fi">
+        <img ngSrc="assets/icons/audio.png" alt="Audio e Hi-Fi" height="512" width="512"/>
+        <span>Audio</span>
+      </a>
+      <a class="category-box" routerLink="/category/Fotocamere e Videocamere">
+        <img ngSrc="assets/icons/fotocamera.png" alt="Fotocamere e Videocamere" height="600" width="600"/>
+        <span>Foto/Video</span>
+      </a>
+      <a class="category-box" routerLink="/category/Climatizzazione e Riscaldamento">
+        <img ngSrc="assets/icons/clima.png" alt="Climatizzazione e Riscaldamento" height="512" width="512"/>
+        <span>Clima</span>
+      </a>
+      <a class="category-box" routerLink="/category/Smartwatch e Wearable">
+        <img ngSrc="assets/icons/smartwatch.jpg" alt="Smartwatch e Wearable" height="980" width="980"/>
+        <span>Wearable</span>
+      </a>
+      <a class="category-box" routerLink="/category/Droni e Mobilità Elettrica">
+        <img src="assets/icons/droni.png" alt="Droni e Mobilità Elettrica" />
+        <span>Droni</span>
+      </a>
+    </div>
   </aside>
 
-  <!-- Contenuto principale -->
+  <!-- CONTENUTO PRINCIPALE -->
   <div class="main-content">
     <router-outlet></router-outlet>
   </div>

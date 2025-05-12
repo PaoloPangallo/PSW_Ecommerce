@@ -342,3 +342,43 @@
     grid-template-columns: 1fr;
   }
 }
+
+.promo-video {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.promo-video-wrapper {
+  position: relative;
+  text-align: center;
+}
+
+.replay-button {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #003366;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+.replay-button:hover {
+  background-color: #0055aa;
+}
+
+
+.promo-video-element {
+  width: 100%;
+  max-width: 960px;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+

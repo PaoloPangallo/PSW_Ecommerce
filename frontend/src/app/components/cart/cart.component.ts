@@ -45,13 +45,15 @@ export class CartComponent implements OnInit {
   ngOnInit(): void {
     const userId = this.authService.getCurrentUserId();
     if (!userId) {
-      this.showSnack('Nessun utente loggato.', 3000);
+      this.showSnack('🔒 Devi effettuare il login per accedere al carrello.', 3000);
+      this.router.navigate(['/login'], {
+        queryParams: {returnUrl: this.router.url}
+      });
       return;
     }
-    this.loadCart(userId);
   }
 
-  loadCart(userId: number): void {
+    loadCart(userId: number): void {
     this.cartService.getCart(userId).subscribe({
       next: (cart) => {
         this.cart = cart;
@@ -157,13 +159,18 @@ export class CartComponent implements OnInit {
   private checkUserLoggedIn(): number | null {
     const userId = this.authService.getCurrentUserId();
     if (!userId) {
-      this.showSnack('Nessun utente loggato.', 3000);
+      this.showSnack('🔒 Devi effettuare il login per continuare.', 3000);
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
       return null;
     }
     return userId;
   }
 
+
   private showSnack(message: string, duration: number = 3000): void {
-    this.snackBar.open(message, 'Chiudi', { duration });
+    this.snackBar.open(message, 'OK', { duration, horizontalPosition: 'right', verticalPosition: 'top' });
   }
+
 }
