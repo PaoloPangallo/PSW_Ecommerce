@@ -26,6 +26,7 @@ import { LirePipe } from '../../services/lire.pipe';
 })
 export class ProductDetailsComponent implements OnInit, OnDestroy {
   product: Product | null = null;
+  alsoBoughtProducts: Product[] = []; // 🔥 Nuova proprietà
   isLoading: boolean = false;
   wishlist: Wishlist | null = null;
   successMessage: string = '';
@@ -33,10 +34,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   coupons: Coupon[] = [];
   private routeSubscription: Subscription | null = null;
 
-  // 🔹 Per la selezione del file
   selectedFile: File | null = null;
-
-  // Proprietà per le recensioni
   reviews: ReviewDTO[] = [];
   couponMessage: string = '';
   userHasReviewed: boolean = false;
@@ -62,6 +60,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
         this.loadProduct(productId);
         this.loadReviewsForProduct(productId);
         this.loadApplicableCoupons(productId);
+        this.loadAlsoBoughtRecommendations(productId); // 🔥
       } else {
         this.errorMessage = "ID prodotto non valido.";
         this.redirectToHome();
@@ -70,6 +69,18 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
 
     this.loadWishlist();
   }
+
+  loadAlsoBoughtRecommendations(productId: number): void {
+    this.productService.getAlsoBoughtRecommendations(productId).subscribe({
+      next: (products) => {
+        this.alsoBoughtProducts = products;
+      },
+      error: (err) => {
+        console.error('Errore nel caricamento dei co-acquisti:', err);
+      }
+    });
+  }
+
 
   // ===========================
   // = UPLOAD IMMAGINE LOGICA =

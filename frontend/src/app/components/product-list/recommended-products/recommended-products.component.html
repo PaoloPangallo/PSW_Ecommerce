@@ -1,0 +1,11 @@
+<div *ngIf="recommendedProducts.length > 0">
+  <h3>Consigliati per te</h3>
+  <div class="product-grid">
+    <div *ngFor="let product of recommendedProducts" class="product-card">
+      <img [src]="product.imageUrl" alt="{{ product.name }}" />
+      <h4>{{ product.name }}</h4>
+      <p>{{ product.price }}€</p>
+      <a [routerLink]="['/product', product.id]">Dettagli</a>
+    </div>
+  </div>
+</div>

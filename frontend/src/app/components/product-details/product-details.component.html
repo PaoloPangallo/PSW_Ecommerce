@@ -10,25 +10,20 @@
     <ng-container *ngIf="product; else notFound">
       <!-- CARD del Prodotto -->
       <section class="product-card">
-        <!-- Immagine del prodotto -->
         <div class="image-container">
           <img *ngIf="product.imageUrl" [src]="product.imageUrl" [alt]="product.name" />
         </div>
 
-        <!-- Dettagli del prodotto -->
         <div class="details-container">
           <h2 class="product-title">{{ product.name }}</h2>
           <p class="description">{{ product.description }}</p>
-          <p class="price">
-            <strong>Prezzo:</strong> {{ product.price | lire }}
-          </p>
+          <p class="price"><strong>Prezzo:</strong> {{ product.price | lire }}</p>
 
           <div class="button-container">
             <button class="cart-button" (click)="addToCart()">🛒 Aggiungi al Carrello</button>
             <button class="wishlist-button" (click)="addToWishlist()">❤️ Aggiungi alla Wishlist</button>
           </div>
 
-          <!-- Pulsante di generazione immagine per admin -->
           <div *ngIf="authService.isAdmin()" class="admin-button-container">
             <button class="admin-generate-button" [routerLink]="['/admin/generate-image', product.id]">
               Genera un'immagine coerente con {{ product.name }}
@@ -39,7 +34,7 @@
         </div>
       </section>
 
-      <!-- Sezione Upload Immagine, visibile solo agli admin -->
+      <!-- Sezione Upload Immagine -->
       <section *ngIf="authService.isAdmin()" class="image-upload-container">
         <h3 class="upload-title">Carica una nuova immagine</h3>
         <div class="upload-controls">
@@ -53,7 +48,7 @@
         </div>
       </section>
 
-      <!-- Sezione Coupon Applicabili -->
+      <!-- Sezione Coupon -->
       <section class="coupon-section" *ngIf="coupons && coupons.length > 0">
         <h3>Coupon Applicabili</h3>
         <ul>
@@ -77,6 +72,24 @@
           <p class="review-info">Hai già recensito questo prodotto.</p>
         </ng-template>
       </section>
+
+      <!-- 🔥 Sezione Spesso acquistati insieme -->
+      <section class="also-bought-section">
+        <h3>Spesso acquistati insieme</h3>
+        <ng-container *ngIf="alsoBoughtProducts.length > 0; else noAlsoBought">
+          <div class="recommended-products">
+            <div *ngFor="let p of alsoBoughtProducts" class="recommended-card">
+              <img [src]="p.imageUrl" [alt]="p.name" />
+              <h4>{{ p.name }}</h4>
+              <p>{{ p.price | lire }}</p>
+              <a [routerLink]="['/product', p.id]">Dettagli</a>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #noAlsoBought>
+          <p class="no-recommendations">Nessun prodotto frequentemente acquistato insieme.</p>
+        </ng-template>
+      </section>
     </ng-container>
 
     <ng-template #notFound>
@@ -85,7 +98,7 @@
       </div>
     </ng-template>
 
-    <!-- Pulsante per tornare indietro -->
+    <!-- Pulsante Indietro -->
     <div class="back-button-container">
       <button class="back-button" (click)="goBack()">⬅️ Indietro</button>
     </div>

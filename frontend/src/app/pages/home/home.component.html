@@ -9,6 +9,9 @@
     </div>
   </section>
 
+  <app-home-recommendations *ngIf="authService.isLoggedIn()"></app-home-recommendations>
+
+
   <!-- Video Promozionale -->
   <section class="promo-video" aria-label="Video Promozionale">
     <div class="container">

@@ -62,4 +62,13 @@ export class ProductService {
     return this.http.post<Product>(`${this.apiUrl}/${productId}/uploadImage`, formData);
   }
 
+  getAlsoBoughtRecommendations(productId: number): Observable<Product[]> {
+    return this.http.get<Product[]>(`http://localhost:8080/api/recommendations/also-bought/${productId}`);
+  }
+
+  getRecommendations(userId: number): Observable<Product[]> {
+    return this.http.get<Product[]>(`http://localhost:8080/api/recommendations/for-user/${userId}`);
+  }
+
+
 }

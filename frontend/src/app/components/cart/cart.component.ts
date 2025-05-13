@@ -47,13 +47,17 @@ export class CartComponent implements OnInit {
     if (!userId) {
       this.showSnack('🔒 Devi effettuare il login per accedere al carrello.', 3000);
       this.router.navigate(['/login'], {
-        queryParams: {returnUrl: this.router.url}
+        queryParams: { returnUrl: this.router.url }
       });
       return;
     }
+
+    // ✅ carica effettivamente il carrello
+    this.loadCart(userId);
   }
 
-    loadCart(userId: number): void {
+
+  loadCart(userId: number): void {
     this.cartService.getCart(userId).subscribe({
       next: (cart) => {
         this.cart = cart;
