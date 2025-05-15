@@ -50,4 +50,16 @@ export class CheckoutService {
         })
       );
   }
+
+  getDeliveryEstimate(cap: string): Observable<Date> {
+    return this.http.get<Date>(`${this.apiUrl}/estimate`, {
+      params: { cap }
+    }).pipe(
+      catchError(error => {
+        console.error('Errore durante la stima della consegna:', error);
+        return throwError(() => new Error('Errore nella stima della consegna.'));
+      })
+    );
+  }
+
 }

@@ -1,0 +1,70 @@
+<h2>Reclami ricevuti</h2>
+
+
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Email</th>
+    <th>Categoria</th>
+    <th>Messaggio</th>
+    <th>Stato</th>
+    <th>Data</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tbody>
+  <tr *ngFor="let complaint of complaints">
+    <td>{{ complaint.id }}</td>
+    <td>{{ complaint.email }}</td>
+    <td>{{ complaint.category }}</td>
+    <td>{{ complaint.message }}</td>
+    <td>
+      <!-- SE lo stato NON è terminale mostro il select -->
+      <ng-container *ngIf="!isTerminal(complaint.status); else terminalBadge">
+        <select
+          [(ngModel)]="complaint.status"
+          (change)="updateStatus(complaint.id, complaint.status)">
+          <option value="PENDING">In attesa</option>
+          <option value="ACCEPTED">Accettato</option>
+          <option value="REJECTED">Respinto</option>
+          <option value="CLOSED">Chiuso</option>
+        </select>
+      </ng-container>
+
+      <!-- Badge con lucchetto + tooltip per stati terminali -->
+      <ng-template #terminalBadge>
+    <span
+      class="status-badge"
+      [ngClass]="badgeClass(complaint.status)"
+      matTooltip="Lo stato {{ complaint.status.toLowerCase() }} non può essere modificato"
+      matTooltipPosition="above"
+    >
+      <i class="fa fa-lock"></i> {{ complaint.status }}
+    </span>
+      </ng-template>
+    </td>
+
+
+
+    <td>{{ complaint.createdAt | date:'short' }}</td>
+    <td>
+      <button (click)="selectComplaint(complaint.id)">Apri conversazione</button>
+    </td>
+  </tr>
+  </tbody>
+
+
+
+
+
+</table>
+
+<hr>
+<h3>Conversazione selezionata</h3>
+<app-admin-complaint-chat
+  *ngIf="selectedComplaintId"
+  [complaintId]="selectedComplaintId">
+</app-admin-complaint-chat>
+
+

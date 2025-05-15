@@ -30,6 +30,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   checkoutForm!: FormGroup;
   currentStep = 1;
   createdOrder: Order | null = null;
+  estimatedDelivery: Date | null = null;
+
 
   checkoutResponse: CheckoutResponse | null = null;
   loading = false;
@@ -52,6 +54,29 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     private cartService: CartService,
     private cdRef: ChangeDetectorRef
   ) {}
+
+
+  get shippingCost(): number {
+    if (!this.cart || !this.checkoutForm) return 0;
+    const method = this.checkoutForm.get('shipping.shippingMethod')?.value;
+    const total = this.getCartTotal();
+    if (total >= 100) return 0;
+
+    const costMap = {
+      STANDARD: 4.99,
+      EXPRESS: 9.99,
+      PREMIUM: 14.99
+    };
+
+    return costMap[method as keyof typeof costMap] ?? 0;
+  }
+
+
+
+  get finalTotal(): number {
+    return this.getCartTotal() + this.shippingCost;
+  }
+
 
   ngOnInit(): void {
     this.initializeForm();
@@ -182,4 +207,21 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         }
       });
   }
+
+  onZipCodeChange(): void {
+    const cap = this.shippingGroup.get('zipCode')?.value;
+    if (cap && cap.length >= 5) {
+      this.checkoutService.getDeliveryEstimate(cap).subscribe({
+        next: (date: Date) => {
+          this.estimatedDelivery = new Date(date);
+          this.cdRef.detectChanges();
+        },
+        error: (err) => {
+          console.error('Errore nella stima della consegna:', err);
+          this.estimatedDelivery = null;
+        }
+      });
+    }
+  }
+
 }

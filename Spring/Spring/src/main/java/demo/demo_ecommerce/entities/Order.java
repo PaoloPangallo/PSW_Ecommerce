@@ -56,6 +56,22 @@ public class Order {
         }
     }
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "shipping_method", nullable = false)
+    private ShippingMethod shippingMethod;
+
+    @Column(name = "shipping_cost", nullable = false)
+    private BigDecimal shippingCost = BigDecimal.ZERO;
+
+
+    public enum ShippingMethod {
+        STANDARD,
+        EXPRESS,
+        PREMIUM
+    }
+
+
+
     public enum OrderStatus {
         CREATED, PAID, SHIPPED, DELIVERED, CANCELLED
     }

@@ -1,45 +1,46 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import {CommonModule, NgOptimizedImage} from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { debounceTime, switchMap } from 'rxjs/operators';
+import { CommonModule } from '@angular/common';
+import { ProductService } from '../../services/product.service';
+import { Product } from '../../models/product.model';
 import { AuthService } from '../../services/auth.services';
-// Assicurati che il path sia corretto
+import { NgOptimizedImage } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [RouterModule, CommonModule, NgOptimizedImage] // Aggiunto CommonModule per usare *ngIf, etc.
+  imports: [RouterModule, CommonModule, ReactiveFormsModule, NgOptimizedImage]
 })
 export class NavbarComponent {
-  searchTerm: string = '';
+  searchControl = new FormControl('');
+  searchResults: Product[] = [];
 
   constructor(
     private router: Router,
+    private productService: ProductService,
     protected authService: AuthService
-  ) {}
-
-  onSearch(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchTerm = input.value.trim();
-    this.navigateToSearch();
+  ) {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(300),
+      switchMap(query => this.productService.searchProducts(query ?? ''))
+    ).subscribe(results => {
+      this.searchResults = results;
+    });
   }
 
-  search(): void {
-    this.navigateToSearch();
-  }
-
-  private navigateToSearch(): void {
-    this.router.navigate([''], { queryParams: { search: this.searchTerm } });
+  onSelectProduct(product: Product): void {
+    this.router.navigate(['/product', product.id]);
+    this.searchResults = [];
+    this.searchControl.setValue('');
   }
 
   handleAccount(): void {
     const token = this.authService.getToken();
-    if (token) {
-      this.router.navigate(['/user-profile']);
-    } else {
-      this.router.navigate(['/login']);
-    }
+    this.router.navigate([token ? '/user-profile' : '/login']);
   }
 
   logout(): void {
@@ -48,9 +49,6 @@ export class NavbarComponent {
   }
 
   isLoggedIn(): boolean {
-    if (typeof window === 'undefined') {
-      return false;
-    }
-    return !!this.authService.getToken();
+    return typeof window !== 'undefined' && !!this.authService.getToken();
   }
 }

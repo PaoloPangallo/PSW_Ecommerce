@@ -2,6 +2,7 @@ package demo.demo_ecommerce.services;
 
 import demo.demo_ecommerce.dtos.OrderDTO;
 import demo.demo_ecommerce.entities.*;
+import demo.demo_ecommerce.entities.Order.ShippingMethod;
 import demo.demo_ecommerce.repositories.CartRepository;
 import demo.demo_ecommerce.repositories.OrderRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
@@ -31,13 +32,8 @@ public class OrderService {
         this.cartRepository = cartRepository;
     }
 
-    /**
-     * Crea un ordine a partire dal carrello dell'utente.
-     * Se un coupon è applicato all'item, ricalcola il prezzo scontato
-     * usando la percentuale di sconto (BigDecimal) presente in Coupon.
-     */
     @Transactional
-    public OrderDTO createOrder(Long userId) {
+    public OrderDTO createOrder(Long userId, ShippingMethod shippingMethod) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Utente non trovato con ID: " + userId));
 
@@ -48,7 +44,7 @@ public class OrderService {
             throw new IllegalArgumentException("Il carrello è vuoto, impossibile creare un ordine");
         }
 
-        // Calcolo del totale
+        // Calcolo totale carrello con eventuali sconti
         BigDecimal totalBD = cart.getItems().stream()
                 .map(cartItem -> {
                     BigDecimal price = cartItem.getProduct().getPrice();
@@ -67,11 +63,18 @@ public class OrderService {
             throw new IllegalArgumentException("Il totale dell'ordine deve essere maggiore di zero");
         }
 
+        // Calcolo del costo di spedizione
+        BigDecimal shippingCost = calculateShippingCost(totalBD, shippingMethod);
+
+        // Crea ordine
         Order unsavedOrder = Order.builder()
                 .user(user)
                 .total(totalBD)
+                .shippingMethod(shippingMethod)
+                .shippingCost(shippingCost)
                 .build();
 
+        // Crea OrderItem
         List<OrderItem> orderItems = cart.getItems().stream()
                 .map(cartItem -> {
                     BigDecimal productPrice = cartItem.getProduct().getPrice();
@@ -83,7 +86,6 @@ public class OrderService {
                         productPrice = productPrice.multiply(discountRate).setScale(2, RoundingMode.HALF_UP);
                     }
 
-                    // 🔥 Verifica e scala lo stock
                     Product product = cartItem.getProduct();
                     int quantity = cartItem.getQuantity();
                     if (product.getStock() < quantity) {
@@ -104,17 +106,25 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(unsavedOrder);
 
-        // Svuota il carrello
+        // Svuota carrello
         cart.getItems().clear();
         cartRepository.save(cart);
 
-        return OrderDTO.fromEntity(savedOrder);
+        return OrderDTO.fromEntity(savedOrder, true); // o false se vuoi evitare il caricamento degli items
     }
 
+    private BigDecimal calculateShippingCost(BigDecimal total, ShippingMethod method) {
+        if (total.compareTo(new BigDecimal("100.00")) >= 0) {
+            return BigDecimal.ZERO;
+        }
 
-    /**
-     * Recupera una pagina di ordini per l'utente, forzando l'inizializzazione degli orderItems.
-     */
+        return switch (method) {
+            case STANDARD -> new BigDecimal("4.99");
+            case EXPRESS -> new BigDecimal("9.99");
+            case PREMIUM -> new BigDecimal("14.99");
+        };
+    }
+
     @Transactional
     public Page<OrderDTO> getOrdersByUserId(Long userId, Pageable pageable) {
         Page<Order> ordersPage = orderRepository.findByUserIdFetchItems(userId, pageable);
@@ -123,16 +133,13 @@ public class OrderService {
                 Hibernate.initialize(order.getOrderItems());
             }
         });
-        return ordersPage.map(OrderDTO::fromEntity);
+        return ordersPage.map(order -> OrderDTO.fromEntity(order, true));
     }
 
-    /**
-     * Recupera un ordine specifico per l'utente, inizializzando gli orderItems.
-     */
     @Transactional
     public OrderDTO getOrderById(Long userId, Long orderId) {
         Order order = orderRepository.findByIdAndUserIdFetchItems(orderId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Ordine non trovato: " + orderId));
-        return OrderDTO.fromEntity(order);
+        return OrderDTO.fromEntity(order, true);
     }
 }

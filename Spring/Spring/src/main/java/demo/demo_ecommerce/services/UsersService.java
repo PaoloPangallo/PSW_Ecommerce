@@ -30,10 +30,6 @@ public class UsersService {
     private final PasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
-    private final ShoppingCartItemRepository shoppingCartItemRepository;
-    private final ReviewRepository reviewRepository;
-    private final UpvoteRepository upvoteRepository;
-    private final WishlistRepository wishlistRepository;
 
 
     public UsersService(UsersRepository usersRepository,
@@ -46,10 +42,6 @@ public class UsersService {
         this.passwordEncoder = passwordEncoder;
         this.cartRepository = cartRepository;
         this.orderRepository = orderRepository;
-        this.shoppingCartItemRepository = shoppingCartItemRepository;
-        this.reviewRepository = reviewRepository;
-        this.upvoteRepository = upvoteRepository;
-        this.wishlistRepository = wishlistRepository;
     }
 
     public Page<User> getAllUsers(Pageable pageable) {

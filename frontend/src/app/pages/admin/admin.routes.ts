@@ -2,6 +2,7 @@
 import { Routes } from '@angular/router';
 import { AdminComponent } from '../admin.component';
 import { AdminGuard } from '../../guards/admin.guard';
+import {AdminNewsletterComponent} from './newsletter/admin-newsletter/admin-newsletter.component';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -39,6 +40,15 @@ export const ADMIN_ROUTES: Routes = [
           import('./coupon/admin-coupons.component').then(m => m.AdminCouponsComponent)
       },
 
+      {
+        path: 'complaints',
+        loadComponent: () =>
+          import('./admin-complaints/admin-complaints.component')
+            .then(m => m.AdminComplaintsComponent)
+      },
+
+
+
       // Generazione immagine per prodotto (già esistente)
       {
         path: 'generate-image/:productId',
@@ -46,6 +56,9 @@ export const ADMIN_ROUTES: Routes = [
           import('./product-image-generator/product-image-generator.component')
             .then(m => m.ProductImageGeneratorComponent)
       },
+
+      { path: 'newsletter', component: AdminNewsletterComponent },
+
 
       {
         path: 'home-photo',

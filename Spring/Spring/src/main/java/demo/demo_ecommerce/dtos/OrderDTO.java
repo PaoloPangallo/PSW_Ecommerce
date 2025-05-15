@@ -1,7 +1,6 @@
 package demo.demo_ecommerce.dtos;
 
 import demo.demo_ecommerce.entities.Order;
-import demo.demo_ecommerce.entities.OrderItem;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.validation.constraints.DecimalMin;
@@ -20,6 +19,10 @@ public class OrderDTO {
 
     @DecimalMin(value = "0.0", inclusive = true, message = "Total must be a positive value")
     private BigDecimal total;
+
+    private String shippingMethod;
+    private BigDecimal shippingCost;
+
 
     private LocalDateTime createdAt;
 
@@ -40,6 +43,18 @@ public class OrderDTO {
      * Mappa l'entità Order in OrderDTO.
      * Se loadItems è true, tenterà di mappare anche gli orderItems, altrimenti li imposterà come lista vuota.
      */
+    public OrderDTO(Long id, BigDecimal total, LocalDateTime createdAt, List<OrderItemDTO> items,
+                    String shippingMethod, BigDecimal shippingCost) {
+        this.id = id;
+        this.total = total;
+        this.createdAt = createdAt;
+        this.items = items;
+        this.shippingMethod = shippingMethod;
+        this.shippingCost = shippingCost;
+    }
+
+
+
     public static OrderDTO fromEntity(Order order, boolean loadItems) {
         List<OrderItemDTO> itemDTOs = Collections.emptyList();
         if (loadItems && order.getOrderItems() != null && Hibernate.isInitialized(order.getOrderItems())) {
@@ -47,11 +62,20 @@ public class OrderDTO {
                     .map(OrderItemDTO::fromEntity)
                     .collect(Collectors.toList());
         }
-        return new OrderDTO(order.getId(), order.getTotal(), order.getCreatedAt(), itemDTOs);
+
+        OrderDTO dto = new OrderDTO();
+        dto.setId(order.getId());
+        dto.setTotal(order.getTotal());
+        dto.setCreatedAt(order.getCreatedAt());
+        dto.setItems(itemDTOs);
+        dto.setShippingMethod(order.getShippingMethod() != null ? order.getShippingMethod().name() : null);
+        dto.setShippingCost(order.getShippingCost());
+
+        return dto;
     }
 
+
+
     // Metodo di default: carica gli item (utile per il dettaglio)
-    public static OrderDTO fromEntity(Order order) {
-        return fromEntity(order, true);
-    }
+
 }

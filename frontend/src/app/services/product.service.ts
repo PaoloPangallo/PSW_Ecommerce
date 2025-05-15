@@ -70,5 +70,12 @@ export class ProductService {
     return this.http.get<Product[]>(`http://localhost:8080/api/recommendations/for-user/${userId}`);
   }
 
+  searchProducts(query: string): Observable<Product[]> {
+    return this.http.get<Product[]>(`http://localhost:8080/api/search`, {
+      params: { query }
+    });
+  }
+
+
 
 }

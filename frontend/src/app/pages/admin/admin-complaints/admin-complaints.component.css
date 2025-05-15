@@ -1,0 +1,98 @@
+.complaints-container {
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+th {
+  background-color: #f5f5f5;
+  color: #333;
+  font-weight: 600;
+}
+
+tr:hover {
+  background-color: #f9f9f9;
+}
+
+td {
+  color: #555;
+}
+
+.status {
+  font-weight: bold;
+  padding: 0.4rem 0.8rem;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+.status.PENDING {
+  background-color: #ffe082;
+  color: #9c6f00;
+}
+
+.status.RESOLVED {
+  background-color: #a5d6a7;
+  color: #1b5e20;
+}
+
+select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-weight: 500;
+  background: #fff;
+}
+
+option {
+  font-weight: 500;
+}
+
+td select {
+  width: 120px;
+}
+
+
+/* Badge di stato */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+/* Colori */
+.badge-pending  { background:#fff3cd; color:#856404; }
+.badge-accepted { background:#d1e7dd; color:#0f5132; }
+.badge-rejected { background:#f8d7da; color:#842029; }
+.badge-closed   { background:#e2e3e5; color:#41464b; }
+
+/* Icona lock */
+.status-badge .fa-lock,
+.status-badge::before {
+  font-size: 0.85rem;
+}
+
+

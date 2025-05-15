@@ -8,9 +8,20 @@
     </div>
 
     <div class="search-box">
-      <input type="text" placeholder="Cerca un prodotto..." (input)="onSearch($event)" />
-      <button (click)="search()" class="search-button">🔍</button>
+      <input [formControl]="searchControl" type="text" placeholder="Cerca un prodotto..." />
+
+      <ul class="search-suggestions" *ngIf="searchResults.length > 0">
+        <li *ngFor="let product of searchResults" (click)="onSelectProduct(product)">
+          <img [src]="product.imageUrl" alt="{{ product.name }}" />
+          <div class="info">
+            <span class="name">{{ product.name }}</span>
+            <span class="price">{{ product.price | number:'1.0-0' }} L</span>
+          </div>
+        </li>
+      </ul>
     </div>
+
+
 
     <button *ngIf="authService.isAdmin()" class="search-button" routerLink="/admin">
       Console Admin
@@ -25,6 +36,7 @@
     </div>
   </div>
 </nav>
+
 
 <!-- LAYOUT A 2 COLONNE -->
 <div class="page-container">

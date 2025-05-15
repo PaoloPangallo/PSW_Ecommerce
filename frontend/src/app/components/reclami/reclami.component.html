@@ -1,0 +1,29 @@
+<div class="reclami-wrapper">
+  <h2 class="reclami-title">📨 Invia un Reclamo</h2>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" class="reclami-form">
+
+    <div class="form-group">
+      <label for="category">Categoria</label>
+      <select formControlName="category" id="category" required>
+        <option value="" disabled selected>Seleziona una categoria</option>
+        <option value="PRODOTTO_DIFETTOSO">Prodotto difettoso</option>
+        <option value="CONSEGNA_IN_RITARDO">Consegna in ritardo</option>
+        <option value="ORDINE_ERRATO">Ordine errato</option>
+        <option value="SERVIZIO_CLIENTI">Servizio clienti</option>
+        <option value="ALTRO">Altro</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="message">Messaggio</label>
+      <textarea formControlName="message" id="message" rows="5" placeholder="Descrivi il problema..."></textarea>
+    </div>
+
+    <button type="submit" [disabled]="form.invalid" class="reclami-button">Invia</button>
+  </form>
+
+  <div *ngIf="success" class="success-message">
+    ✅ Reclamo inviato con successo! Ti contatteremo presto.
+  </div>
+</div>

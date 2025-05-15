@@ -107,4 +107,19 @@ export class AuthService {
       return false;
     }
   }
+  getCurrentUserEmail(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const payloadPart = token.split('.')[1];
+      const payloadJson = atob(payloadPart);
+      const payload = JSON.parse(payloadJson);
+      return payload.sub || payload.email || null;
+    } catch (error) {
+      console.error('Errore nel leggere l\'email dal token:', error);
+      return null;
+    }
+  }
+
 }

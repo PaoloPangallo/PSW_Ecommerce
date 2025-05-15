@@ -1,0 +1,9 @@
+<section class="newsletter-section">
+  <h2>📬 Iscriviti alla Newsletter</h2>
+  <p>Ricevi offerte, consigli e novità direttamente nella tua casella email!</p>
+  <form (submit)="subscribe(); $event.preventDefault()">
+    <input type="email" [(ngModel)]="email" placeholder="Inserisci la tua email" name="email" required />
+    <button type="submit">Iscriviti</button>
+  </form>
+  <p [ngClass]="{ 'success': !error, 'error': error }">{{ message }}</p>
+</section>

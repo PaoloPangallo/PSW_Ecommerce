@@ -1,0 +1,41 @@
+<section class="complaint-section">
+  <h2 class="complaint-title">🗂️ I tuoi Reclami</h2>
+
+  <div *ngIf="isLoading" class="complaint-loading">Caricamento in corso...</div>
+  <div *ngIf="error" class="complaint-error">{{ error }}</div>
+
+  <table *ngIf="!isLoading && complaints.length > 0" class="complaint-table">
+    <thead>
+    <tr>
+      <th>Categoria</th>
+      <th>Stato</th>
+      <th>Data</th>
+      <th>Azioni</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let c of complaints">
+      <td>{{ c.category }}</td>
+      <td>
+          <span [ngClass]="{
+            'status-pending': c.status === 'PENDING',
+            'status-resolved': c.status === 'RESOLVED'
+          }">
+            {{ c.status }}
+          </span>
+      </td>
+      <td>{{ c.createdAt | date:'short' }}</td>
+      <td>
+        <button class="chat-button" (click)="selectComplaint(c.id)">💬 Chat</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- Chat associata -->
+  <app-user-complaint-chat
+    *ngIf="selectedComplaintId"
+    [complaintId]="selectedComplaintId"
+    [userEmail]="userEmail">
+  </app-user-complaint-chat>
+</section>

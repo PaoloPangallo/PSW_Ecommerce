@@ -1,0 +1,28 @@
+<section class="newsletter-panel">
+  <h2>📬 Iscritti alla Newsletter</h2>
+
+  <button (click)="sendNow()">✉️ Invia Newsletter Ora</button>
+
+  <div *ngIf="loading" class="loading">⏳ Caricamento in corso...</div>
+
+  <div *ngIf="!loading && subscribers.length === 0" class="empty">
+    Nessun iscritto alla newsletter.
+  </div>
+
+  <table *ngIf="!loading && subscribers.length > 0">
+    <thead>
+    <tr>
+      <th>Email</th>
+      <th>Stato</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let s of subscribers">
+      <td>{{ s.email }}</td>
+      <td [ngClass]="{ 'confirmed-true': s.confirmed, 'confirmed-false': !s.confirmed }">
+        {{ s.confirmed ? '✅ Confermato' : '❌ Non confermato' }}
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</section>

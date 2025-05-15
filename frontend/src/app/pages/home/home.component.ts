@@ -8,11 +8,13 @@ import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
 import {HomeRecommendationsComponent} from '../../components/home-recommendations/home-recommendations.component';
 import {AuthService} from '../../services/auth.services';
+import {NewsletterSignupComponent} from '../../components/newsletter-signup/newsletter-signup.component';
+import {FooterComponent} from '../../components/footer/footer.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, NgOptimizedImage, HomeRecommendationsComponent],
+  imports: [CommonModule, RouterModule, FormsModule, NgOptimizedImage, HomeRecommendationsComponent, NewsletterSignupComponent, FooterComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })

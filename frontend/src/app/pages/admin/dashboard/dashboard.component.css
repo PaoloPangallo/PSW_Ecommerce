@@ -86,4 +86,11 @@
     text-align: center;
     padding: 10px;
   }
+
+
 }
+.status-pending  { color:#ffc107; font-weight:600; }
+.status-accepted { color:#198754; font-weight:600; }
+.status-rejected { color:#dc3545; font-weight:600; }
+.status-closed   { color:#6c757d; font-weight:600; }
+

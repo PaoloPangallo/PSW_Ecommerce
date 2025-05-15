@@ -7,31 +7,22 @@
 
 .nav-top {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 15px 30px;
+  position: relative;
+  overflow: visible !important;
+  z-index: 10;
 }
+
+
 
 .logo img {
   width: 180px;
   height: auto;
 }
 
-/* Ricerca */
-.search-box {
-  display: flex;
-  align-items: center;
-  border-radius: 4px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
 
-.search-box input {
-  border: none;
-  padding: 10px;
-  font-size: 0.95rem;
-  width: 250px;
-}
 
 .search-button {
   background-color: #ffd700;
@@ -157,3 +148,73 @@ button[routerLink="/admin"]:hover {
   transform: scale(1.05);
 }
 
+.search-box {
+  position: relative; /* 🔑 serve per .search-suggestions assoluto */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 300px;
+  margin-left: 20px;
+}
+
+.search-box input {
+  border: none;
+  padding: 10px;
+  font-size: 0.95rem;
+  width: 100%;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-suggestions li {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+
+.search-suggestions li:hover {
+  background-color: #f8f8f8;
+}
+
+.search-suggestions img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-right: 10px;
+}
+
+.search-suggestions .info {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-suggestions .name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #002f6c; /* Blu navy come il brand */
+}
+
+
+.search-suggestions .price {
+  font-size: 0.85rem;
+  color: #666;
+}

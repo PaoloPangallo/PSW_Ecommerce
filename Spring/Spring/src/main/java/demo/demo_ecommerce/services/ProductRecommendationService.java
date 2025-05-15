@@ -6,6 +6,7 @@ import demo.demo_ecommerce.entities.Product;
 import demo.demo_ecommerce.repositories.OrderRepository;
 import demo.demo_ecommerce.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -13,44 +14,37 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductRecommendationService {
 
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
 
-    /**
-     * Raccomanda prodotti basati sulla co-occorrenza pesata per frequenza e quantità.
-     * Considera solo ordini con stato "PAID" per maggiore attendibilità.
-     */
     public List<Product> recommendProductsFor(Long productId) {
         Map<Long, Map<Long, Integer>> coPurchaseMap = new HashMap<>();
 
         List<Order> paidOrders = orderRepository.findByStatus(Order.OrderStatus.PAID);
-        System.out.println("Totale ordini PAID trovati: " + paidOrders.size());
+        log.info("Trovati {} ordini con stato PAID", paidOrders.size());
 
         for (Order order : paidOrders) {
-            // Usa una mappa productId -> quantity per questo ordine
-            Map<Long, Integer> productQuantities = order.getOrderItems().stream()
-                    .collect(Collectors.toMap(
-                            oi -> oi.getProduct().getId(),
-                            OrderItem::getQuantity,
-                            Integer::sum
-                    ));
+            List<OrderItem> items = order.getOrderItems();
 
-            for (Long pidA : productQuantities.keySet()) {
+            for (int i = 0; i < items.size(); i++) {
+                Long pidA = items.get(i).getProduct().getId();
+                int qtyA = items.get(i).getQuantity();
                 coPurchaseMap.putIfAbsent(pidA, new HashMap<>());
-                for (Long pidB : productQuantities.keySet()) {
-                    if (!pidA.equals(pidB)) {
-                        int weight = productQuantities.get(pidA) * productQuantities.get(pidB);
-                        coPurchaseMap.get(pidA).merge(pidB, weight, Integer::sum);
-                    }
+
+                for (int j = 0; j < items.size(); j++) {
+                    if (i == j) continue;
+                    Long pidB = items.get(j).getProduct().getId();
+                    int qtyB = items.get(j).getQuantity();
+
+                    coPurchaseMap.get(pidA).merge(pidB, qtyA * qtyB, Integer::sum);
                 }
             }
         }
 
-        System.out.println("Mappa co-acquisti per " + productId + ": " + coPurchaseMap.get(productId));
-
-        Map<Long, Integer> recommendations = coPurchaseMap.getOrDefault(productId, Map.of());
+        Map<Long, Integer> recommendations = coPurchaseMap.getOrDefault(productId, Collections.emptyMap());
 
         List<Long> recommendedIds = recommendations.entrySet().stream()
                 .sorted(Map.Entry.<Long, Integer>comparingByValue().reversed())
@@ -58,7 +52,8 @@ public class ProductRecommendationService {
                 .limit(5)
                 .collect(Collectors.toList());
 
-        // ✅ Escludiamo prodotti non disponibili
+        if (recommendedIds.isEmpty()) return List.of();
+
         return productRepository.findAllById(recommendedIds).stream()
                 .filter(p -> p.getStock() > 0)
                 .collect(Collectors.toList());

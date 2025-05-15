@@ -1,6 +1,14 @@
 <div class="profile-wrapper" *ngIf="user">
   <div class="profile-container">
     <h2>Profilo Utente</h2>
+
+    <!-- Link alla chat reclami -->
+    <div class="form-group">
+      <a routerLink="/user/complaints" class="complaint-link">
+        🗨️ Vai ai tuoi reclami e conversazioni con l'assistenza
+      </a>
+    </div>
+
     <form (ngSubmit)="updateProfile()" #profileForm="ngForm">
       <!-- Username -->
       <div class="form-group">

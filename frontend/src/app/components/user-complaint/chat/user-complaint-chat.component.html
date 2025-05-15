@@ -1,0 +1,37 @@
+<div class="chat-wrapper">
+  <h3 class="chat-title">Conversazione con l'assistenza</h3>
+
+  <!-- Stato caricamento -->
+  <div *ngIf="isLoading" class="chat-info">Caricamento in corso...</div>
+  <div *ngIf="error" class="chat-error">{{ error }}</div>
+
+  <!-- Box messaggi -->
+  <div class="chat-box" *ngIf="!isLoading && !error">
+    <div *ngIf="messages.length === 0" class="chat-info">Nessun messaggio presente.</div>
+
+    <div *ngFor="let msg of messages" class="chat-message" [ngClass]="msg.sender === 'USER' ? 'user' : 'admin'">
+      <div class="chat-bubble">
+        <div class="chat-content">
+          <span class="chat-sender">{{ msg.sender === 'USER' ? 'Tu' : 'Admin' }}</span>
+          {{ msg.content }}
+        </div>
+        <div class="chat-timestamp">{{ msg.timestamp | date:'short' }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input messaggio -->
+  <div class="chat-input">
+    <textarea
+      [(ngModel)]="newMessage"
+      placeholder="Scrivi un messaggio..."
+      rows="3"
+    ></textarea>
+    <button
+      (click)="sendMessage()"
+      [disabled]="!newMessage.trim()"
+    >
+      Invia
+    </button>
+  </div>
+</div>

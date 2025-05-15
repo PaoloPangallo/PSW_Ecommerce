@@ -1,6 +1,7 @@
 package demo.demo_ecommerce.Controllers;
 
 import demo.demo_ecommerce.dtos.OrderDTO;
+import demo.demo_ecommerce.dtos.OrderRequestDTO;
 import demo.demo_ecommerce.services.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -33,14 +34,16 @@ public class OrdersController {
     })
     @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @PostMapping
-    public ResponseEntity<?> createOrder(@PathVariable Long userId) {
+    public ResponseEntity<?> createOrder(@PathVariable Long userId,
+                                         @RequestBody OrderRequestDTO request) {
         try {
-            OrderDTO orderDto = orderService.createOrder(userId);
+            OrderDTO orderDto = orderService.createOrder(userId, request.getShippingMethod());
             return ResponseEntity.status(HttpStatus.CREATED).body(orderDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
 
     @Operation(summary = "Elenca tutti gli ordini di un utente")
     @ApiResponses(value = {

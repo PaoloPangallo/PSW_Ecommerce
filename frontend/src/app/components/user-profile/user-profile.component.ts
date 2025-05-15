@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.services';
 import { UserService } from '../../services/user.service';
 import { User } from '../../models/user.model';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css']
 })

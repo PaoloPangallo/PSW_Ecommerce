@@ -1,0 +1,20 @@
+.confirmation-section {
+  margin-top: 4rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.success {
+  color: green;
+}
+
+.error {
+  color: red;
+}
+
+.home-link {
+  display: inline-block;
+  margin-top: 2rem;
+  color: #007bff;
+  text-decoration: underline;
+}

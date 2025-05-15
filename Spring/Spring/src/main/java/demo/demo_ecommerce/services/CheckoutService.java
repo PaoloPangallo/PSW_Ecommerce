@@ -21,6 +21,7 @@ public class CheckoutService {
     private final ShippingRepository shippingRepository;
     private final PaymentRepository paymentRepository;
 
+
     // AGGIUNTO:
     private final OrderService orderService;
 
@@ -51,9 +52,12 @@ public class CheckoutService {
 
         // 2. Crea l'ordine utilizzando la logica esistente di OrderService
         //    (che copia gli item dal carrello nell'ordine e salva gli OrderItem)
-        OrderDTO orderDto = orderService.createOrder(userId);
+        Order.ShippingMethod method = shippingDTO.getShippingMethod();
+        if (method == null) {
+            method = Order.ShippingMethod.STANDARD; // fallback se mancante
+        }
+        OrderDTO orderDto = orderService.createOrder(userId, method);
 
-        // Recuperiamo l'entità Order dal DB (opzionale se vuoi direttamente restituire un DTO)
         Order order = orderRepository.findById(orderDto.getId())
                 .orElseThrow(() -> new RuntimeException(
                         "Impossibile trovare l'ordine appena creato con ID: " + orderDto.getId()));

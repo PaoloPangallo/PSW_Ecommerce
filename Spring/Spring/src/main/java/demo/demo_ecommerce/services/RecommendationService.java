@@ -77,6 +77,19 @@ public class RecommendationService {
     }
 
 
+    public List<Product> getRecommendationsForEmail(String email) {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            System.out.println("❌ Nessun utente trovato con email: " + email);
+            return List.of();
+        }
+
+        User user = userOpt.get();
+        return recommendProductsForUser(user.getId());
+    }
+
+
+
     // Raccomandazioni per un prodotto (simili per categoria)
     public List<Product> recommendProductsForProduct(Long productId) {
         Optional<Product> productOpt = productRepository.findById(productId);

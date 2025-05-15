@@ -13,6 +13,9 @@ import { CheckoutComponent } from './components/checkout/checkout.component';
 import { WishlistComponent } from './components/wishlist/wishlist.component';
 import { OrderDetailsComponent } from './components/order/order-details/order-details.component';
 import { AdminGuard } from './guards/admin.guard';
+import {NewsletterConfirmComponent} from './components/newsletter-confirm/newsletter-confirm.component';
+import {ReclamiComponent} from './components/reclami/reclami.component';
+import {UserComplaintListComponent} from './components/user-complaint/user-complaint-list.component';
 
 export const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -30,6 +33,19 @@ export const appRoutes: Routes = [
   { path: 'wishlist', component: WishlistComponent },
   { path: 'orders/:id', component: OrderDetailsComponent },
   { path: 'orders', component: OrderHistoryComponent },
+  { path: 'newsletter/confirm', component: NewsletterConfirmComponent },
+  { path: 'reclami', component: ReclamiComponent },
+  {
+    path: 'user/complaints',
+    component: UserComplaintListComponent,
+  },
+
+
+
+
+
+
+
   {
     path: 'admin',
     canActivate: [AdminGuard],

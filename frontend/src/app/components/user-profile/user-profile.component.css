@@ -122,4 +122,17 @@ button:active {
   .profile-container h2 {
     font-size: 1.4rem;
   }
+
+
+}
+.complaint-link {
+  display: inline-block;
+  margin: 1rem 0;
+  font-weight: bold;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.complaint-link:hover {
+  text-decoration: underline;
 }
