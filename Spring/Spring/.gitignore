@@ -13,6 +13,8 @@ target/
 .springBeans
 .sts4-cache
 
+unilire-firebase-adminsdk-fbsvc-1e8339ed5c.json
+
 ### IntelliJ IDEA ###
 .idea
 *.iws
