@@ -1,5 +1,8 @@
 package demo.demo_ecommerce.services;
 
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import com.itextpdf.text.pdf.draw.LineSeparator;
 import demo.demo_ecommerce.dtos.OrderDTO;
 import demo.demo_ecommerce.entities.*;
 import demo.demo_ecommerce.entities.Order.ShippingMethod;
@@ -12,19 +15,32 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
 
     private final OrderRepository orderRepository;
+
+
     private final UsersRepository userRepository;
     private final CartRepository cartRepository;
 
-    public OrderService(OrderRepository orderRepository,
+    public OrderService(OrderRepository orderRepository, UsersRepository usersRepository,
                         UsersRepository userRepository,
                         CartRepository cartRepository) {
         this.orderRepository = orderRepository;
@@ -141,5 +157,142 @@ public class OrderService {
         Order order = orderRepository.findByIdAndUserIdFetchItems(orderId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Ordine non trovato: " + orderId));
         return OrderDTO.fromEntity(order, true);
+
     }
+
+    public byte[] generateInvoicePdf(Long userId, Long orderId) throws IOException, DocumentException {
+        Optional<Order> optionalOrder = orderRepository.findByUserIdAndId(userId, orderId);
+        if (optionalOrder.isEmpty()) {
+            throw new IllegalArgumentException("Ordine non trovato");
+        }
+
+        Order order = optionalOrder.get();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Document document = new Document(PageSize.A4, 50, 50, 50, 50);
+        PdfWriter.getInstance(document, out);
+        document.open();
+
+        // Logo
+        try {
+            URL imageUrl = getClass().getClassLoader().getResource("static/logo_unilire.png");
+            if (imageUrl != null) {
+                Image logo = Image.getInstance(imageUrl);
+                logo.scaleToFit(150, 80);
+                logo.setAlignment(Image.ALIGN_CENTER);
+                document.add(logo);
+            } else {
+                document.add(new Paragraph("Unilire", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18)));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            document.add(new Paragraph("Unilire", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18)));
+        }
+
+
+
+        // Font
+        Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
+        Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.DARK_GRAY);
+        Font normalFont = FontFactory.getFont(FontFactory.HELVETICA, 11);
+        Font totalFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14, BaseColor.BLACK);
+
+        document.add(new Paragraph("Fattura Ordine #" + order.getId(), titleFont));
+        document.add(Chunk.NEWLINE);
+
+        User user = order.getUser();
+        String indirizzo = String.format("%s, %s %s (%s) - %s",
+                safe(user.getAddress()), safe(user.getCap()), safe(user.getCity()),
+                safe(user.getRegion()), safe(user.getCountry())
+        );
+
+        document.add(new Paragraph("Cliente: " + safe(user.getUsername()), normalFont));
+        document.add(new Paragraph("Email: " + safe(user.getEmail()), normalFont));
+        document.add(new Paragraph("Indirizzo: " + indirizzo, normalFont));
+        document.add(new Paragraph("Data ordine: " + order.getCreatedAt(), normalFont));
+        document.add(new Paragraph("Spedizione: " + safe(order.getShippingMethod() != null ? order.getShippingMethod().name() : "-"), normalFont));
+        document.add(Chunk.NEWLINE);
+
+        // Linea divisoria
+        LineSeparator separator = new LineSeparator();
+        separator.setLineColor(BaseColor.LIGHT_GRAY);
+        document.add(new Chunk(separator));
+        document.add(Chunk.NEWLINE);
+
+        List<OrderItem> items = order.getOrderItems();
+        if (items == null || items.isEmpty()) {
+            document.add(new Paragraph("⚠ Nessun prodotto presente nell’ordine.", sectionFont));
+        } else {
+            PdfPTable table = new PdfPTable(4);
+            table.setWidthPercentage(100);
+            table.setWidths(new float[]{4, 1.2f, 2, 2});
+
+            // Header
+            addCell(table, "Prodotto", sectionFont, BaseColor.LIGHT_GRAY);
+            addCell(table, "Quantità", sectionFont, BaseColor.LIGHT_GRAY);
+            addCell(table, "Prezzo", sectionFont, BaseColor.LIGHT_GRAY);
+            addCell(table, "Totale", sectionFont, BaseColor.LIGHT_GRAY);
+
+            BigDecimal subtotal = BigDecimal.ZERO;
+
+            for (OrderItem item : items) {
+                String name = safe(item.getProduct() != null ? item.getProduct().getName() : "-");
+                int quantity = item.getQuantity() != null ? item.getQuantity() : 0;
+                BigDecimal price = item.getPrice() != null ? item.getPrice() : BigDecimal.ZERO;
+                BigDecimal total = price.multiply(BigDecimal.valueOf(quantity));
+
+                subtotal = subtotal.add(total);
+
+                addCell(table, name, normalFont, BaseColor.WHITE);
+                addCell(table, String.valueOf(quantity), normalFont, BaseColor.WHITE);
+                addCell(table, price.setScale(2, RoundingMode.HALF_UP) + " €", normalFont, BaseColor.WHITE);
+                addCell(table, total.setScale(2, RoundingMode.HALF_UP) + " €", normalFont, BaseColor.WHITE);
+            }
+
+            document.add(table);
+            document.add(Chunk.NEWLINE);
+
+            // Totali
+            BigDecimal discount = BigDecimal.ZERO;
+            if (order.getCoupon() != null && order.getCoupon().getDiscountPercentage() != null) {
+                BigDecimal perc = order.getCoupon().getDiscountPercentage();
+                discount = subtotal.multiply(perc).divide(BigDecimal.valueOf(100));
+                document.add(new Paragraph("Sconto coupon (" + order.getCoupon().getCode() + "): -" + discount.setScale(2, RoundingMode.HALF_UP) + " €", normalFont));
+            }
+
+            BigDecimal shipping = order.getShippingCost() != null ? order.getShippingCost() : BigDecimal.ZERO;
+            document.add(new Paragraph("Spese di spedizione: " + shipping.setScale(2, RoundingMode.HALF_UP) + " €", normalFont));
+
+            BigDecimal total = subtotal.subtract(discount).add(shipping);
+            document.add(Chunk.NEWLINE);
+            document.add(new Paragraph("💰 Totale da pagare: " + total.setScale(2, RoundingMode.HALF_UP) + " €", totalFont));
+        }
+
+        document.close();
+        return out.toByteArray();
+    }
+
+    // Aggiunge celle con background
+    private void addCell(PdfPTable table, String text, Font font, BaseColor bgColor) {
+        PdfPCell cell = new PdfPCell(new Phrase(text, font));
+        cell.setBackgroundColor(bgColor);
+        cell.setPadding(6);
+        table.addCell(cell);
+    }
+
+
+
+
+
+
+
+    private String safe(String val) {
+        return val != null ? val : "-";
+    }
+
+
+
+
+
+
+
 }

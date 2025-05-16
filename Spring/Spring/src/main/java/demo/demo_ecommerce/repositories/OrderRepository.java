@@ -50,4 +50,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findAll();  // ora funzionante
 
 
+    @EntityGraph(attributePaths = {"orderItems", "orderItems.product", "coupon", "user"})
+    Optional<Order> findByUserIdAndId(Long userId, Long orderId);
 }

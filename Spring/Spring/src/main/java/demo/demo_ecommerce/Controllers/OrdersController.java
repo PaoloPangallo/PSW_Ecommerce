@@ -1,5 +1,6 @@
 package demo.demo_ecommerce.Controllers;
 
+import com.itextpdf.text.DocumentException;
 import demo.demo_ecommerce.dtos.OrderDTO;
 import demo.demo_ecommerce.dtos.OrderRequestDTO;
 import demo.demo_ecommerce.services.OrderService;
@@ -11,11 +12,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/users/{userId}/orders")
@@ -43,7 +48,6 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-
 
     @Operation(summary = "Elenca tutti gli ordini di un utente")
     @ApiResponses(value = {
@@ -73,4 +77,33 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ordine non trovato: " + e.getMessage());
         }
     }
+
+    @GetMapping(
+            value = "/{orderId}/invoice",
+            produces = MediaType.APPLICATION_PDF_VALUE
+    )
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
+    public ResponseEntity<byte[]> downloadInvoice(@PathVariable Long userId, @PathVariable Long orderId) throws IOException, DocumentException {
+        byte[] pdf = orderService.generateInvoicePdf(userId, orderId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(ContentDisposition.inline().filename("ordine_" + orderId + ".pdf").build());
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdf);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }

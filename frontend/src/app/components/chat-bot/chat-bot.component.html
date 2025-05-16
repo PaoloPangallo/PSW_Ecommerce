@@ -1,0 +1,29 @@
+<div class="chat-container">
+  <div class="chat-box">
+    <div *ngFor="let msg of messages" class="message-wrapper" [ngClass]="msg.sender">
+      <div class="message">
+        <ng-container *ngIf="msg.sender === 'bot'; else userBlock">
+          <ng-container *ngIf="splitResponse(msg.text).intent; else simpleBot">
+            <p><strong>🤖 LLaMA:</strong><br>{{ splitResponse(msg.text).llama }}</p>
+            <p class="intent"><strong>🎯 Intento:</strong><br>{{ splitResponse(msg.text).intent }}</p>
+          </ng-container>
+          <ng-template #simpleBot>
+            <p><strong>🤖 Bot:</strong> {{ msg.text }}</p>
+          </ng-template>
+        </ng-container>
+        <ng-template #userBlock>
+          <p><strong>👤 Tu:</strong> {{ msg.text }}</p>
+        </ng-template>
+      </div>
+    </div>
+    <div #chatEnd></div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">⏳ Sto pensando...</div>
+
+  <!-- ✅ INPUT CHAT SEMPRE VISIBILE -->
+  <div class="chat-input">
+    <input [(ngModel)]="userMessage" placeholder="Scrivi un messaggio..." (keyup.enter)="sendMessage()" />
+    <button (click)="sendMessage()">Invia</button>
+  </div>
+</div>

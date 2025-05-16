@@ -16,6 +16,7 @@ import { AdminGuard } from './guards/admin.guard';
 import {NewsletterConfirmComponent} from './components/newsletter-confirm/newsletter-confirm.component';
 import {ReclamiComponent} from './components/reclami/reclami.component';
 import {UserComplaintListComponent} from './components/user-complaint/user-complaint-list.component';
+import {FaqComponent} from './components/faq/faq.component';
 
 export const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -35,6 +36,8 @@ export const appRoutes: Routes = [
   { path: 'orders', component: OrderHistoryComponent },
   { path: 'newsletter/confirm', component: NewsletterConfirmComponent },
   { path: 'reclami', component: ReclamiComponent },
+  { path: 'faq', component: FaqComponent },
+
   {
     path: 'user/complaints',
     component: UserComplaintListComponent,

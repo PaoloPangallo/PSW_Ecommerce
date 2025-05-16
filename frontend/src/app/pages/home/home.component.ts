@@ -10,11 +10,22 @@ import {HomeRecommendationsComponent} from '../../components/home-recommendation
 import {AuthService} from '../../services/auth.services';
 import {NewsletterSignupComponent} from '../../components/newsletter-signup/newsletter-signup.component';
 import {FooterComponent} from '../../components/footer/footer.component';
+import {ChatBotComponent} from '../../components/chat-bot/chat-bot.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, NgOptimizedImage, HomeRecommendationsComponent, NewsletterSignupComponent, FooterComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    NgOptimizedImage,
+    HomeRecommendationsComponent,
+    NewsletterSignupComponent,
+    FooterComponent,
+    ChatBotComponent
+  ],
+
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
@@ -41,9 +52,19 @@ export class HomeComponent implements OnInit, AfterViewInit {
     public authService: AuthService  // ✅ aggiunto
   ) {}
 
+
+  showChat = false;
+
+  toggleChat() {
+    this.showChat = !this.showChat;
+  }
+
+
   ngOnInit(): void {
     this.loadFeaturedProducts();
   }
+
+
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {

@@ -7,6 +7,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { LirePipe } from '../../services/lire.pipe';
+import {HttpClient} from '@angular/common/http';
 
 @Component({
   selector: 'app-order-history',
@@ -25,31 +26,39 @@ export class OrderHistoryComponent implements OnInit {
   orders: Order[] = [];
   error = '';
   isLoading = true;
-  displayedColumns: string[] = ['id', 'total', 'date', 'actions'];
+  displayedColumns: string[] = ['id', 'total', 'date', 'status', 'download', 'actions'];
 
-  // Proprietà per la paginazione
   currentPage = 0;
   pageSize = 5;
   totalPages = 0;
+
+  userId: number | null = null;
+
+
 
   private orderService = inject(OrderService);
   private authService = inject(AuthService);
 
   ngOnInit(): void {
+    this.userId = this.authService.getCurrentUserId();
     this.loadOrders(this.currentPage);
   }
 
+  constructor(
+    private http: HttpClient
+  ) {}
+
+
+
   loadOrders(page: number): void {
-    const userId = this.authService.getCurrentUserId();
-    if (!userId) {
+    if (!this.userId) {
       this.error = 'Nessun utente autenticato!';
       this.isLoading = false;
       return;
     }
-    this.isLoading = true;
 
-    // Chiamata al servizio che restituisce un oggetto Page<Order>
-    this.orderService.getOrdersByUserPaginated(userId, page, this.pageSize).subscribe({
+    this.isLoading = true;
+    this.orderService.getOrdersByUserPaginated(this.userId, page, this.pageSize).subscribe({
       next: (data: Page<Order>) => {
         this.orders = data.content;
         this.currentPage = data.number;
@@ -75,4 +84,20 @@ export class OrderHistoryComponent implements OnInit {
       this.loadOrders(this.currentPage + 1);
     }
   }
+
+
+  downloadInvoice(orderId: number): void {
+    const userId = this.authService.getCurrentUserId();
+    const url = `http://localhost:8080/users/${userId}/orders/${orderId}/invoice`;
+
+    this.http.get(url, { responseType: 'blob' }).subscribe(blob => {
+      const file = new Blob([blob], { type: 'application/pdf' });
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(file);
+      link.download = `fattura_ordine_${orderId}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(link.href);
+    });
+  }
+
 }

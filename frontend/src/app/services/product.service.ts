@@ -76,6 +76,24 @@ export class ProductService {
     });
   }
 
+  getPagedProducts(page: number, size: number, category?: string): Observable<any> {
+    let url = `${this.apiUrl}/paged?page=${page}&size=${size}`;
+    if (category) {
+      url += `&category=${category}`;
+    }
+
+    return this.http.get<any>(url).pipe(
+      map(response => ({
+        ...response,
+        content: response.content.map((product: Product) => ({
+          ...product,
+          price: this.convertToLira(product.price)
+        }))
+      }))
+    );
+  }
+
+
 
 
 }

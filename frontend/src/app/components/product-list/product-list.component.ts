@@ -5,8 +5,8 @@ import { Product } from '../../models/product.model';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { combineLatest } from 'rxjs';
-import {CartService} from '../../services/cart.service';
-import {AuthService} from '../../services/auth.services';
+import { CartService } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.services';
 
 @Component({
   selector: 'app-product-list',
@@ -19,49 +19,49 @@ export class ProductListComponent implements OnInit {
   products: Product[] = [];
   category: string | null = null;
   searchTerm: string = '';
-  isLoading: boolean = true; // Nuovo stato di caricamento
-  errorMessage: string | null = null; // Nuovo stato per gestire gli errori
+  isLoading: boolean = true;
+  errorMessage: string | null = null;
+  successMessage: string = '';
+
+  page = 0;
+  size = 8;
+  totalPages = 0;
 
   private route = inject(ActivatedRoute);
 
   constructor(
     private productService: ProductService,
-  private cartService: CartService,       // <-- aggiungi
-  private authService: AuthService) {}
+    private cartService: CartService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     combineLatest([this.route.paramMap, this.route.queryParams]).subscribe(
       ([params, queryParams]) => {
         this.category = params.get('categoryName') ? decodeURIComponent(params.get('categoryName')!) : null;
         this.searchTerm = queryParams['search'] || '';
-
-        console.log("✅ Categoria ricevuta:", this.category);
-        console.log("✅ Termine di ricerca ricevuto:", this.searchTerm);
-
+        this.page = 0; // reset alla prima pagina su nuova categoria o ricerca
         this.loadProducts();
       }
     );
   }
 
   loadProducts(): void {
-    this.isLoading = true; // Attiviamo il loading state
-    this.errorMessage = null; // Reset errori
+    this.isLoading = true;
+    this.errorMessage = null;
 
-    const productsObservable = this.category
-      ? this.productService.getProductsByCategory(this.category)
-      : this.productService.getAllProducts();
-
-    productsObservable.subscribe(
-      (data) => {
-        this.products = this.applySearchFilter(data);
-        this.isLoading = false; // Disattiviamo il loading
+    this.productService.getPagedProducts(this.page, this.size, this.category ?? undefined).subscribe({
+      next: (pagedData) => {
+        this.products = this.applySearchFilter(pagedData.content);
+        this.totalPages = pagedData.totalPages;
+        this.isLoading = false;
       },
-      (error) => {
+      error: (error) => {
         console.error('❌ Errore nel recupero dei prodotti:', error);
         this.errorMessage = "Errore nel caricamento dei prodotti. Riprova più tardi.";
         this.isLoading = false;
       }
-    );
+    });
   }
 
   private applySearchFilter(data: Product[]): Product[] {
@@ -70,15 +70,12 @@ export class ProductListComponent implements OnInit {
       : data;
   }
 
-
-
-
   addToCart(product: Product): void {
     const userId = this.authService.getCurrentUserId();
     if (!userId) {
       alert('🔒 Devi effettuare il login per aggiungere un prodotto al carrello.');
-      this.authService.logout(); // opzionale: rimuovi token se scaduto
-      this.successMessage = ''; // reset messaggio
+      this.authService.logout();
+      this.successMessage = '';
       location.href = `/login?returnUrl=${encodeURIComponent(location.pathname)}`;
       return;
     }
@@ -96,9 +93,17 @@ export class ProductListComponent implements OnInit {
     });
   }
 
+  nextPage(): void {
+    if (this.page < this.totalPages - 1) {
+      this.page++;
+      this.loadProducts();
+    }
+  }
 
-
-  successMessage: string = '';
-
-
+  prevPage(): void {
+    if (this.page > 0) {
+      this.page--;
+      this.loadProducts();
+    }
+  }
 }

@@ -1,0 +1,10 @@
+<h2>Domande frequenti</h2>
+<div *ngFor="let faq of faqs" class="faq-item">
+  <button (click)="toggleFaq(faq)" class="faq-question">
+    {{ faq.question }}
+    <span class="arrow">{{ faq.open ? '−' : '+' }}</span>
+  </button>
+  <div *ngIf="faq.open" class="faq-answer">
+    {{ faq.answer }}
+  </div>
+</div>

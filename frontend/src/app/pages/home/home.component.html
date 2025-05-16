@@ -139,6 +139,20 @@
 
   <app-newsletter-signup></app-newsletter-signup>
 
+
+
   <app-footer></app-footer>
+
+
+  <!-- Bottone assistenza flottante -->
+  <button class="help-button" (click)="toggleChat()">
+    💬 Ricevi assistenza
+  </button>
+
+  <!-- Finestra chat bot -->
+  <div class="chat-panel" *ngIf="showChat">
+    <app-chat-bot></app-chat-bot>
+  </div>
+
 
 </div>

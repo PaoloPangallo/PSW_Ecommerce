@@ -7,12 +7,17 @@
   </div>
 
   <!-- Messaggio se non ci sono prodotti -->
-  <div *ngIf="products.length === 0">
+  <div *ngIf="!isLoading && products.length === 0">
     <p class="empty-message">Nessun prodotto disponibile.</p>
   </div>
 
+  <!-- Stato di caricamento -->
+  <div *ngIf="isLoading" class="loading-message">
+    Caricamento prodotti in corso...
+  </div>
+
   <!-- Griglia prodotti -->
-  <div class="product-list-container">
+  <div class="product-list-container" *ngIf="!isLoading && products.length > 0">
     <div *ngFor="let product of products" class="product-card">
       <img [src]="product.imageUrl" [alt]="product.name" />
       <h2>{{ product.name }}</h2>
@@ -29,5 +34,12 @@
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- Paginazione -->
+  <div class="pagination-controls" *ngIf="totalPages > 1">
+    <button (click)="prevPage()" [disabled]="page === 0">« Indietro</button>
+    <span>Pagina {{ page + 1 }} di {{ totalPages }}</span>
+    <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Avanti »</button>
   </div>
 </div>

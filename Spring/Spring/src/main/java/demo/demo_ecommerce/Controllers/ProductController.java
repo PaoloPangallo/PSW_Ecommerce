@@ -1,5 +1,6 @@
 package demo.demo_ecommerce.Controllers;
 
+import demo.demo_ecommerce.dtos.PageResponse;
 import demo.demo_ecommerce.dtos.ProductDTO;
 import demo.demo_ecommerce.entities.Product;
 import demo.demo_ecommerce.services.FirebaseStorageService;
@@ -8,6 +9,9 @@ import demo.demo_ecommerce.services.ProductService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -109,4 +113,24 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
+    @GetMapping("/paged")
+    public ResponseEntity<PageResponse<ProductDTO>> getProductsPaged(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String category
+    ) {
+        logger.info("Fetching paged products" + (category != null ? " in category: " + category : ""));
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Product> productsPage = (category != null)
+                ? productService.getProductsByCategoryPaged(category, pageable)
+                : productService.getAllProductsPaged(pageable);
+
+        // Mappa a ProductDTO
+        Page<ProductDTO> productDTOPage = productsPage.map(ProductDTO::fromEntity);
+
+        return ResponseEntity.ok(new PageResponse<>(productDTOPage));
+    }
+
 }

@@ -9,6 +9,8 @@ import demo.demo_ecommerce.entities.Product;
 import demo.demo_ecommerce.repositories.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -173,6 +175,28 @@ public class ProductService {
 
         return productRepository.save(product);
     }
+
+    public Page<Product> getProductsByCategoryPaged(String categoryName, Pageable pageable) {
+        Category category = categoryRepository.findByName(categoryName)
+                .orElseThrow(() -> new RuntimeException("Categoria non trovata: " + categoryName));
+        return productRepository.findByCategory(category, pageable);
+    }
+
+
+
+
+
+    @Transactional(readOnly = true)
+    public Page<Product> getAllProductsPaged(Pageable pageable) {
+        Page<Product> products = productRepository.findAll(pageable);
+        products.forEach(product -> {
+            if (product.getImageUrl() == null || product.getImageUrl().isEmpty()) {
+                product.setImageUrl("https://source.unsplash.com/300x300/?electronics");
+            }
+        });
+        return products;
+    }
+
 
 
 
