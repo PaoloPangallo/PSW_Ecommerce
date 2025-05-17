@@ -44,6 +44,9 @@ public class FirebaseStorageService {
                 .build();
 
         storage.create(blobInfo, file.getBytes());
+        Blob blob = storage.create(blobInfo, file.getBytes());
+        blob.createAcl(com.google.cloud.storage.Acl.of(com.google.cloud.storage.Acl.User.ofAllUsers(), com.google.cloud.storage.Acl.Role.READER));
+
         return "https://storage.googleapis.com/" + bucketName + "/" + fileName;
     }
 

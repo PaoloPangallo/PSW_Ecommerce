@@ -76,7 +76,6 @@ export class ProductListComponent implements OnInit {
       alert('🔒 Devi effettuare il login per aggiungere un prodotto al carrello.');
       this.authService.logout();
       this.successMessage = '';
-      location.href = `/login?returnUrl=${encodeURIComponent(location.pathname)}`;
       return;
     }
 
@@ -107,3 +106,5 @@ export class ProductListComponent implements OnInit {
     }
   }
 }
+
+
