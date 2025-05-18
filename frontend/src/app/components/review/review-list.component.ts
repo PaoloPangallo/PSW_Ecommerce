@@ -111,4 +111,6 @@ export class ReviewListComponent implements OnInit {
       });
     }
   }
+
+    protected readonly Array = Array;
 }

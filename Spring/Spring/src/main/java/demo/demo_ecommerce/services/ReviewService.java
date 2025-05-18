@@ -4,6 +4,7 @@ import demo.demo_ecommerce.Utility.ResourceNotFoundException;
 import demo.demo_ecommerce.Utility.ReviewLimitExceededException;
 import demo.demo_ecommerce.dtos.ReviewDTO;
 import demo.demo_ecommerce.entities.Review;
+import demo.demo_ecommerce.entities.ReviewImage;
 import demo.demo_ecommerce.repositories.ReviewRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,18 +15,74 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 
 @Service
 public class ReviewService {
 
+
     private static final Logger logger = LoggerFactory.getLogger(ReviewService.class);
     private final ReviewRepository reviewRepository;
 
+    private final FirebaseStorageService firebaseStorageService;
+
     @Autowired
-    public ReviewService(ReviewRepository reviewRepository) {
+    public ReviewService(ReviewRepository reviewRepository,
+                         FirebaseStorageService firebaseStorageService) {
         this.reviewRepository = reviewRepository;
+        this.firebaseStorageService = firebaseStorageService;
     }
+
+
+    @Transactional
+    public void uploadImages(Long reviewId, List<MultipartFile> images) throws IOException {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ResourceNotFoundException("Review non trovata con ID: " + reviewId));
+
+        // 🔒 Validazioni di sicurezza
+        if (images == null || images.isEmpty()) {
+            throw new IllegalArgumentException("Nessuna immagine fornita.");
+        }
+
+        if (images.size() > 3) {
+            throw new IllegalArgumentException("Puoi caricare al massimo 3 immagini.");
+        }
+
+        for (MultipartFile image : images) {
+            String contentType = image.getContentType();
+            if (!(contentType.equals("image/jpeg") || contentType.equals("image/png"))) {
+                throw new IllegalArgumentException("Sono supportati solo file JPG o PNG.");
+            }
+
+            if (image.getSize() > 2 * 1024 * 1024) {
+                throw new IllegalArgumentException("Ogni immagine deve essere inferiore a 2MB.");
+            }
+        }
+
+        // 🔄 Inizializza la collezione lazy
+        review.getImages().size();
+
+        // 📤 Upload immagini
+        for (MultipartFile image : images) {
+            String url = firebaseStorageService.uploadFile(image);
+            ReviewImage img = ReviewImage.builder()
+                    .imageUrl(url)
+                    .review(review)
+                    .build();
+            review.getImages().add(img);
+        }
+
+        Review saved = reviewRepository.save(review);
+
+        logger.info("Caricate {} immagini per la recensione ID: {}", images.size(), reviewId);
+        ReviewDTO.fromEntity(saved);
+    }
+
+
+
 
     // Crea una nuova recensione
     public ReviewDTO createReview(Review review) {

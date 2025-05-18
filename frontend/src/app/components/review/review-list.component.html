@@ -13,14 +13,25 @@
       </mat-card-header>
       <mat-card-content>
         <div class="rating-container">
-          <!-- Mostra 5 icone, evidenziando quante "stelle" corrispondono al rating -->
           <mat-icon *ngFor="let star of [].constructor(5); let i = index" [class.filled]="i < review.rating">
             star
           </mat-icon>
           <span class="rating-value">{{ review.rating }} / 5</span>
         </div>
+
         <p class="review-comment">{{ review.comment }}</p>
+
+        <!-- 👇 NUOVO BLOCCO IMMAGINI -->
+        <div *ngIf="Array.isArray(review.imageUrls) && review.imageUrls.length > 0" class="review-images">
+          <img
+            *ngFor="let imgUrl of review.imageUrls"
+            [src]="imgUrl"
+            alt="Immagine recensione"
+            class="review-image"
+          />
+        </div>
       </mat-card-content>
+
       <mat-card-actions class="card-actions">
         <div class="action-buttons">
           <!-- Mostra "Modifica" e "Elimina" solo se l'utente corrente è il proprietario -->

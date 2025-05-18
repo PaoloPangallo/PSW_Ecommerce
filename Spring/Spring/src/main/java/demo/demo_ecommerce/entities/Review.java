@@ -46,6 +46,10 @@ public class Review {
     @Size(max = 1000, message = "Comment cannot exceed 1000 characters")
     private String comment;
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ReviewImage> images = new HashSet<>();
+
+
     @Column(nullable = false)
     private LocalDateTime createdDate;
 

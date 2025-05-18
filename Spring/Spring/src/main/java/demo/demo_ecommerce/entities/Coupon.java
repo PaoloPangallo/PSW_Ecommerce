@@ -23,7 +23,7 @@ public class Coupon {
     private String code;
 
 
-    @DecimalMax(value = "90.0", inclusive = true, message = "Lo sconto massimo è del 90%")
+    @DecimalMax(value = "90.0", message = "Lo sconto massimo è del 90%")
     @Column(nullable = false)
     private BigDecimal discountPercentage;
 

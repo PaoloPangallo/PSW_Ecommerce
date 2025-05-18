@@ -19,5 +19,7 @@ export interface ReviewDTO {
   createdDate: string;
   userName: string;
   upvotesCount: number; // nuovo campo per il conteggio degli upvote
-  hasUpvoted: boolean;  // flag per indicare se l'utente corrente ha votato
+  hasUpvoted: boolean;
+  imageUrls: string[];
+// flag per indicare se l'utente corrente ha votato
 }

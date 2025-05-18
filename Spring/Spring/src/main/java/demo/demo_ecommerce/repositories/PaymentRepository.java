@@ -11,13 +11,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // Trova i pagamenti per stato
     List<Payment> findByStatus(String status);
 
-    // Trova i pagamenti per ordine
-    List<Payment> findByOrderId(Long orderId);
 
-    // Query personalizzata per trovare pagamenti con stato e importo maggiore di un certo valore
-    // (lascia invariato se lo usi, oppure modificalo se necessario)
-    // @Query("SELECT p FROM Payment p WHERE p.status = :status AND p.amount > :minAmount")
-    // List<Payment> findPaymentsByStatusAndAmountGreaterThan(@Param("status") String status, @Param("minAmount") Double minAmount);
 
     // Metodo aggiornato per cercare in base al campo "paymentMethod"
     Payment findByPaymentMethod(String paymentMethod);

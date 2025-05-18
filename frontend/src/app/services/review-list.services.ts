@@ -30,4 +30,11 @@ export class ReviewService {
     return this.http.delete<void>(`${this.baseUrl}/${reviewId}`);
   }
 
+  uploadReviewImages(reviewId: number, images: File[]): Observable<void> {
+    const formData = new FormData();
+    images.forEach(file => formData.append('images', file));
+    return this.http.post<void>(`${this.baseUrl}/${reviewId}/images`, formData);
+  }
+
+
 }

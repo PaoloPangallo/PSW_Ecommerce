@@ -191,10 +191,15 @@ export class CheckoutComponent implements OnInit, OnDestroy {
               next: (order: Order | null) => {
                 this.createdOrder = order;
                 this.cdRef.detectChanges();
+                console.log("TOKEN:", this.authService.getToken());
+                console.log("USER ID:", this.authService.getCurrentUserId());
+                console.log("LOCAL STORAGE userId:", localStorage.getItem("userId"));
+
               },
               error: (err) => {
                 console.error('Errore nel recupero dell\'ordine creato:', err);
               }
+
             });
           }
 

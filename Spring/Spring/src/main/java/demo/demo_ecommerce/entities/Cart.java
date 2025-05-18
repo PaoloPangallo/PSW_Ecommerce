@@ -27,6 +27,10 @@ public class Cart {
     @Column(name = "coupon_code")
     private Map<Long, String> selectedCoupons = new HashMap<>();
 
+    @Version
+    private Long version;
+
+
 
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)

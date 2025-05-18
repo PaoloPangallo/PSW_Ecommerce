@@ -49,9 +49,38 @@
         </div>
       </div>
 
+      <!-- Upload immagini -->
+      <div class="form-group">
+        <label for="images" class="form-label">Carica immagini (max 3):</label>
+        <input
+          type="file"
+          id="images"
+          (change)="onFileChange($event)"
+          multiple
+          accept="image/*"
+          class="form-control"
+        />
+        <small class="form-hint">Sono consentite immagini JPG o PNG fino a 2MB.</small>
+      </div>
+
+      <!-- Anteprima immagini -->
+      <div *ngIf="imagePreviews.length > 0" class="image-preview-container">
+        <h5>Anteprima:</h5>
+        <div class="image-preview-grid">
+          <img
+            *ngFor="let preview of imagePreviews"
+            [src]="preview"
+            alt="Anteprima"
+            width="80"
+            height="80"
+            class="image-thumbnail"
+          />
+        </div>
+      </div>
+
       <!-- Bottone di invio -->
-      <button type="submit" class="btn-submit" [disabled]="reviewForm.invalid">
-        Invia Recensione
+      <button type="submit" class="btn-submit" [disabled]="reviewForm.invalid || isSubmitting">
+        {{ isSubmitting ? 'Invio in corso...' : 'Invia Recensione' }}
       </button>
     </form>
   </div>

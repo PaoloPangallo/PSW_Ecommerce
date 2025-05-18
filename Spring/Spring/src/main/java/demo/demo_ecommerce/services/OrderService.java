@@ -24,10 +24,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,7 +37,7 @@ public class OrderService {
     private final UsersRepository userRepository;
     private final CartRepository cartRepository;
 
-    public OrderService(OrderRepository orderRepository, UsersRepository usersRepository,
+    public OrderService(OrderRepository orderRepository,
                         UsersRepository userRepository,
                         CartRepository cartRepository) {
         this.orderRepository = orderRepository;
@@ -189,7 +186,6 @@ public class OrderService {
         }
 
 
-
         // Font
         Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 16);
         Font sectionFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BaseColor.DARK_GRAY);
@@ -280,19 +276,12 @@ public class OrderService {
     }
 
 
-
-
-
-
-
     private String safe(String val) {
         return val != null ? val : "-";
     }
 
 
-
-
-
-
-
 }
+
+
+

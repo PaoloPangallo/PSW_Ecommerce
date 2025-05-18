@@ -416,4 +416,23 @@
   z-index: 1001;
 }
 
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.home-container section {
+  animation: fadeUp 0.6s ease-in-out;
+}
+
+.category-box {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.category-box:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+
+
 

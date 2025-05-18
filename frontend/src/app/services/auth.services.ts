@@ -58,16 +58,11 @@ export class AuthService {
       localStorage.removeItem('token');
     }
   }
-
   getCurrentUserId(): number | null {
-    if (this.currentUserId === null && typeof localStorage !== 'undefined') {
-      const storedUserId = localStorage.getItem('userId');
-      if (storedUserId) {
-        this.currentUserId = parseInt(storedUserId, 10);
-      }
-    }
-    return this.currentUserId;
+    const storedUserId = localStorage.getItem('userId');
+    return storedUserId ? parseInt(storedUserId, 10) : null;
   }
+
 
   logout(): void {
     console.log("Eseguo il logout: rimuovo token e resetto il carrello.");

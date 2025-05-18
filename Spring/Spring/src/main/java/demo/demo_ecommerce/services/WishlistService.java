@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class WishlistService {
@@ -88,22 +86,6 @@ public void deleteWishlist(Long id) {
             throw new WishlistNotFoundException("Wishlist not found with ID: " + id);
         }
         wishlistRepository.deleteById(id);
-    }
-
-    // Elimina la wishlist per un determinato utente
-    public void deleteUserWishlist(Long userId) {
-        if (!wishlistRepository.existsByUserId(userId)) {
-            throw new WishlistNotFoundException("No wishlist found for user ID: " + userId);
-        }
-        wishlistRepository.deleteByUserId(userId);
-    }
-
-    // Recupera tutte le wishlist come lista di DTO
-    public List<WishlistDTO> getAllWishlists() {
-        return wishlistRepository.findAll()
-                .stream()
-                .map(WishlistDTO::fromEntity)
-                .collect(Collectors.toList());
     }
 
     @Transactional

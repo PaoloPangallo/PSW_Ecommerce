@@ -1,6 +1,5 @@
 package demo.demo_ecommerce.Controllers;
 
-import demo.demo_ecommerce.Utility.ResourceNotFoundException;
 import demo.demo_ecommerce.Utility.ReviewLimitExceededException;
 import demo.demo_ecommerce.dtos.ReviewDTO;
 import demo.demo_ecommerce.entities.Review;
@@ -14,11 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +31,11 @@ public class ReviewController {
     private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
 
     private final ReviewService reviewService;
-    private final ReviewRepository reviewRepository;
-    private final UsersService userService; // Servizio per recuperare l'utente corrente
 
     @Autowired
     public ReviewController(ReviewService reviewService, ReviewRepository reviewRepository, UsersService userService) {
         this.reviewService = reviewService;
-        this.reviewRepository = reviewRepository;
-        this.userService = userService;
+        // Servizio per recuperare l'utente corrente
     }
 
     // Qualsiasi utente autenticato può creare una recensione
@@ -107,4 +105,14 @@ public class ReviewController {
         reviewService.deleteReview(reviewId, null); // Il service può ignorare il controllo dell'utente se già validato
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{id}/images")
+    public ResponseEntity<?> uploadReviewImages(
+            @PathVariable Long id,
+            @RequestParam("images") List<MultipartFile> images
+    ) throws IOException {
+        reviewService.uploadImages(id, images);
+        return ResponseEntity.ok().build();
+    }
+
 }
