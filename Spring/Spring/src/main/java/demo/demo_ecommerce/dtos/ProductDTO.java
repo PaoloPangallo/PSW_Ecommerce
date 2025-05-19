@@ -18,6 +18,10 @@ public class ProductDTO {
     private String description;
     private Integer stock;
     private String imageUrl;
+    private Integer discountPercentage;
+    private BigDecimal discountedPrice;
+
+
 
 
     public static ProductDTO fromEntity(Product product) {
@@ -25,6 +29,8 @@ public class ProductDTO {
                 .id(product.getId())
                 .name(product.getName())
                 .price(product.getPrice())
+                .discountedPrice(product.getDiscountedPrice())
+                .discountPercentage(product.getDiscountPercentage())
                 .featured(product.isFeatured())
                 .description(product.getDescription())
                 .stock(product.getStock())

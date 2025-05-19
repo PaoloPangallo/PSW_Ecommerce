@@ -1,0 +1,48 @@
+<div class="admin-discount-container">
+  <h2>Gestione Sconti Prodotti</h2>
+
+  <table class="product-table" *ngIf="products.length > 0">
+    <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Prezzo</th>
+      <th>Sconto Attuale</th>
+      <th>Azioni</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let p of products">
+      <td>{{ p.name }}</td>
+      <td>{{ p.price | lire:false }}</td>
+      <td>
+          <span *ngIf="p.discountPercentage > 0; else noSconto">
+            -{{ p.discountPercentage }}%
+          </span>
+        <ng-template #noSconto>
+          Nessuno
+        </ng-template>
+      </td>
+      <td>
+        <button (click)="openDiscountForm(p)">✏️ Applica Sconto</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="showForm && selectedProduct" class="discount-form">
+    <h3>Imposta Sconto per: {{ selectedProduct.name }}</h3>
+
+    <form [formGroup]="discountForm" (ngSubmit)="applyDiscount()">
+      <label>Percentuale di sconto:</label>
+      <input type="number" formControlName="discountPercentage" />
+      <div *ngIf="discountForm.get('discountPercentage')?.invalid && discountForm.get('discountPercentage')?.touched">
+        <small>Sconto tra 0 e 100</small>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" [disabled]="discountForm.invalid">Salva</button>
+        <button type="button" (click)="cancel()">Annulla</button>
+      </div>
+    </form>
+  </div>
+</div>

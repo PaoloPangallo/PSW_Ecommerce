@@ -209,4 +209,24 @@
   font-size: 1rem;
 }
 
+.old-price {
+  color: #888;
+  text-decoration: line-through;
+  margin-right: 5px;
+}
+
+.new-price {
+  color: green;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.discount-badge {
+  background-color: red;
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
 

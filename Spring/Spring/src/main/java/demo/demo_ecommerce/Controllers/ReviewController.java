@@ -2,8 +2,11 @@ package demo.demo_ecommerce.Controllers;
 
 import demo.demo_ecommerce.Utility.ReviewLimitExceededException;
 import demo.demo_ecommerce.dtos.ReviewDTO;
+import demo.demo_ecommerce.dtos.ReviewReportDTO;
 import demo.demo_ecommerce.entities.Review;
+import demo.demo_ecommerce.entities.ReviewReport;
 import demo.demo_ecommerce.repositories.ReviewRepository;
+import demo.demo_ecommerce.services.ReviewResetService;
 import demo.demo_ecommerce.services.ReviewService;
 
 import demo.demo_ecommerce.services.UsersService;
@@ -31,11 +34,13 @@ public class ReviewController {
     private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
 
     private final ReviewService reviewService;
+    private final ReviewResetService reviewReportService;
 
     @Autowired
-    public ReviewController(ReviewService reviewService, ReviewRepository reviewRepository, UsersService userService) {
+    public ReviewController(ReviewService reviewService, ReviewRepository reviewRepository, UsersService userService, ReviewResetService reviewReportService) {
         this.reviewService = reviewService;
         // Servizio per recuperare l'utente corrente
+        this.reviewReportService = reviewReportService;
     }
 
     // Qualsiasi utente autenticato può creare una recensione
@@ -114,5 +119,25 @@ public class ReviewController {
         reviewService.uploadImages(id, images);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{reviewId}/report")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> reportReview(
+            @PathVariable Long reviewId,
+            @RequestParam Long userId,
+            @RequestParam String reason) {
+        reviewReportService.reportReview(reviewId, userId, reason);
+        return ResponseEntity.ok("Recensione segnalata.");
+    }
+
+    @GetMapping("/reports/admin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ReviewReportDTO>> getAllReports() {
+        List<ReviewReport> reports = reviewReportService.getAllReports();
+        return ResponseEntity.ok(reports.stream().map(ReviewReportDTO::fromEntity).toList());
+    }
+
+
+
 
 }

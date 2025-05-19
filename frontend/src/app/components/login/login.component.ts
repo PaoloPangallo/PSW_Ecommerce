@@ -16,6 +16,9 @@ export class LoginComponent {
   password = '';
   errorMessage = '';
   successMessage = '';
+  showForgotPassword = false;
+  email = '';
+  isSubmitting = false;
 
   constructor(
     private authService: AuthService,
@@ -28,7 +31,6 @@ export class LoginComponent {
         console.log("Login riuscito, token ricevuto:", res.token);
         this.authService.setToken(res.token);
         this.errorMessage = '';
-        // Reindirizza alla dashboard o alla homepage dopo il login
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
@@ -37,4 +39,34 @@ export class LoginComponent {
       }
     });
   }
+
+  toggleForgotPassword(): void {
+    this.showForgotPassword = !this.showForgotPassword;
+    this.errorMessage = '';
+    this.successMessage = '';
+  }
+
+  submitForgotPassword(): void {
+    if (!this.email) {
+      this.errorMessage = 'Inserisci una email valida';
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.authService.requestPasswordReset(this.email).subscribe({
+      next: (res: any) => {
+        console.log('Risposta backend:', res);
+        this.successMessage = res.message || '✅ Se l\'email è corretta, riceverai un link per reimpostare la password.';
+        this.errorMessage = '';
+        this.isSubmitting = false;
+      },
+      error: (err) => {
+        console.error('Errore nel reset:', err);
+        this.errorMessage = err.error?.message || 'Errore durante l\'invio';
+        this.successMessage = '';
+        this.isSubmitting = false;
+      }
+    });
+  }
+
 }

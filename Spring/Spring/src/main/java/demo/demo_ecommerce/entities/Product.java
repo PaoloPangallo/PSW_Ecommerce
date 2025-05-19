@@ -8,6 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 @Setter
@@ -39,6 +40,10 @@ public class Product {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @Column(name = "discount_percentage")
+    private Integer discountPercentage; // es: 20 per 20%
+
+
 
 
     @UpdateTimestamp
@@ -54,7 +59,15 @@ public class Product {
 
     // Nuovo campo per identificare i prodotti in evidenza
     @Column(nullable = false)
-    private boolean featured = false;  // Default: false (non in evidenza)
+    private boolean featured = false;
+
+    public BigDecimal getDiscountedPrice() {
+        if (discountPercentage != null && discountPercentage > 0) {
+            BigDecimal discount = price.multiply(BigDecimal.valueOf(discountPercentage)).divide(BigDecimal.valueOf(100));
+            return price.subtract(discount).setScale(2, RoundingMode.HALF_UP);
+        }
+        return price;
+    }
 
     public Product() {}
 

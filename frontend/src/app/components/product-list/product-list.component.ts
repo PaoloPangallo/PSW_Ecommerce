@@ -7,11 +7,12 @@ import { RouterModule } from '@angular/router';
 import { combineLatest } from 'rxjs';
 import { CartService } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.services';
+import {LirePipe} from '../../services/lire.pipe';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LirePipe],
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })

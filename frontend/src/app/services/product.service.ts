@@ -14,14 +14,15 @@ export class ProductService {
   constructor(private http: HttpClient) {}
 
   private convertToLira(price: number): number {
-    return Number((price * this.conversionRate).toFixed(2)); // Mantiene 2 decimali
+    return Number((price * this.conversionRate).toFixed(2));
   }
 
   getAllProducts(): Observable<Product[]> {
     return this.http.get<Product[]>(this.apiUrl).pipe(
       map(products => products.map(product => ({
         ...product,
-        price: this.convertToLira(product.price)
+        price: this.convertToLira(product.price),
+        discountedPrice: this.convertToLira(product.discountedPrice ?? product.price)
       })))
     );
   }
@@ -30,7 +31,8 @@ export class ProductService {
     return this.http.get<Product[]>(`${this.apiUrl}/featured`).pipe(
       map(products => products.map(product => ({
         ...product,
-        price: this.convertToLira(product.price)
+        price: this.convertToLira(product.price),
+        discountedPrice: this.convertToLira(product.discountedPrice ?? product.price)
       })))
     );
   }
@@ -39,7 +41,8 @@ export class ProductService {
     return this.http.get<Product[]>(`${this.apiUrl}?category=${category}`).pipe(
       map(products => products.map(product => ({
         ...product,
-        price: this.convertToLira(product.price)
+        price: this.convertToLira(product.price),
+        discountedPrice: this.convertToLira(product.discountedPrice ?? product.price)
       })))
     );
   }
@@ -48,26 +51,18 @@ export class ProductService {
     return this.http.get<Product>(`${this.apiUrl}/${id}`).pipe(
       map(product => ({
         ...product,
-        price: this.convertToLira(product.price)
+        price: this.convertToLira(product.price),
+        discountedPrice: this.convertToLira(product.discountedPrice ?? product.price)
       }))
     );
   }
 
-
-  uploadProductImage(productId: number, file: File): Observable<Product> {
-    const formData = new FormData();
-    formData.append('file', file);
-
-    // POST /api/products/{id}/uploadImage
-    return this.http.post<Product>(`${this.apiUrl}/${productId}/uploadImage`, formData);
-  }
-
   getAlsoBoughtRecommendations(productId: number): Observable<Product[]> {
-    return this.http.get<Product[]>(`http://localhost:8080/api/recommendations/also-bought/${productId}`);
+    return this.http.get<Product[]>(`${this.apiUrl}/../recommendations/also-bought/${productId}`);
   }
 
   getRecommendations(userId: number): Observable<Product[]> {
-    return this.http.get<Product[]>(`http://localhost:8080/api/recommendations/for-user/${userId}`);
+    return this.http.get<Product[]>(`${this.apiUrl}/../recommendations/for-user/${userId}`);
   }
 
   searchProducts(query: string): Observable<Product[]> {
@@ -87,13 +82,31 @@ export class ProductService {
         ...response,
         content: response.content.map((product: Product) => ({
           ...product,
-          price: this.convertToLira(product.price)
+          price: this.convertToLira(product.price),
+          discountedPrice: this.convertToLira(product.discountedPrice ?? product.price)
         }))
       }))
     );
   }
 
+  uploadProductImage(productId: number, file: File): Observable<Product> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<Product>(`${this.apiUrl}/${productId}/uploadImage`, formData);
+  }
 
+  updateProduct(product: Product): Observable<Product> {
+    const productToSend = {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      stock: product.stock,
+      imageUrl: product.imageUrl,
+      featured: product.featured,
+      discountPercentage: product.discountPercentage,
+      price: Number((product.price / this.conversionRate).toFixed(2)) // euro
+    };
 
-
+    return this.http.put<Product>(`${this.apiUrl}/${product.id}`, productToSend);
+  }
 }

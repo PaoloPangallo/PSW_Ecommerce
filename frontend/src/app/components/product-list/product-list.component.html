@@ -22,7 +22,17 @@
       <img [src]="product.imageUrl" [alt]="product.name" />
       <h2>{{ product.name }}</h2>
       <p class="description">{{ product.description }}</p>
-      <p class="price"><strong>Prezzo:</strong> {{ product.price }} L</p>
+      <p class="price">
+        <ng-container *ngIf="product.discountPercentage > 0; else noDiscount">
+          <del class="old-price">{{ product.price | lire }}</del>
+          <span class="new-price">{{ product.discountedPrice | lire }}</span>
+          <span class="discount-badge">-{{ product.discountPercentage }}%</span>
+        </ng-container>
+        <ng-template #noDiscount>
+          {{ product.price | lire }}
+        </ng-template>
+      </p>
+
       <p class="stock"><strong>Disponibilità:</strong> {{ product.stock }}</p>
 
       <div class="button-container">

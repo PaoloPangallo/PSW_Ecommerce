@@ -11,6 +11,8 @@ import { ReviewService } from '../../services/review-list.services';
 import { AuthService } from '../../services/auth.services';
 import {UpdateReviewDialogComponent} from '../ConfirmDialog/update-review-dialog.component';
 import {MatIcon} from '@angular/material/icon';
+import {ReviewReportDialogComponent} from '../review-report/review-report-dialog.component';
+import {MatButton} from '@angular/material/button';
 
 @Component({
   selector: 'app-review-list',
@@ -23,6 +25,7 @@ import {MatIcon} from '@angular/material/icon';
     ReviewUpvoteComponent,       // Componente per gli upvote
     UpdateReviewDialogComponent,
     MatIcon,
+    MatButton,
     // Dialog di modifica (se anch'esso è standalone)
   ],
   templateUrl: './review-list.component.html',
@@ -66,22 +69,18 @@ export class ReviewListComponent implements OnInit {
   onUpdateReview(review: ReviewDTO): void {
     const dialogRef = this.dialog.open(UpdateReviewDialogComponent, {
       width: '500px',
-      data: review // Passiamo la recensione da modificare
+      data: review
     });
 
-    // Quando la dialog si chiude, recuperiamo i dati aggiornati (rating, comment) se l'utente ha salvato
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // result = { rating: X, comment: '...' }
         const updatedReview = {
           rating: result.rating,
           comment: result.comment
         };
 
-        // Chiamiamo il service per aggiornare la recensione nel backend
         this.reviewService.updateReview(review.id, updatedReview).subscribe({
           next: (response) => {
-            // Aggiorna la recensione anche nella lista locale
             const index = this.reviews.findIndex(r => r.id === review.id);
             if (index !== -1) {
               this.reviews[index] = response;
@@ -94,6 +93,15 @@ export class ReviewListComponent implements OnInit {
       }
     });
   }
+
+// ✅ CORRETTA — dichiarata fuori
+  openReportDialog(reviewId: number): void {
+    this.dialog.open(ReviewReportDialogComponent, {
+      width: '500px',
+      data: { reviewId }
+    });
+  }
+
 
   /**
    * Elimina la recensione dopo una conferma

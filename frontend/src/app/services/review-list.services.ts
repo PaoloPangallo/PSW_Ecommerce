@@ -26,15 +26,33 @@ export class ReviewService {
   }
 
   // Metodo per cancellare una recensione
-  deleteReview(reviewId: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${reviewId}`);
-  }
+
 
   uploadReviewImages(reviewId: number, images: File[]): Observable<void> {
     const formData = new FormData();
     images.forEach(file => formData.append('images', file));
     return this.http.post<void>(`${this.baseUrl}/${reviewId}/images`, formData);
   }
+
+  reportReview(reviewId: number, userId: number, reason: string): Observable<void> {
+    const params = new URLSearchParams();
+    params.set('userId', userId.toString());
+    params.set('reason', reason);
+
+    return this.http.post<void>(`${this.baseUrl}/${reviewId}/report?${params.toString()}`, {});
+  }
+
+  getReportedReviews(): Observable<any[]> {
+    return this.http.get<any[]>('http://localhost:8080/api/reviews/reports/admin');
+  }
+
+
+  deleteReview(reviewId: number): Observable<void> {
+    return this.http.delete<void>(`http://localhost:8080/api/reviews/${reviewId}`);
+  }
+
+
+
 
 
 }

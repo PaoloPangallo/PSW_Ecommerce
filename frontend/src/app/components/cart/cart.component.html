@@ -1,11 +1,14 @@
 <mat-card class="cart-wrapper" *ngIf="cart && cart.items.length > 0; else emptyCart">
   <mat-card-title>Il tuo Carrello</mat-card-title>
   <mat-card-content>
-    <table mat-table [dataSource]="cart.items" class="mat-elevation-z8">
+    <table mat-table [dataSource]="cart.items" class="mat-elevation-z8 full-width-table">
+
       <!-- Colonna Prodotto -->
       <ng-container matColumnDef="productName">
         <th mat-header-cell *matHeaderCellDef>Prodotto</th>
-        <td mat-cell *matCellDef="let item">{{ item.productName }}</td>
+        <td mat-cell *matCellDef="let item">
+          {{ item.productName }}
+        </td>
       </ng-container>
 
       <!-- Colonna Quantità -->
@@ -26,28 +29,33 @@
       <ng-container matColumnDef="price">
         <th mat-header-cell *matHeaderCellDef>Prezzo Unitario</th>
         <td mat-cell *matCellDef="let item">
-          <ng-container *ngIf="item.oldPrice && item.oldPrice > item.price; else normalPrice">
-            <del class="old-price">{{ item.oldPrice | lire }}</del>
-            <span class="new-price">{{ item.price | lire }}</span>
+          <ng-container *ngIf="item.oldPrice && item.oldPrice > item.price; else noDiscount">
+            <del class="old-price">{{ item.oldPrice | lire:false }}</del>
+            <span class="new-price">{{ item.price | lire:false }}</span>
+            <span class="discount-badge">
+              -{{ ((1 - (item.price / item.oldPrice)) * 100) | number: '1.0-0' }}%
+            </span>
           </ng-container>
-          <ng-template #normalPrice>
-            {{ item.price | lire }}
+          <ng-template #noDiscount>
+            {{ item.price | lire:false }}
           </ng-template>
         </td>
       </ng-container>
 
-
       <!-- Colonna Totale per Prodotto -->
       <ng-container matColumnDef="total">
         <th mat-header-cell *matHeaderCellDef>Totale</th>
-        <td mat-cell *matCellDef="let item">{{ (item.price * item.quantity) | lire }}</td>
+        <td mat-cell *matCellDef="let item">
+          {{ (getDiscountedPrice(item.price, item.discountPercentage) * item.quantity) | lire:false }}
+        </td>
+
       </ng-container>
 
       <!-- Colonna Coupon -->
       <ng-container matColumnDef="coupon">
         <th mat-header-cell *matHeaderCellDef>Coupon</th>
         <td mat-cell *matCellDef="let item">
-          <input placeholder="Incolla Codice Coupon" [(ngModel)]="couponCodes[item.id]" name="coupon{{item.id}}" />
+          <input matInput placeholder="Codice coupon" [(ngModel)]="couponCodes[item.id]" name="coupon{{item.id}}" />
           <button mat-button color="primary" (click)="applyCoupon(item.id)">Applica</button>
         </td>
       </ng-container>
@@ -56,34 +64,96 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Azioni</th>
         <td mat-cell *matCellDef="let item">
-          <button mat-button color="warn" (click)="remove(item.productId)">Rimuovi</button>
+          <button mat-button color="primary" (click)="saveForLater(item)">💾 Salva per dopo</button>
+          <button mat-button color="warn" (click)="remove(item.productId)">❌ Rimuovi</button>
         </td>
       </ng-container>
 
+      <!-- Righe -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 
     <!-- Totale Ordine -->
     <div class="cart-total">
-      <p><strong>Totale Ordine:</strong> {{ getTotalPrice() | lire }}</p>
+      <p><strong>Totale Ordine:</strong> {{ getTotalPrice() | lire:false }}
+      </p>
     </div>
 
-    <!-- Pulsante per svuotare il carrello -->
+    <!-- Pulsante svuota -->
     <div class="clear-btn-container">
       <button mat-raised-button color="accent" (click)="clear()">Svuota carrello</button>
     </div>
   </mat-card-content>
 </mat-card>
 
+<!-- Pulsante Checkout -->
 <div class="cart-summary" *ngIf="cart && cart.items.length > 0">
   <button mat-raised-button color="primary" (click)="goToCheckout()">Procedi al Checkout</button>
 </div>
 
+<!-- Link ai salvati -->
+<div class="saved-link">
+  <a routerLink="/saved" mat-button>📥 Vedi i prodotti salvati per dopo</a>
+</div>
+
+<!-- Sezione salvati per dopo -->
+<div class="saved-container" *ngIf="savedItems.length > 0">
+  <h2 class="section-title">
+    <mat-icon>bookmark_added</mat-icon>
+    Prodotti salvati per dopo
+  </h2>
+
+  <div *ngFor="let item of savedItems" class="saved-card">
+    <mat-card class="product-card">
+      <mat-card-header>
+        <div mat-card-avatar class="product-avatar" [ngStyle]="{ 'background-image': 'url(' + item.product.imageUrl + ')' }"></div>
+        <mat-card-title>{{ item.product.name }}</mat-card-title>
+        <mat-card-subtitle>Quantità: {{ item.quantity }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p class="price" *ngIf="item.product.discountPercentage && item.product.discountPercentage > 0; else noDiscountSaved">
+          Prezzo:
+          <del class="old-price">{{ item.product.price | lire:false }}</del>
+
+          <strong class="new-price">
+            {{ getDiscountedPrice(item.product.price, item.product.discountPercentage) | lire:false }}
+
+          </strong>
+          <span class="discount-badge">-{{ item.product.discountPercentage }}%</span>
+        </p>
+        <ng-template #noDiscountSaved>
+          <p class="price">Prezzo:<strong>{{ item.product.price | lire:false }}</strong></p>
+        </ng-template>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-raised-button color="primary" (click)="moveToCart(item)">
+          <mat-icon>add_shopping_cart</mat-icon> Sposta nel carrello
+        </button>
+        <button mat-stroked-button color="warn" (click)="removeFromSaved(item)">
+          <mat-icon>delete</mat-icon> Rimuovi
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+</div>
+
+<!-- fallback se non ci sono salvati -->
+<div *ngIf="savedItems.length === 0" class="empty-saved">
+  <mat-card>
+    <mat-card-content>
+      <p>🗃️ Nessun prodotto salvato per dopo.</p>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<!-- Messaggio carrello vuoto -->
 <ng-template #emptyCart>
   <mat-card class="cart-wrapper">
     <mat-card-content>
-      <p>Il carrello è vuoto.</p>
+      <p>🛒 Il carrello è vuoto.</p>
     </mat-card-content>
   </mat-card>
 </ng-template>

@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>Segnala Recensione</h2>
+<mat-dialog-content>
+  <form [formGroup]="reportForm">
+    <mat-form-field appearance="fill" style="width:100%">
+      <mat-label>Motivazione</mat-label>
+      <textarea matInput formControlName="reason" rows="4" placeholder="Scrivi perché segnali questa recensione"></textarea>
+      <mat-error *ngIf="reportForm.get('reason')?.invalid">Motivazione obbligatoria</mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Annulla</button>
+  <button mat-flat-button color="warn" [disabled]="reportForm.invalid" (click)="submit()">Invia</button>
+</mat-dialog-actions>

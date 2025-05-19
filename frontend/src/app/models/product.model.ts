@@ -7,4 +7,6 @@ export interface Product {
   category?: { name: string };
   imageUrl?: string;
   featured?: boolean;
+  discountedPrice: number;
+  discountPercentage: number;
 }

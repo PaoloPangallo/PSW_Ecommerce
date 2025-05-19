@@ -41,6 +41,10 @@
           <button mat-raised-button color="warn" class="btn-delete" *ngIf="review.userId === (currentUserId ?? 0)" (click)="onDeleteReview(review.id)">
             Elimina
           </button>
+          <button mat-button color="warn" (click)="openReportDialog(review.id)">
+            Segnala
+          </button>
+
         </div>
         <!-- Componente per gestire gli upvote -->
         <app-review-upvote

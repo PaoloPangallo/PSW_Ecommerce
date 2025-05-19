@@ -12,6 +12,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { LirePipe } from '../../services/lire.pipe';
 import { FormsModule } from '@angular/forms';
+import {SavedService} from '../../services/saved-for-later.service';
+import {MatInput} from '@angular/material/input';
 
 @Component({
   selector: 'app-cart',
@@ -25,7 +27,8 @@ import { FormsModule } from '@angular/forms';
     MatIconModule,
     MatSnackBarModule,
     LirePipe,
-    FormsModule
+    FormsModule,
+    MatInput
   ],
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
@@ -41,6 +44,8 @@ export class CartComponent implements OnInit {
   private orderService = inject(OrderService);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
+  private savedService = inject(SavedService);
+
 
   ngOnInit(): void {
     const userId = this.authService.getCurrentUserId();
@@ -52,9 +57,10 @@ export class CartComponent implements OnInit {
       return;
     }
 
-    // ✅ carica effettivamente il carrello
     this.loadCart(userId);
+    this.loadSaved(); // ✅ mancava questa riga!
   }
+
 
 
   loadCart(userId: number): void {
@@ -121,8 +127,11 @@ export class CartComponent implements OnInit {
   }
 
   getTotalPrice(): number {
-    return this.cart?.items.reduce((total, item) => total + item.price * item.quantity, 0) || 0;
+    return this.cart?.items.reduce((total, item) =>
+      total + this.getDiscountedPrice(item.price, item.discountPercentage) * item.quantity, 0
+    ) || 0;
   }
+
 
   private updateItemQuantity(userId: number, productId: number, newQuantity: number): void {
     this.cartService.updateItemQuantity(userId, productId, newQuantity).subscribe({
@@ -176,5 +185,73 @@ export class CartComponent implements OnInit {
   private showSnack(message: string, duration: number = 3000): void {
     this.snackBar.open(message, 'OK', { duration, horizontalPosition: 'right', verticalPosition: 'top' });
   }
+
+  saveForLater(item: any): void {
+    const userId = this.checkUserLoggedIn();
+    if (!userId) return;
+
+    this.cartService.removeItem(userId, item.productId).subscribe({
+      next: () => {
+        this.savedService.addToSaved(item.productId, item.quantity).subscribe({
+          next: () => {
+            this.showSnack('💾 Prodotto salvato per dopo!', 2000);
+            this.loadCart(userId);
+            this.loadSaved();
+          },
+          error: (err) => {
+            console.error('Errore nel salvataggio per dopo:', err);
+            this.showSnack('❌ Errore nel salvataggio.', 3000);
+          }
+        });
+      },
+      error: (err) => {
+        console.error('Errore nella rimozione dal carrello:', err);
+        this.showSnack('❌ Errore nella rimozione.', 3000);
+      }
+    });
+  }
+
+
+
+  savedItems: any[] = [];
+
+  loadSaved(): void {
+    this.savedService.getSavedItems().subscribe({
+      next: (items) => this.savedItems = items
+    });
+  }
+
+  moveToCart(item: any): void {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) return;
+
+    this.cartService.addToCart(userId, item.product.id, item.quantity).subscribe({
+      next: () => {
+        this.savedService.removeSavedItem(item.product.id).subscribe({
+          next: () => {
+            this.loadCart(userId);
+            this.loadSaved();
+            this.showSnack('✅ Prodotto spostato nel carrello', 2000);
+          }
+        });
+      }
+    });
+  }
+
+  removeFromSaved(item: any): void {
+    this.savedService.removeSavedItem(item.product.id).subscribe(() => {
+      this.loadSaved();
+      this.showSnack('🗑️ Rimosso dai salvati', 2000);
+    });
+  }
+
+  getDiscountedPrice(price: number, discountPercentage: number | null | undefined): number {
+    if (!discountPercentage || discountPercentage <= 0) return price;
+    return price - (price * discountPercentage) / 100;
+  }
+
+
+
+
 
 }

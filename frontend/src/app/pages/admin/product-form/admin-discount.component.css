@@ -1,0 +1,53 @@
+.admin-discount-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.product-table th,
+.product-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.product-table th {
+  background-color: #f0f0f0;
+}
+
+.discount-form {
+  background: #fafafa;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.discount-form input {
+  width: 80px;
+  padding: 5px;
+  margin-right: 10px;
+}
+
+.form-actions {
+  margin-top: 10px;
+}
+
+button {
+  padding: 6px 12px;
+  margin-right: 8px;
+  cursor: pointer;
+  border: none;
+  background-color: #1976d2;
+  color: white;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #115293;
+}

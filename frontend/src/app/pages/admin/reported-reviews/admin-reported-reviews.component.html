@@ -1,0 +1,16 @@
+<h2>Recensioni Segnalate</h2>
+
+<div *ngIf="isLoading">Caricamento...</div>
+<div *ngIf="error">{{ error }}</div>
+
+<mat-card *ngFor="let report of reports" class="report-card">
+  <mat-card-title>Segnalata da: {{ report.userName }}</mat-card-title>
+  <mat-card-subtitle>{{ report.reportedAt | date:'short' }}</mat-card-subtitle>
+  <mat-card-content>
+    <p><strong>Motivazione:</strong> {{ report.reason }}</p>
+    <p><strong>Commento recensito:</strong> {{ report.reviewComment }}</p>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-flat-button color="warn" (click)="deleteReview(report.reviewId)">Elimina recensione</button>
+  </mat-card-actions>
+</mat-card>

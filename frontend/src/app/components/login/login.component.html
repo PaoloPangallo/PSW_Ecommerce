@@ -1,7 +1,11 @@
 <div class="waves"></div>
+
 <div class="login-container">
-  <h2>Login</h2>
-  <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+  <h2 *ngIf="!showForgotPassword">Login</h2>
+  <h2 *ngIf="showForgotPassword">Recupera Password</h2>
+
+  <!-- FORM DI LOGIN -->
+  <form *ngIf="!showForgotPassword" (ngSubmit)="onSubmit()" #loginForm="ngForm">
     <div class="form-group">
       <label for="username">Username</label>
       <input
@@ -12,6 +16,7 @@
         required
       />
     </div>
+
     <div class="form-group">
       <label for="password">Password</label>
       <input
@@ -22,21 +27,55 @@
         required
       />
     </div>
+
     <button type="submit" [disabled]="loginForm.invalid">Login</button>
   </form>
 
-  <div *ngIf="errorMessage" class="error">
+  <!-- FORM PASSWORD DIMENTICATA -->
+  <form *ngIf="showForgotPassword" (ngSubmit)="submitForgotPassword()">
+    <p>Inserisci la tua email. Se esiste, riceverai un link per reimpostare la password.</p>
+
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        id="email"
+        required
+      />
+    </div>
+
+    <button type="submit" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Invio...' : 'Invia link di reset' }}
+    </button>
+  </form>
+
+  <!-- MESSAGGI -->
+  <div *ngIf="errorMessage && !successMessage" class="error">
     {{ errorMessage }}
   </div>
   <div *ngIf="successMessage" class="success">
-    {{ successMessage }}
+    ✅ Se l'email è corretta, riceverai un link per reimpostare la password.
   </div>
 
-  <p>
-    Non hai un account?
-    <a (click)="router.navigate(['/register'])">Registrati qui</a>
-  </p>
+  <!-- LINK UTENTE -->
+  <div class="login-footer">
+    <p *ngIf="!showForgotPassword">
+      <button type="button" (click)="toggleForgotPassword()" class="link-button">
+        Hai dimenticato la password?
+      </button>
+    </p>
+    <p *ngIf="showForgotPassword">
+      <button type="button" (click)="toggleForgotPassword()" class="link-button">
+        ⇦ Torna al login
+      </button>
+    </p>
+    <p *ngIf="!showForgotPassword">
+      Non hai un account?
+      <a (click)="router.navigate(['/register'])">Registrati qui</a>
+    </p>
+  </div>
 </div>
-
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,600&display=swap" />

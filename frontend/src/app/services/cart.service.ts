@@ -84,4 +84,22 @@ export class CartService {
     const errorMsg = error?.error?.message || "Si è verificato un errore imprevisto.";
     return throwError(() => new Error(errorMsg));
   }
+
+  addToCart(userId: number, productId: number, quantity: number): Observable<CartDTO> {
+    return this.http.post<CartDTO>(`${this.baseUrl}/${userId}/add`, null, {
+      params: {
+        userId,
+        productId,
+        quantity
+      },
+      responseType: 'json'
+    }).pipe(
+      tap(cart => {
+        console.log('🛒 Prodotto aggiunto al carrello:', cart);
+        this.cartSubject.next(cart);
+      }),
+      catchError(error => this.handleError(error))
+    );
+  }
+
 }

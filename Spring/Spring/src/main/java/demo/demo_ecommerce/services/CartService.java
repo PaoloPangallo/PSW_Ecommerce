@@ -145,18 +145,35 @@ public class CartService {
             if (quantity > availableStock) {
                 throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
             }
+
             ShoppingCartItem newItem = new ShoppingCartItem();
             newItem.setCart(cart);
             newItem.setProduct(product);
             newItem.setQuantity(quantity);
-            newItem.setPrice(product.getPrice());
-            newItem.setOldPrice(product.getPrice());
+
+            BigDecimal basePrice = product.getPrice();
+            Integer discountPercentage = product.getDiscountPercentage();
+
+            if (discountPercentage != null && discountPercentage > 0) {
+                BigDecimal discountAmount = basePrice
+                        .multiply(BigDecimal.valueOf(discountPercentage))
+                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                BigDecimal discountedPrice = basePrice.subtract(discountAmount);
+
+                newItem.setPrice(discountedPrice);
+                newItem.setOldPrice(basePrice);
+            } else {
+                newItem.setPrice(basePrice);
+                newItem.setOldPrice(null);
+            }
+
             shoppingCartItemRepository.save(newItem);
         }
 
         cartRepository.save(cart);
         return getCartByUserId(userId);
     }
+
 
 
     /**

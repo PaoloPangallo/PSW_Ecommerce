@@ -1,0 +1,24 @@
+<div class="saved-container">
+  <h2>📥 Prodotti salvati per dopo</h2>
+
+  <div *ngIf="savedItems.length === 0" class="empty-message">
+    Nessun prodotto salvato.
+  </div>
+
+  <div *ngFor="let item of savedItems" class="saved-card">
+    <div class="product-info">
+      <h3>{{ item.product.name }}</h3>
+      <p>Quantità: {{ item.quantity }}</p>
+      <p>Prezzo: {{ item.product.price | currency:'EUR' }}</p>
+    </div>
+
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="moveToCart(item)">
+        🛒 Sposta nel carrello
+      </button>
+      <button mat-stroked-button color="warn" (click)="removeFromSaved(item)">
+        ❌ Rimuovi
+      </button>
+    </div>
+  </div>
+</div>

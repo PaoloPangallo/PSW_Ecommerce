@@ -17,6 +17,7 @@ import {NewsletterConfirmComponent} from './components/newsletter-confirm/newsle
 import {ReclamiComponent} from './components/reclami/reclami.component';
 import {UserComplaintListComponent} from './components/user-complaint/user-complaint-list.component';
 import {FaqComponent} from './components/faq/faq.component';
+import {ResetPasswordComponent} from './components/reset-password/reset-password.component';
 
 export const appRoutes: Routes = [
   { path: '', component: HomeComponent },
@@ -37,10 +38,21 @@ export const appRoutes: Routes = [
   { path: 'newsletter/confirm', component: NewsletterConfirmComponent },
   { path: 'reclami', component: ReclamiComponent },
   { path: 'faq', component: FaqComponent },
+  { path: 'reset-password', component: ResetPasswordComponent },
+  { path: 'forgot-password', component: LoginComponent },
+
+
+
 
   {
     path: 'user/complaints',
     component: UserComplaintListComponent,
+  },
+
+  {
+    path: 'saved',
+    loadComponent: () =>
+      import('./components/saved-items/saved-items.component').then(m => m.SavedItemsComponent)
   },
 
 

@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Product } from '../../../models/product.model';
 import { AdminProductService } from '../../../service-admin/admin-product.service';
+import {LirePipe} from '../../../services/lire.pipe';
 
 @Component({
   selector: 'app-admin-products',
   templateUrl: './admin-products.component.html',
   styleUrls: ['./admin-products.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, LirePipe]
 })
 export class AdminProductsComponent implements OnInit {
   products: Product[] = [];

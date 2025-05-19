@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { AdminComponent } from '../admin.component';
 import { AdminGuard } from '../../guards/admin.guard';
 import {AdminNewsletterComponent} from './newsletter/admin-newsletter/admin-newsletter.component';
+import {AdminDiscountComponent} from './product-form/admin-discount.component';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -18,6 +19,14 @@ export const ADMIN_ROUTES: Routes = [
         loadComponent: () =>
           import('./dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
+      {
+        path: 'reported-reviews',
+        loadComponent: () => import('./reported-reviews/admin-reported-reviews.component').then(m => m.AdminReportedReviewsComponent)
+      },
+
+      { path: 'discounts', component: AdminDiscountComponent },
+
+
 
       // Gestione utenti
       {

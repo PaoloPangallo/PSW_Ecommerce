@@ -17,7 +17,17 @@
         <div class="details-container">
           <h2 class="product-title">{{ product.name }}</h2>
           <p class="description">{{ product.description }}</p>
-          <p class="price"><strong>Prezzo:</strong> {{ product.price | lire }}</p>
+          <p class="price">
+            <ng-container *ngIf="product.discountPercentage > 0; else noDiscountList">
+              <del class="old-price">{{ product.price | lire:false }}</del>
+              <span class="new-price">{{ product.discountedPrice | lire:false }}</span>
+              <span class="discount-badge">-{{ product.discountPercentage }}%</span>
+            </ng-container>
+            <ng-template #noDiscountList>
+              {{ product.price | lire:false }}
+            </ng-template>
+          </p>
+
 
           <div class="button-container">
             <button class="cart-button" (click)="addToCart()">🛒 Aggiungi al Carrello</button>
@@ -81,7 +91,7 @@
             <div *ngFor="let p of alsoBoughtProducts" class="recommended-card">
               <img [src]="p.imageUrl" [alt]="p.name" />
               <h4>{{ p.name }}</h4>
-              <p>{{ p.price | lire }}</p>
+              <p>{{ p.price | lire:false }}</p>
               <a [routerLink]="['/product', p.id]">Dettagli</a>
             </div>
           </div>

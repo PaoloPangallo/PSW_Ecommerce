@@ -181,6 +181,14 @@
   background-color: #138496;
 }
 
+.image-container img {
+  transition: transform 0.3s ease;
+}
+.image-container img:hover {
+  transform: scale(1.03);
+}
+
+
 .upload-button {
   background-color: #17a2b8;
   color: #fff;
@@ -348,4 +356,26 @@
   font-style: italic;
   color: #888;
 }
+
+.recommended-card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.recommended-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.recommended-card:nth-child(3) {
+  animation-delay: 0.2s;
+}
+/* etc. */
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 

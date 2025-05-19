@@ -8,6 +8,9 @@ export interface CartItemDTO {
   price: number;      // Prezzo scontato (se applicato)
   oldPrice?: number;  // Prezzo originale (se presente e maggiore del prezzo scontato)
   couponCode?: string;
+  discountPercentage?: number;
+  discountedPrice?: number;
+  originalPrice?: number;
 }
 
 

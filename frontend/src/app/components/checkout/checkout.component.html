@@ -6,14 +6,25 @@
     <h3>Riepilogo Carrello</h3>
     <div *ngIf="cart && cart.items.length > 0; else emptyCart" class="cart-summary">
       <ul class="cart-items">
-        <li *ngFor="let item of cart.items">
-          <span class="item-name">
-            {{ item.productName }} ({{ item.quantity }}x)
-          </span>
+        <li *ngFor="let item of cart.items" class="checkout-item">
+  <span class="item-name">
+    {{ item.productName }} ({{ item.quantity }}x)
+  </span>
+
           <span class="item-price">
-            {{ item.price | lire }}
-          </span>
+    <ng-container *ngIf="item.oldPrice && item.oldPrice > item.price; else noDiscount">
+      <del class="old-price">{{ item.oldPrice | lire }}</del>
+      <strong class="new-price">{{ item.price | lire }}</strong>
+      <span class="discount-badge">
+        -{{ ((1 - (item.price / item.oldPrice)) * 100) | number: '1.0-0' }}%
+      </span>
+    </ng-container>
+    <ng-template #noDiscount>
+      {{ item.price | lire }}
+    </ng-template>
+  </span>
         </li>
+
       </ul>
       <p class="cart-total">
         <strong>Totale:</strong> {{ getCartTotal() | lire }}

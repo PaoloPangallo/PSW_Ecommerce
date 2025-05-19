@@ -92,18 +92,20 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException("Prodotto non trovato con ID: " + id));
 
         validateProduct(productDetails);
+
         existingProduct.setName(productDetails.getName());
         existingProduct.setDescription(productDetails.getDescription());
         existingProduct.setPrice(productDetails.getPrice());
         existingProduct.setStock(productDetails.getStock());
+        existingProduct.setDiscountPercentage(productDetails.getDiscountPercentage()); // ✅ ECCOLO
 
-        // ✅ Mantieni l'immagine esistente se il nuovo prodotto non ha un'immagine
         if (productDetails.getImageUrl() != null && !productDetails.getImageUrl().isEmpty()) {
             existingProduct.setImageUrl(productDetails.getImageUrl());
         }
 
         return productRepository.save(existingProduct);
     }
+
 
     /**
      * Elimina un prodotto dal database.
