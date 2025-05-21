@@ -5,11 +5,12 @@ import { ProductService } from '../../services/product.service';
 import { Product } from '../../models/product.model';
 import { RouterModule } from '@angular/router';
 import {AuthService} from '../../services/auth.services';
+import {LirePipe} from '../../services/lire.pipe';
 
 @Component({
   selector: 'app-home-recommendations',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, LirePipe],
   templateUrl: './home-recommendations.component.html',
   styleUrls: ['./home-recommendations.component.css']
 })

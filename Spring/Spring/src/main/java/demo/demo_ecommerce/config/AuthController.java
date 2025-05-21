@@ -4,6 +4,7 @@ import demo.demo_ecommerce.dtos.LoginResponseDTO;
 import demo.demo_ecommerce.dtos.UserDTO;
 import demo.demo_ecommerce.services.PasswordResetService;
 import demo.demo_ecommerce.services.UsersService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AuthController.class);
+
 
     private final UsersService usersService;
     private final PasswordEncoder passwordEncoder;
@@ -30,31 +34,50 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequest loginRequest) {
-        var user = usersService.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        if (loginRequest.getUsername() == null || loginRequest.getPassword() == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Username e password sono obbligatori."));
+        }
+
+        var userOpt = usersService.findByUsername(loginRequest.getUsername());
+
+        if (userOpt.isEmpty()) {
+            logger.warn("Tentativo di login fallito: utente non trovato [{}]", loginRequest.getUsername());
+            return ResponseEntity.status(401).body(Map.of("error", "Username o password non validi."));
+        }
+
+        var user = userOpt.get();
 
         if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
+            logger.warn("Tentativo di login fallito: password errata per [{}]", user.getUsername());
+            return ResponseEntity.status(401).body(Map.of("error", "Username o password non validi."));
         }
 
         String token = jwtTokenProvider.generateToken(user.getUsername(), user.getRole().name());
+        logger.info("Login riuscito per utente [{}]", user.getUsername());
 
         return ResponseEntity.ok(new LoginResponseDTO(token, user.getId()));
     }
 
+
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody UserDTO userDTO) {
-        if (usersService.findByUsername(userDTO.getUsername()).isPresent()) {
-            return ResponseEntity.badRequest().body("Username already exists");
+    public ResponseEntity<?> register(@RequestBody @Valid UserDTO userDTO) {
+        if (userDTO.getUsername() == null || userDTO.getEmail() == null || userDTO.getPassword() == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Compila tutti i campi obbligatori."));
         }
+
+        if (usersService.findByUsername(userDTO.getUsername()).isPresent()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Username già esistente."));
+        }
+
         if (usersService.existsByEmail(userDTO.getEmail())) {
-            return ResponseEntity.badRequest().body("Email already exists");
+            return ResponseEntity.badRequest().body(Map.of("error", "Email già registrata."));
         }
 
         usersService.registerUser(userDTO);
-        return ResponseEntity.ok("User registered successfully");
+        return ResponseEntity.ok(Map.of("message", "Registrazione completata con successo."));
     }
+
 
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> body) {
@@ -66,16 +89,22 @@ public class AuthController {
 
     // 🔒 Reset password con token
     @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> body) {
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
         String token = body.get("token");
         String newPassword = body.get("newPassword");
 
-        if (token == null || newPassword == null) {
-            return ResponseEntity.badRequest().body("Token o nuova password mancanti.");
+        if (token == null || newPassword == null || newPassword.length() < 6) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Token non valido o password troppo corta."));
         }
 
-        passwordResetService.resetPassword(token, newPassword);
-        return ResponseEntity.ok("Password aggiornata con successo.");
+        try {
+            passwordResetService.resetPassword(token, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Password aggiornata con successo."));
+        } catch (Exception e) {
+            logger.error("Errore durante reset password: {}", e.getMessage());
+            return ResponseEntity.status(400).body(Map.of("error", "Reset password fallito: " + e.getMessage()));
+        }
     }
+
 
 }

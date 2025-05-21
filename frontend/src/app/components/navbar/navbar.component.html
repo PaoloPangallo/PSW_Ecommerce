@@ -7,10 +7,14 @@
       </a>
     </div>
 
-    <div class="search-box">
+    <div class="search-box" tabindex="0" (focusout)="onFocusOut($event)">
       <input [formControl]="searchControl" type="text" placeholder="Cerca un prodotto..." />
 
-      <ul class="search-suggestions" *ngIf="searchResults.length > 0">
+      <!-- LOADING -->
+      <div class="spinner" *ngIf="isLoading"></div>
+
+      <!-- RISULTATI -->
+      <ul class="search-suggestions" *ngIf="isDropdownOpen && searchResults.length > 0">
         <li *ngFor="let product of searchResults" (click)="onSelectProduct(product)">
           <img [src]="product.imageUrl" alt="{{ product.name }}" />
           <div class="info">
@@ -19,7 +23,16 @@
           </div>
         </li>
       </ul>
+
+
+      <!-- NESSUN RISULTATO -->
+      <div class="no-results" *ngIf="noResults">
+        Nessun prodotto trovato
+      </div>
+
+
     </div>
+
 
 
 

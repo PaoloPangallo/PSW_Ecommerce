@@ -2,6 +2,7 @@ package demo.demo_ecommerce.Controllers;
 
 import demo.demo_ecommerce.dtos.UpdateUserDTO;
 import demo.demo_ecommerce.dtos.UserDTO;
+import demo.demo_ecommerce.dtos.UserProfileSummaryDTO;
 import demo.demo_ecommerce.dtos.UserResponseDTO;
 import demo.demo_ecommerce.entities.Role;
 import demo.demo_ecommerce.entities.User;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -104,4 +106,26 @@ public class UsersController {
         Page<User> users = usersService.searchUsers(username, email, pageable);
         return ResponseEntity.ok(users);
     }
+
+
+    @GetMapping("/{userId}/profile-summary")
+    public ResponseEntity<UserProfileSummaryDTO> getUserProfile(@PathVariable Long userId) {
+        return ResponseEntity.ok(usersService.getUserProfileSummary(userId));
+    }
+
+    @PostMapping("/{id}/upload-image")
+    public ResponseEntity<String> uploadProfileImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        String imageUrl = usersService.uploadProfileImage(id, file);
+        return ResponseEntity.ok(imageUrl);
+    }
+
+    @PutMapping("/users/{id}/remove-image")
+    public ResponseEntity<Void> removeProfileImage(@PathVariable Long id) {
+        usersService.removeProfileImage(id);
+        return ResponseEntity.ok().build();
+    }
+
+
+
+
 }

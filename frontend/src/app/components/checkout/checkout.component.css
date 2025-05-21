@@ -29,12 +29,33 @@
   margin-bottom: 25px;
 }
 
-.checkout-container h3 {
+.checkout-step h3 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
   color: var(--accent-color, #ff9800);
-  margin-bottom: 15px;
   border-bottom: 1px solid #eee;
-  padding-bottom: 5px;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
 }
+.checkout-container label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+  display: block;
+  color: #444;
+}
+
+.checkout-container input,
+.checkout-container select {
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+}
+
+
 
 /* ===================== */
 /*   STEP 1: Carrello    */
@@ -123,12 +144,21 @@
   margin-top: 3px;
 }
 
-/* Bottoni e Layout */
 .btn-group {
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  justify-content: flex-end;
   margin-top: 20px;
 }
+
+.btn-group button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
 
 /* Bottoni base */
 .btn-group button {
@@ -228,5 +258,87 @@
   padding: 2px 6px;
   border-radius: 4px;
 }
+.checkout-container input,
+.checkout-container select,
+.btn-group button {
+  transition: all 0.3s ease;
+}
+
+.checkout-container input:hover,
+.checkout-container select:hover {
+  border-color: var(--accent-color, #ff9800);
+  box-shadow: 0 0 8px rgba(255, 152, 0, 0.3);
+}
+
+.checkout-step {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.checkout-step:has(input:focus),
+.checkout-step:hover {
+  transform: scale(1.01);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.checkout-step {
+  animation: fadeSlideIn 0.4s ease;
+}
+.checkout-step {
+  border-radius: 16px;
+  background: linear-gradient(to bottom right, #ffffff, #f1f5fc);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+.checkout-step {
+  background-color: #ffffff;
+  padding: 1.5rem;
+  border-radius: var(--border-radius, 8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  border-left: 5px solid var(--primary-color, #1976d2);
+  transition: all 0.3s ease;
+}
+
+
+.discount-badge {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  border: 2px solid #fff;
+  border-top: 2px solid #333;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
+
+
+
+
 
 

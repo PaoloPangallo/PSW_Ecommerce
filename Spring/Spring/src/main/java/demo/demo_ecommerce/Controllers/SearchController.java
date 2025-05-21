@@ -1,6 +1,5 @@
 package demo.demo_ecommerce.Controllers;
 
-
 import demo.demo_ecommerce.entities.Product;
 import demo.demo_ecommerce.services.ProductSearchService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +10,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/search")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*") // ✅ utile se accedi da frontend Angular
 public class SearchController {
 
     private final ProductSearchService searchService;
@@ -20,4 +20,3 @@ public class SearchController {
         return searchService.fuzzySearch(query);
     }
 }
-

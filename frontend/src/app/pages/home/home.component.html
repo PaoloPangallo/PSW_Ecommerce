@@ -114,7 +114,7 @@
         <div class="featured-card" *ngFor="let product of featuredProducts" tabindex="0">
           <img [src]="product.imageUrl" [alt]="product.name" />
           <h3>{{ product.name }}</h3>
-          <p class="price">Prezzo: {{ product.price }} L</p>
+          <p class="price">Prezzo: {{ product.price | lire:false }}</p>
           <button class="details-button" [routerLink]="['/product', product.id]">Dettagli</button>
         </div>
       </div>
@@ -129,7 +129,7 @@
         <div class="product-card" *ngFor="let product of allProducts" tabindex="0">
           <img [src]="product.imageUrl" [alt]="product.name" />
           <h3>{{ product.name }}</h3>
-          <p class="price">Prezzo: {{ product.price }} L</p>
+          <p class="price">Prezzo: {{ product.price | lire:false }}</p>
           <button class="details-button" [routerLink]="['/product', product.id]">Dettagli</button>
         </div>
       </div>

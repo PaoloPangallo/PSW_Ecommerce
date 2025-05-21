@@ -3,6 +3,7 @@ package demo.demo_ecommerce.services;
 import demo.demo_ecommerce.Utility.UserNotFoundException;
 import demo.demo_ecommerce.dtos.UpdateUserDTO;
 import demo.demo_ecommerce.dtos.UserDTO;
+import demo.demo_ecommerce.dtos.UserProfileSummaryDTO;
 import demo.demo_ecommerce.dtos.UserResponseDTO;
 import demo.demo_ecommerce.entities.Cart;
 import demo.demo_ecommerce.entities.Order;
@@ -17,7 +18,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,18 +38,21 @@ public class UsersService {
     private final PasswordEncoder passwordEncoder;
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
+    private final WishlistRepository wishlistRepository;
+    private final ReviewRepository reviewRepository;;
 
 
     public UsersService(UsersRepository usersRepository,
                         PasswordEncoder passwordEncoder,
                         CartRepository cartRepository,
                         OrderRepository orderRepository,
-                        ShoppingCartItemRepository shoppingCartItemRepository,
-                        WishlistRepository wishlistRepository, ReviewRepository reviewRepository, UpvoteRepository upvoteRepository) {
+                        WishlistRepository wishlistRepository1, ReviewRepository reviewRepository1) {
         this.usersRepository = usersRepository;
         this.passwordEncoder = passwordEncoder;
         this.cartRepository = cartRepository;
         this.orderRepository = orderRepository;
+        this.wishlistRepository = wishlistRepository1;
+        this.reviewRepository = reviewRepository1;
     }
 
     public Page<User> getAllUsers(Pageable pageable) {
@@ -167,11 +178,6 @@ public class UsersService {
         return usersRepository.findByUsername(username);
     }
 
-    public User getUserByUsername(String username) {
-        return usersRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("User not found with username: " + username));
-    }
-
     public boolean existsByEmail(String email) {
         return usersRepository.existsByEmail(email);
     }
@@ -189,6 +195,8 @@ public class UsersService {
         dto.setCity(user.getCity());
         dto.setRegion(user.getRegion());
         dto.setCountry(user.getCountry());
+        dto.setProfileImageUrl(user.getProfileImageUrl()); // ✅ deve esserci questa riga!
+
         return dto;
     }
 
@@ -197,4 +205,62 @@ public class UsersService {
         return usersRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
+
+    @Transactional
+    public UserProfileSummaryDTO getUserProfileSummary(Long userId) {
+        User user = findUserById(userId);
+
+        int totalOrders = orderRepository.countByUserId(userId);
+        BigDecimal totalSpent = orderRepository.sumTotalByUserId(userId);
+        int wishlistCount = wishlistRepository.countByUserId(userId);
+        int reviewsCount = reviewRepository.countByUserId(userId);
+
+
+        UserProfileSummaryDTO dto = new UserProfileSummaryDTO();
+        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
+        dto.setCity(user.getCity());
+        dto.setCountry(user.getCountry());
+        dto.setTotalOrders(totalOrders);
+        dto.setTotalSpent(totalSpent != null ? totalSpent : BigDecimal.ZERO);
+        dto.setWishlistCount(wishlistCount);
+        dto.setReviewsCount(reviewsCount);
+        dto.setProfileImageUrl(user.getProfileImageUrl());
+
+
+        return dto;
+    }
+
+    public String uploadProfileImage(Long userId, MultipartFile file) {
+        User user = findUserById(userId);
+        String fileName = "user_" + userId + "_" + file.getOriginalFilename();
+        Path imagePath = Paths.get("uploads/profile_images", fileName);
+
+        try {
+            Files.createDirectories(imagePath.getParent());
+            Files.write(imagePath, file.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException("Errore durante il salvataggio dell'immagine", e);
+        }
+        String imageUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/public/profile_images/")
+                .path(fileName)
+                .toUriString();
+
+
+        user.setProfileImageUrl(imageUrl);
+        usersRepository.save(user);
+        return imageUrl;
+    }
+
+
+    @Transactional
+    public void removeProfileImage(Long userId) {
+        User user = findUserById(userId);
+        user.setProfileImageUrl(null);
+        usersRepository.save(user);
+    }
+
+
+
 }

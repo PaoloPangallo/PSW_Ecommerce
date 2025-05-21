@@ -2,15 +2,26 @@
   <div class="profile-container">
     <h2>Profilo Utente</h2>
 
-    <!-- Link alla chat reclami -->
-    <div class="form-group">
-      <a routerLink="/user/complaints" class="complaint-link">
-        🗨️ Vai ai tuoi reclami e conversazioni con l'assistenza
-      </a>
+    <!-- FOTO PROFILO -->
+    <div class="profile-image-container">
+      <img
+        [src]="previewUrl || user?.profileImageUrl || 'assets/default-avatar.png'"
+        alt="Foto profilo"
+        class="profile-image"
+      />
+
+      <div class="image-actions">
+        <label for="fileInput" class="upload-btn">📷 Cambia foto</label>
+        <input id="fileInput" type="file" (change)="onImageSelected($event)" hidden />
+
+        <button type="button" class="remove-btn" (click)="removeProfileImage()">🗑️ Rimuovi foto</button>
+      </div>
     </div>
 
+
+
+    <!-- ✅ FORM CORRETTAMENTE APERTA -->
     <form (ngSubmit)="updateProfile()" #profileForm="ngForm">
-      <!-- Username -->
       <div class="form-group">
         <label for="username">Username:</label>
         <input
@@ -22,7 +33,6 @@
         />
       </div>
 
-      <!-- Email -->
       <div class="form-group">
         <label for="email">Email:</label>
         <input
@@ -34,13 +44,11 @@
         />
       </div>
 
-      <!-- Ruolo (non modificabile) -->
       <div class="form-group">
         <label>Ruolo:</label>
-        <input type="text" [value]="user.role" readonly>
+        <input type="text" [value]="user.role" readonly />
       </div>
 
-      <!-- Telefono -->
       <div class="form-group">
         <label for="phone">Telefono:</label>
         <input
@@ -48,23 +56,19 @@
           id="phone"
           name="phone"
           [(ngModel)]="user.phone"
-          placeholder="Inserisci il tuo numero di telefono"
         />
       </div>
 
-      <!-- Indirizzo -->
       <div class="form-group">
         <label for="address">Indirizzo:</label>
         <textarea
           id="address"
           name="address"
           [(ngModel)]="user.address"
-          placeholder="Inserisci il tuo indirizzo"
           rows="2"
         ></textarea>
       </div>
 
-      <!-- CAP -->
       <div class="form-group">
         <label for="cap">CAP:</label>
         <input
@@ -72,11 +76,9 @@
           id="cap"
           name="cap"
           [(ngModel)]="user.cap"
-          placeholder="Inserisci il CAP"
         />
       </div>
 
-      <!-- Città -->
       <div class="form-group">
         <label for="city">Città:</label>
         <input
@@ -84,11 +86,9 @@
           id="city"
           name="city"
           [(ngModel)]="user.city"
-          placeholder="Inserisci la città"
         />
       </div>
 
-      <!-- Regione -->
       <div class="form-group">
         <label for="region">Regione:</label>
         <input
@@ -96,11 +96,9 @@
           id="region"
           name="region"
           [(ngModel)]="user.region"
-          placeholder="Inserisci la regione"
         />
       </div>
 
-      <!-- Paese -->
       <div class="form-group">
         <label for="country">Paese:</label>
         <input
@@ -108,7 +106,6 @@
           id="country"
           name="country"
           [(ngModel)]="user.country"
-          placeholder="Inserisci il paese"
         />
       </div>
 
@@ -117,12 +114,26 @@
       </button>
     </form>
 
-    <!-- Messaggi di errore e successo -->
-    <div *ngIf="errorMessage" class="error">
-      {{ errorMessage }}
+    <!-- MESSAGGI -->
+    <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+    <hr class="section-divider" />
+
+    <!-- STATISTICHE -->
+    <div class="section-header">Statistiche account</div>
+    <div *ngIf="summary" class="profile-stats">
+      <ul>
+        <li>📦 Ordini effettuati: <strong>{{ summary.totalOrders }}</strong></li>
+        <li>💶 Totale speso: <strong>{{ summary.totalSpent | currency:'EUR' }}</strong></li>
+        <li>🧡 Wishlist: <strong>{{ summary.wishlistCount }}</strong></li>
+        <li>📝 Recensioni: <strong>{{ summary.reviewsCount }}</strong></li>
+      </ul>
     </div>
-    <div *ngIf="successMessage" class="success">
-      {{ successMessage }}
-    </div>
+
+    <!-- LINK AI RECLAMI -->
+    <a routerLink="/user/complaints" class="complaint-link">
+      🗨️ Vai ai tuoi reclami e conversazioni con l'assistenza
+    </a>
   </div>
 </div>

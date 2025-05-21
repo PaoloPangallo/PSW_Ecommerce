@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.services';
 import { UserService } from '../../services/user.service';
-import { User } from '../../models/user.model';
+import {User, UserProfileSummary} from '../../models/user.model';
 import {RouterLink} from '@angular/router';
 
 @Component({
@@ -15,8 +15,11 @@ import {RouterLink} from '@angular/router';
 })
 export class UserProfileComponent implements OnInit {
   user: User | null = null;
+  summary: UserProfileSummary | null = null;
   errorMessage = '';
   successMessage = '';
+  previewUrl: string | ArrayBuffer | null = null;
+
 
   constructor(
     private authService: AuthService,
@@ -26,9 +29,10 @@ export class UserProfileComponent implements OnInit {
   ngOnInit(): void {
     const userId = this.authService.getCurrentUserId();
     if (userId !== null) {
+
+      // Carica dati anagrafici
       this.userService.getUserById(userId).subscribe({
         next: (serverUser: any) => {
-          // Mappiamo i dati dal server (in inglese) al nostro modello User
           this.user = this.mapServerUser(serverUser);
         },
         error: (err) => {
@@ -36,10 +40,22 @@ export class UserProfileComponent implements OnInit {
           console.error(err);
         }
       });
+
+      // Carica riepilogo statistico
+      this.userService.getUserProfileSummary(userId).subscribe({
+        next: (summary) => {
+          this.summary = summary;
+        },
+        error: (err) => {
+          console.error('Errore nel caricamento delle statistiche utente', err);
+        }
+      });
+
     } else {
       this.errorMessage = 'Nessun utente loggato';
     }
   }
+
 
   updateProfile(): void {
     if (this.user) {
@@ -73,14 +89,16 @@ export class UserProfileComponent implements OnInit {
       username: serverUser.username,
       email: serverUser.email,
       role: serverUser.role,
-      phone: serverUser.phone,       // <-- Usiamo 'phone', NON 'telefono'
-      address: serverUser.address,   // <-- Usiamo 'address', NON 'indirizzo'
+      phone: serverUser.phone,
+      address: serverUser.address,
       cap: serverUser.cap,
-      city: serverUser.city,         // <-- Usiamo 'city', NON 'citta'
-      region: serverUser.region,     // <-- Usiamo 'region', NON 'regione'
-      country: serverUser.country    // <-- Usiamo 'country', NON 'paese'
+      city: serverUser.city,
+      region: serverUser.region,
+      country: serverUser.country,
+      profileImageUrl: serverUser.profileImageUrl // ✅ aggiunto!
     };
   }
+
 
   /**
    * Mappa l'oggetto User nel formato richiesto dal server per l'update,
@@ -97,4 +115,52 @@ export class UserProfileComponent implements OnInit {
       country: user.country
     };
   }
+
+  onImageSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      // Preview immediata
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.previewUrl = reader.result;
+      };
+      reader.readAsDataURL(file);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const userId = this.authService.getCurrentUserId();
+      if (userId) {
+        this.userService.uploadProfileImage(userId, formData).subscribe({
+          next: (imageUrl: string) => {
+            if (this.user) {
+              this.user.profileImageUrl = imageUrl;
+              this.previewUrl = null; // resetta dopo l'upload
+            }
+          },
+          error: (err) => {
+            console.error('Errore durante il caricamento dell\'immagine', err);
+          }
+        });
+      }
+    }
+
+  }
+  removeProfileImage(): void {
+    if (this.user) {
+      this.user.profileImageUrl = undefined;
+      this.previewUrl = null;
+
+      // Notifica il backend se vuoi salvare la rimozione nel DB
+      this.userService.removeProfileImage(this.user.id).subscribe({
+        next: () => console.log('Immagine rimossa'),
+        error: err => console.error('Errore nella rimozione immagine', err)
+      });
+    }
+  }
+
+
+
+
+
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
-import { User } from '../models/user.model';
+import {User, UserProfileSummary} from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,12 +18,23 @@ export class UserService {
     );
   }
 
+  // user.service.ts
+  getUserProfileSummary(userId: number) {
+    return this.http.get<UserProfileSummary>(`${this.apiUrl}/${userId}/profile-summary`);
+  }
+
+
   // ✅ Ottiene un singolo utente per ID
   getUserById(id: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`).pipe(
       catchError(this.handleError)
     );
   }
+
+  uploadProfileImage(userId: number, formData: FormData) {
+    return this.http.post(`${this.apiUrl}/${userId}/upload-image`, formData, { responseType: 'text' });
+  }
+
 
 // ✅ Aggiorna un utente
   updateUser(id: number, user: Partial<User>): Observable<User> {
@@ -45,4 +56,9 @@ export class UserService {
     console.error('Errore HTTP:', error);
     return throwError(() => new Error(error.message || 'Errore del server'));
   }
+
+  removeProfileImage(userId: number) {
+    return this.http.put<void>(`http://localhost:8080/api/users/${userId}/remove-image`, {});
+  }
+
 }

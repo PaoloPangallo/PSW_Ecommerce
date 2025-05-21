@@ -4,7 +4,7 @@
     <div class="recommended-card" *ngFor="let product of recommendedProducts">
       <img [src]="product.imageUrl" [alt]="product.name" />
       <h3>{{ product.name }}</h3>
-      <p class="price">Prezzo: {{ product.price }} L</p>
+      <p class="price">Prezzo: {{ product.price | lire:false }}</p>
       <button [routerLink]="['/product', product.id]">Dettagli</button>
     </div>
   </div>

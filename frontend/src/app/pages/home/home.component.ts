@@ -11,6 +11,7 @@ import {AuthService} from '../../services/auth.services';
 import {NewsletterSignupComponent} from '../../components/newsletter-signup/newsletter-signup.component';
 import {FooterComponent} from '../../components/footer/footer.component';
 import {ChatBotComponent} from '../../components/chat-bot/chat-bot.component';
+import {LirePipe} from '../../services/lire.pipe';
 
 @Component({
   selector: 'app-home',
@@ -23,7 +24,8 @@ import {ChatBotComponent} from '../../components/chat-bot/chat-bot.component';
     HomeRecommendationsComponent,
     NewsletterSignupComponent,
     FooterComponent,
-    ChatBotComponent
+    ChatBotComponent,
+    LirePipe
   ],
 
   templateUrl: './home.component.html',

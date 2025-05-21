@@ -163,6 +163,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    if (this.loading) return; // 🔐 Protezione sincrona contro doppi clic
+
     if (this.checkoutForm.invalid) {
       this.checkoutForm.markAllAsTouched();
       return;
@@ -175,8 +177,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.loading = true;
-    const checkoutData: CheckoutRequest = this.checkoutForm.getRawValue(); // shipping + transaction
+    this.loading = true; // ✅ Appena dopo il blocco, prima di qualsiasi async
+
+    const checkoutData: CheckoutRequest = this.checkoutForm.getRawValue();
 
     this.checkoutService.processCheckout(userId, checkoutData, token)
       .pipe(takeUntil(this.unsubscribe$))
@@ -191,15 +194,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
               next: (order: Order | null) => {
                 this.createdOrder = order;
                 this.cdRef.detectChanges();
-                console.log("TOKEN:", this.authService.getToken());
-                console.log("USER ID:", this.authService.getCurrentUserId());
-                console.log("LOCAL STORAGE userId:", localStorage.getItem("userId"));
-
               },
               error: (err) => {
                 console.error('Errore nel recupero dell\'ordine creato:', err);
               }
-
             });
           }
 
@@ -212,6 +210,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         }
       });
   }
+
 
   onZipCodeChange(): void {
     const cap = this.shippingGroup.get('zipCode')?.value;

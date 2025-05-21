@@ -99,16 +99,20 @@
     </div>
 
     <!-- STEP 4: Riepilogo -->
+    <!-- STEP 4: Riepilogo -->
     <div *ngIf="currentStep === 4" class="checkout-step step4">
       <h3>Riepilogo Ordine</h3>
+
       <div class="address-summary">
         <p><strong>Indirizzo:</strong></p>
         <p>{{ shippingGroup.get('address')?.value }},
           {{ shippingGroup.get('zipCode')?.value }},
           {{ shippingGroup.get('city')?.value }},
           {{ shippingGroup.get('country')?.value }}</p>
-        <p *ngIf="estimatedDelivery"><strong>Consegna stimata:</strong> {{ estimatedDelivery | date:'fullDate' }}</p>
 
+        <p *ngIf="estimatedDelivery">
+          <strong>Consegna stimata:</strong> {{ estimatedDelivery | date:'fullDate' }}
+        </p>
 
         <p><strong>Metodo di Spedizione:</strong> {{ shippingGroup.get('shippingMethod')?.value }}</p>
       </div>
@@ -117,12 +121,28 @@
       <p><strong>Totale Prodotti:</strong> {{ getCartTotal() | lire }}</p>
 
       <div class="btn-group">
-        <button type="button" class="back-button" (click)="previousStep()">Indietro</button>
-        <button type="submit" class="submit-button" [disabled]="loading">
-          {{ loading ? 'Elaborazione...' : 'Conferma Ordine' }}
+        <button
+          type="button"
+          class="back-button"
+          (click)="previousStep()"
+          *ngIf="!checkoutResponse && !createdOrder">
+          Indietro
         </button>
+
+        <button
+          *ngIf="!checkoutResponse && !createdOrder"
+          type="submit"
+          class="submit-button"
+          [disabled]="loading">
+          <ng-container *ngIf="!loading">Conferma Ordine</ng-container>
+          <ng-container *ngIf="loading">
+            <span class="spinner"></span> Elaborazione...
+          </ng-container>
+        </button>
+
       </div>
     </div>
+
   </form>
 
   <!-- Messaggio di successo -->

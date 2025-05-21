@@ -57,8 +57,7 @@ public class User implements UserDetails {
     private String address;
 
     @Column(length = 10)
-    private String cap;  // Codice di avviamento postale
-
+    private String cap;
     @Column(length = 100)
     private String city;
 
@@ -67,6 +66,9 @@ public class User implements UserDetails {
 
     @Column(length = 100)
     private String country;
+
+    private String profileImageUrl;
+
 
     public User() {
     }

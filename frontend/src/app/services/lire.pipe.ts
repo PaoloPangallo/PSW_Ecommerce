@@ -10,24 +10,22 @@ export class LirePipe implements PipeTransform {
   private readonly LIRE_PER_EURO = 1936.27; // Tasso di conversione storico
 
   transform(value: number, alreadyInLire: boolean = false): string {
-    let lireValue: number;
+    if (value == null || isNaN(value)) return '';
 
-    if (alreadyInLire) {
-      // Se il valore è già in Lire, non facciamo alcuna conversione
-      lireValue = value;
-    } else {
-      // Altrimenti convertiamo da Euro a Lire
-      lireValue = value * this.LIRE_PER_EURO;
-    }
+    // eur < 10000, lire > 100000
+    const euroThreshold = 10000;
 
-    // Formattazione con separatore migliaia (opzionale)
-    // 'it-IT' per formattare con il punto come separatore delle migliaia
+    // Heuristic: if > threshold and alreadyInLire not specificato, assume it's already in lire
+    const assumeAlreadyInLire = value > euroThreshold && !alreadyInLire;
+
+    const lireValue = assumeAlreadyInLire ? value : value * 1936.27;
+
     const formatted = new Intl.NumberFormat('it-IT', {
-      maximumFractionDigits: 0 // niente decimali
-    }).format(lireValue);
+      maximumFractionDigits: 0
+    }).format(Math.round(lireValue));
 
-    // Aggiungiamo la L di Lire
     return `${formatted} L`;
   }
+
 
 }

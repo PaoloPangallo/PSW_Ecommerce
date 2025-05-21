@@ -36,6 +36,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/products/featured").permitAll()
                         .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                         .requestMatchers("/api/storage/**").permitAll()
+                        .requestMatchers("/public/**").permitAll()  // ✅ AGGIUNGI QUESTA
+
 
                         // Accesso autenticato
                         .requestMatchers("/api/reviews/**").authenticated()

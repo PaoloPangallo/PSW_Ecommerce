@@ -10,4 +10,21 @@ export interface User {
   city?: string;
   region?: string;
   country?: string;
+  profileImageUrl?: string; // ✅ nuovo campo per la foto profilo
+
 }
+
+// user-profile-summary.model.ts
+export interface UserProfileSummary {
+  username: string;
+  email: string;
+  city: string;
+  country: string;
+  totalOrders: number;
+  totalSpent: number;
+  wishlistCount: number;
+  reviewsCount: number;
+
+
+}
+

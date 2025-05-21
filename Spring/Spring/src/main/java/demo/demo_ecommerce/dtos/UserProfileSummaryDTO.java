@@ -1,23 +1,27 @@
 package demo.demo_ecommerce.dtos;
 
-import demo.demo_ecommerce.entities.Role;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
+
 @Getter
 @Setter
-public class UserResponseDTO {
-    private Long id;
+public class UserProfileSummaryDTO {
     private String username;
     private String email;
-    private String role;
-    private String phone;
-    private String address;
-    private String cap;
     private String city;
-    private String region;
     private String country;
+    private int totalOrders;
+    private BigDecimal totalSpent;
+    private int wishlistCount;
+    private int reviewsCount;
     private String profileImageUrl; // ✅ AGGIUNTO
 
+
+
+
+    // Getters e Setters
 }
 

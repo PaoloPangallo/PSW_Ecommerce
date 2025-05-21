@@ -56,7 +56,7 @@ class AuthControllerTest {
         when(usersService.existsByEmail("testuser@example.com")).thenReturn(false);
 
         // Act
-        ResponseEntity<String> response = authController.register(userDTO);
+        ResponseEntity<String> response = (ResponseEntity<String>) authController.register(userDTO);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());
@@ -78,7 +78,7 @@ class AuthControllerTest {
         when(usersService.findByUsername("testuser")).thenReturn(Optional.of(new User()));
 
         // Act
-        ResponseEntity<String> response = authController.register(userDTO);
+        ResponseEntity<String> response = (ResponseEntity<String>) authController.register(userDTO);
 
         // Assert
         assertEquals(400, response.getStatusCodeValue());
@@ -102,7 +102,7 @@ class AuthControllerTest {
         when(jwtTokenProvider.generateToken("testuser", "USER")).thenReturn("jwt-token");
 
         // Act
-        ResponseEntity<LoginResponseDTO> response = authController.login(loginRequest);
+        ResponseEntity<LoginResponseDTO> response = (ResponseEntity<LoginResponseDTO>) authController.login(loginRequest);
 
         // Assert
         assertEquals(200, response.getStatusCodeValue());

@@ -32,9 +32,15 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByIdAndUserIdFetchItems(@Param("orderId") Long orderId, @Param("userId") Long userId);
 
     // Nuovo metodo: restituisce gli ordini con join fetch degli orderItems e supporta la paginazione
-    @Query(value = "SELECT distinct o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user.id = :userId",
-            countQuery = "SELECT count(o) FROM Order o WHERE o.user.id = :userId")
+    @Query(value = "SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.orderItems WHERE o.user.id = :userId ORDER BY o.createdAt DESC",
+            countQuery = "SELECT COUNT(o) FROM Order o WHERE o.user.id = :userId")
     Page<Order> findByUserIdFetchItems(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT SUM(o.total) FROM Order o WHERE o.user.id = :userId")
+    BigDecimal sumTotalByUserId(@Param("userId") Long userId);
+
+    int countByUserId(Long userId);
+
 
     // Altri metodi...
     @Query("SELECT oi FROM OrderItem oi WHERE oi.order.id = :orderId AND oi.price > :price")
