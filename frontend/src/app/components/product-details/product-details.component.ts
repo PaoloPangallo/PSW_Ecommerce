@@ -22,7 +22,7 @@ import { LirePipe } from '../../services/lire.pipe';
   standalone: true,
   imports: [CommonModule, RouterModule, ReviewListComponent, ReviewFormComponent, LirePipe],
   templateUrl: './product-details.component.html',
-  styleUrls: ['./product-details.component.css']
+  styleUrls: ['./product-details.component.scss']
 })
 export class ProductDetailsComponent implements OnInit, OnDestroy {
   product: Product | null = null;

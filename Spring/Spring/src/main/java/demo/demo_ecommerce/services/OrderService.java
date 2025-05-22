@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -279,6 +280,39 @@ public class OrderService {
     private String safe(String val) {
         return val != null ? val : "-";
     }
+
+
+    public String getOrderStatus(Long userId, Long orderId) {
+        Optional<Order> opt = orderRepository.findById(orderId);
+
+        if (opt.isEmpty()) {
+            System.out.println("❌ Ordine con ID " + orderId + " non esiste affatto.");
+            return "❓ Ordine non trovato.";
+        }
+
+        Order ordine = opt.get();
+
+        // 👇 DEBUG STAMPE CRITICHE
+        System.out.println("✅ Ordine trovato");
+        System.out.println("👉 userId richiesto = " + userId);
+        System.out.println("👉 userId ordine   = " + ordine.getUser().getId());
+
+        if (!Objects.equals(ordine.getUser().getId(), userId)) {
+            return "🚫 Questo ordine appartiene all’utente #" + ordine.getUser().getId() + ", non a te (#" + userId + ").";
+        }
+
+        // Restituisci stato reale
+        return switch (ordine.getStatus()) {
+            case CREATED -> "📝 Ordine appena creato";
+            case PAID -> "💳 Pagato";
+            case SHIPPED -> "🚚 Spedito";
+            case DELIVERED -> "📦 Consegnato";
+            case CANCELLED -> "❌ Annullato";
+        };
+    }
+
+
+
 
 
 }

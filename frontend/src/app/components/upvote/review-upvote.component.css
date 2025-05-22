@@ -1,29 +1,77 @@
+/* upvote.component.css */
+
+/* Contenitore upvote retrò */
 .upvote-container {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(255,255,255,0.9);
+  border: 2px solid #d8cfc4;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+  font-family: 'Courier New', Courier, monospace;
+  color: #2c3e50;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.fa-thumbs-up {
-  cursor: pointer;
+.upvote-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.25), inset 0 0 8px rgba(230,126,34,0.3);
+}
+
+/* Icona pollice */
+.upvote-container .fa-thumbs-up {
   font-size: 1.4rem;
-  transition: color 0.2s, opacity 0.2s;
+  color: #ddd;
+  cursor: pointer;
+  transition: color 0.3s, text-shadow 0.3s;
 }
 
-.upvoted {
-  color: #007bff; /* Colore se già votato */
+.upvote-container .fa-thumbs-up:hover:not(.disabled) {
+  color: #e67e22;
+  text-shadow: 0 0 4px rgba(230,126,34,0.6);
 }
 
-.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* Stato upvoted */
+.upvote-container .fa-thumbs-up.upvoted {
+  color: #e67e22;
+  text-shadow: 0 0 6px rgba(230,126,34,0.8);
+  cursor: default;
 }
 
+/* Count retrò */
 .upvote-count {
   font-weight: bold;
+  font-size: 1rem;
+  text-shadow: 0 0 2px rgba(0,0,0,0.2);
 }
 
+/* Messaggio di errore */
 .error-message {
-  color: red;
-  font-size: 0.9rem;
+  margin-left: 1rem;
+  font-size: 0.85rem;
+  color: #c0392b;
+  animation: retroShake 0.4s ease-in-out 2;
+}
+
+/* Animazione shake retrò */
+@keyframes retroShake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-6px); }
+  40%,80% { transform: translateX(6px); }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .upvote-container {
+    gap: 0.3rem;
+    padding: 0.2rem 0.5rem;
+  }
+  .upvote-container .fa-thumbs-up {
+    font-size: 1.2rem;
+  }
+  .upvote-count {
+    font-size: 0.9rem;
+  }
 }

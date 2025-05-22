@@ -1,239 +1,523 @@
-.profile-wrapper {
+/* profile.component.css */
+
+/* Container principale e sfondo retrò con texture leggera */
+:host {
   display: flex;
   justify-content: center;
-  align-items: center;
-  background: linear-gradient(120deg, #0d47a1, #1976d2);
-  min-height: 100vh;
   padding: 2rem;
-  font-family: 'Poppins', sans-serif;
+  background:
+    linear-gradient(135deg, #f4e8d6, #d8cfc4) fixed,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 10 10'%3E%3Cpath fill='%23ffffff22' d='M0 0L10 0L10 10Z'%3E%3C/path%3E%3C/svg%3E") repeat;
+  font-family: 'Courier New', Courier, monospace;
+  color: #2c3e50;
 }
 
+/* Card profilo retrò con bordi arrotondati e ombra profonda */
 .profile-container {
-  background: #fff;
-  border-radius: 16px;
   width: 100%;
-  max-width: 460px;
-  padding: 2rem;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #d8cfc4;
+  border-radius: 15px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  animation: slideIn 0.5s ease forwards;
+  padding: 2rem;
+  animation: retroSlideIn 0.6s ease-out forwards;
 }
 
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
+
+@keyframes retroSlideIn {
+  from { transform: translateY(-40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
 }
 
+/* Titolo con effetto “glow” retrò */
 .profile-container h2 {
-  font-size: 1.8rem;
-  color: #333;
-  margin-bottom: 1.5rem;
+  margin: 0 0 1.5rem;
+  font-size: 2rem;
+  font-weight: bold;
   text-align: center;
+  color: #e67e22;
+  text-shadow: 0 0 8px rgba(230,126,34,0.7), 1px 1px 2px rgba(0,0,0,0.3);
 }
 
-.section-header {
-  font-size: 1.2rem;
-  color: #1976d2;
-  margin-bottom: 1rem;
-  font-weight: 600;
-  border-left: 4px solid #1976d2;
-  padding-left: 0.5rem;
+/* Immagine profilo con bordo in rilievo */
+.profile-image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
-.section-divider {
-  margin: 2rem 0 1rem;
+.profile-image {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 4px solid #e67e22;
+  box-shadow: inset 0 0 8px rgba(230,126,34,0.5), 0 4px 12px rgba(0,0,0,0.1);
+  object-fit: cover;
+}
+
+/* Azioni immagine con micro-animazioni “press” */
+.image-actions {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.8rem;
+}
+
+.upload-btn,
+.remove-btn {
+  background: linear-gradient(145deg, #e67e22, #cf711e);
+  color: #fff;
   border: none;
-  border-top: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 6px #bd651a, -2px -2px 6px #f08238;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.form-group {
-  margin-bottom: 1rem;
+.upload-btn:hover,
+.remove-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 4px 4px 10px #bd651a, -4px -4px 10px #f08238;
+}
+
+.upload-btn:active,
+.remove-btn:active {
+  transform: translateY(2px);
+  box-shadow: 1px 1px 3px #bd651a, -1px -1px 3px #f08238;
+}
+
+/* Form stile retrò con sfondo leggero */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 0.4rem;
-  font-weight: 500;
-  color: #444;
+  font-weight: bold;
+  font-size: 0.95rem;
+  color: #2c3e50;
 }
 
 .form-group input,
 .form-group textarea {
   width: 100%;
   padding: 0.7rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  border: 2px solid #d8cfc4;
+  border-radius: 8px;
+  background: #fdfaf5;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
   font-size: 0.95rem;
-  transition: border-color 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-  border-color: #1976d2;
-  outline: none;
+  border-color: #e67e22;
+  box-shadow: 0 0 0 4px rgba(230,126,34,0.2);
 }
 
-button {
-  width: 100%;
-  background-color: #1976d2;
+/* Pulsante “Aggiorna Profilo” con retro glass effect */
+button[type="submit"] {
+  align-self: flex-end;
+  background: rgba(230,126,34,0.8);
+  backdrop-filter: blur(4px);
   color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.9rem;
+  border: 2px solid #cf711e;
+  border-radius: 10px;
+  padding: 0.6rem 1.4rem;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: bold;
   cursor: pointer;
-  margin-top: 1.2rem;
-  transition: background 0.3s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
 }
 
-button:hover {
-  background-color: #1565c0;
+button[type="submit"]:hover {
+  background: rgba(230,126,34,0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.25);
 }
 
-button:active {
-  transform: scale(0.98);
+button[type="submit"]:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
-.error,
-.success {
-  margin-top: 1rem;
-  font-weight: 500;
-  text-align: center;
+button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
+/* Feedback messaggi */
+.success,
 .error {
-  color: #e74c3c;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.95rem;
 }
 
 .success {
   color: #27ae60;
 }
 
-.profile-stats {
-  background: #f5f8fa;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  padding: 1rem;
-  margin-top: 0.5rem;
+.error {
+  color: #c0392b;
+  animation: retroShake 0.4s ease-in-out 2;
+}
+
+/* Section divider retrò */
+.section-divider {
+  border: none;
+  border-top: 3px dashed #d8cfc4;
+  margin: 2rem 0;
+}
+
+/* Statistiche utente */
+.section-header {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #e67e22;
+  text-shadow: 0 0 4px rgba(230,126,34,0.5);
 }
 
 .profile-stats ul {
   list-style: none;
-  padding-left: 0;
+  padding: 0;
+  margin: 0;
 }
 
 .profile-stats li {
-  margin: 0.5rem 0;
-  font-size: 1rem;
-  color: #333;
+  margin-bottom: 0.6rem;
+  font-size: 0.95rem;
 }
 
+/* Link reclami retrò */
 .complaint-link {
   display: block;
   margin-top: 1.5rem;
   text-align: center;
-  font-weight: 500;
-  color: #007bff;
-  text-decoration: none;
+  font-weight: bold;
+  color: #e67e22;
+  text-decoration: underline;
+  transition: color 0.3s, text-shadow 0.3s;
 }
 
 .complaint-link:hover {
-  text-decoration: underline;
+  color: #cf711e;
+  text-shadow: 0 0 4px rgba(207,113,30,0.6);
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-  .profile-container {
-    padding: 1.5rem;
-  }
-
-  .profile-container h2 {
-    font-size: 1.5rem;
-  }
+/* Dialog conferma retrò */
+.confirm-dialog {
+  border: 2px solid #d8cfc4;
+  border-radius: 10px;
+  padding: 1rem;
+  background: #fffbf4;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.profile-image-container {
-  text-align: center;
-  margin-bottom: 1rem;
+.confirm-dialog p {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
 }
 
-.profile-image {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 3px solid #1976d2;
-  margin-bottom: 0.5rem;
+.confirm-actions {
+  display: flex;
+  justify-content: space-around;
+  gap: 1rem;
 }
 
-input[type="file"] {
-  margin-top: 1rem;
-  padding: 0.4rem;
-  font-size: 0.9rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background-color: #f8f8f8;
+.confirm-actions button {
+  background: linear-gradient(145deg, #e67e22, #cf711e);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: bold;
   cursor: pointer;
+  box-shadow: 2px 2px 6px #bd651a, -2px -2px 6px #f08238;
+  transition: transform 0.2s;
 }
 
-.profile-image-container {
-  text-align: center;
-  margin-bottom: 1rem;
+.confirm-actions button:hover {
+  transform: translateY(-3px);
 }
 
-.profile-image {
-  width: 130px;
-  height: 130px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 3px solid #1976d2;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  margin-bottom: 0.8rem;
+.confirm-actions button:active {
+  transform: translateY(2px);
 }
 
-.profile-image:hover {
-  transform: scale(1.05);
+/* Animazione shake retrò */
+@keyframes retroShake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-7px); }
+  40%,80% { transform: translateX(7px); }
 }
 
-.image-actions {
+/* Responsive mobile */
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 1rem;
+  }
+  .image-actions {
+    flex-direction: column;
+  }
+  button[type="submit"] {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Container principale e sfondo retrò con texture leggera */
+:host {
   display: flex;
   justify-content: center;
-  gap: 0.5rem;
+  padding: 2rem;
+  background:
+    linear-gradient(135deg, #f4e8d6, #d8cfc4) fixed,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 10 10'%3E%3Cpath fill='%23ffffff22' d='M0 0L10 0L10 10Z'%3E%3C/path%3E%3C/svg%3E") repeat;
+  font-family: 'Courier New', Courier, monospace;
+  color: #2c3e50;
+}
+
+/* Card profilo retrò con bordi arrotondati e ombra profonda */
+.profile-container {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid #d8cfc4;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  animation: retroSlideIn 0.6s ease-out forwards;
+}
+
+@keyframes retroSlideIn {
+  from { transform: translateY(-40px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* Titolo con effetto “glow” retrò */
+.profile-container h2,
+.profile-container h3 {
+  margin: 0 0 1.5rem;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  color: #e67e22;
+  text-shadow: 0 0 8px rgba(230,126,34,0.7), 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+/* SFONDO PATTERN RETRÒ SUL CONTAINER */
+.review-list-container {
+  background:
+    linear-gradient(135deg, #fdf6ec, #ece2d8) fixed,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 10 10'%3E%3Ccircle cx='5' cy='5' r='1' fill='%23ffffff11'/%3E%3C/svg%3E") repeat;
+  padding: 1.5rem;
+  border: 3px solid #d8cfc4;
+  border-radius: 16px;
+}
+
+/* NESSUNA RECENSIONE */
+.no-reviews-text {
+  font-style: italic;
+  color: #7a583c;
+  text-shadow: 1px 1px 0 #fff9f1;
+}
+
+/* GRID EFFETTO VIGNETTA */
+.review-list-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+@media (min-width: 600px) {
+  .review-list-container {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+}
+
+/* CARD RECENSIONE - RETRÒ MAX */
+.review-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px dashed #b08c69;
+  border-radius: 16px;
+  padding: 1.2rem;
+  box-shadow:
+    inset 0 0 8px #ffe4c4,
+    0 6px 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.review-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, transparent 60%, rgba(232,224,212,0.3) 61%);
+  transform: rotate(25deg);
+}
+.review-card:hover {
+  transform: translateY(-6px) rotate(-1deg);
+  box-shadow:
+    inset 0 0 12px #ffe4c4,
+    0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* HEADER CON NEON EDGE */
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+}
+.review-header a {
+  color: #cf711e;
+  text-decoration: none;
+  text-shadow:
+    0 0 4px rgba(207,113,30,0.8),
+    1px 1px 2px rgba(0,0,0,0.2);
+}
+.review-date {
+  font-family: 'Courier New', monospace;
+  color: #8b5e3c;
+}
+
+/* STELLE ULTRA GLOW */
+.rating-container span {
+  font-size: 1.3rem;
+  color: #ddd;
+  text-shadow: 0 0 2px #fff9f1;
+}
+.rating-container span.filled {
+  color: #e67e22;
+  text-shadow:
+    0 0 6px rgba(230,126,34,0.8),
+    0 0 10px rgba(230,126,34,0.6);
+}
+.rating-value {
+  margin-left: auto;
+  color: #7a583c;
+  font-weight: bold;
+}
+
+/* COMMENTO CON BORDO/OMBRE */
+.review-comment {
+  position: relative;
+  padding: 1rem 1.2rem;
+  margin-bottom: 0.8rem;
+  background:
+    linear-gradient(90deg, rgba(232,224,212,0.2), rgba(255,255,255,0.5)),
+    #fffdfa;
+  border-left: 4px solid #cf711e;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+.review-comment::before {
+  content: "“";
+  position: absolute;
+  top: -10px;
+  left: 10px;
+  font-size: 3rem;
+  color: rgba(207,113,30,0.4);
+}
+
+/* GALLERIA IMMAGINI IN CORNICE */
+.review-images {
+  display: flex;
   flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.review-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 3px solid #d8cfc4;
+  border-radius: 8px;
+  box-shadow:
+    inset 0 0 6px rgba(207,113,30,0.6),
+    0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.review-image:hover {
+  transform: translateY(-4px) rotate(-1deg);
+  box-shadow:
+    inset 0 0 8px rgba(232,224,212,0.8),
+    0 6px 12px rgba(0,0,0,0.2);
 }
 
-.upload-btn,
-.remove-btn {
-  font-size: 0.85rem;
-  padding: 0.5rem 0.8rem;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background 0.3s ease;
+/* TESTO “CARICA ALTRE” RIMOSSO */
+/* Se in futuro servisse, basta aggiungere la regola pulsante */
+
+/* ANIMAZIONE RETRÒ GLOW */
+@keyframes retroGlow {
+  0%,100% { box-shadow: inset 0 0 6px rgba(230,126,34,0.6); }
+  50%      { box-shadow: inset 0 0 12px rgba(230,126,34,0.9); }
 }
 
-.upload-btn {
-  background-color: #1976d2;
-  color: white;
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .review-card {
+    padding: 0.8rem;
+  }
+  .review-images {
+    justify-content: center;
+  }
 }
 
-.upload-btn:hover {
-  background-color: #1565c0;
+/* Aumenta opacità e contrasto generale */
+.review-card {
+  background: rgba(255, 255, 255, 1); /* pieno bianco per miglior contrasto */
+  border: 2px solid #b08c69;          /* bordo più scuro e definito */
 }
 
-.remove-btn {
-  background-color: #e74c3c;
-  color: white;
+/* Testo recensione più scuro e leggibile */
+.review-comment {
+  background: #fffdfa;                /* rimuove gradient troppo leggero */
+  color: #3a2f2f;                     /* testo grigio scuro per contrasto */
+  border-left: 4px solid #cf711e;     /* rimane vivace per richiamo retrò */
 }
 
-.remove-btn:hover {
-  background-color: #c0392b;
+/* Titoli e link più marcati */
+.review-header, .review-header a {
+  color: #2c3e50;                     /* testo principale scuro */
+  text-shadow: none;                  /* rimuove glow che sfoca il testo */
+  font-weight: bold;
 }
+
+/* Punteggi e stelle */
+.rating-container span,
+.rating-value {
+  color: #2c3e50;                     /* stelle e numeri in scuro */
+  text-shadow: none;
+}
+
+/* Testo “nessuna recensione” più contrastato */
+.no-reviews-text {
+  color: #51331d;                     /* marrone scuro */
+  font-weight: bold;
+}
+
+/* Data recensione più leggibile */
+.review-date {
+  color: #5e4b3c;                     /* grigio-bruno scuro */
+}
+
+/* Immagini restano come sono, testo ora più nitido */
+

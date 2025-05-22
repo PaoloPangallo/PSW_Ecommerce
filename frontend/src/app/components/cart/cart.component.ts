@@ -31,7 +31,7 @@ import {MatInput} from '@angular/material/input';
     MatInput
   ],
   templateUrl: './cart.component.html',
-  styleUrls: ['./cart.component.css']
+  styleUrls: ['./cart.component.scss']
 })
 export class CartComponent implements OnInit {
   cart: CartDTO | null = null;

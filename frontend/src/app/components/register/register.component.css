@@ -1,55 +1,40 @@
-/*
-  Per una tipografia moderna, aggiungi nel tuo index.html (o in un file globale):
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,600&display=swap" />
-*/
+/* register.component.css */
 
-/* Contenitore principale con sfondo gradiente */
-.register-wrapper {
+/* Contenitore principale e sfondo retrò */
+:host {
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(120deg, #0d47a1, #1976d2);
-  font-family: 'Poppins', sans-serif;
-  position: relative; /* se vuoi aggiungere le onde */
+  background: linear-gradient(135deg, #f4e8d6, #d8cfc4);
+  font-family: 'Courier New', Courier, monospace;
+  color: #2c3e50;
+  padding: 1rem;
+  position: relative;
 }
 
 
-.waves {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 250px;
-  background: url("data:image/svg+xml,%3Csvg ... %3C/svg%3E");
-  background-repeat: no-repeat;
-  background-size: cover;
-  z-index: 1;
-}
 
-
-/* Card centrale */
+/* Wrapper della card */
 .register-container {
   position: relative;
-  z-index: 2; /* se usi le onde */
-  width: 400px;
-  background: #fff;
+  z-index: 2;
+  width: 360px;
+  background: #fffbf4;
+  border: 2px solid #d8cfc4;
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  animation: slideIn 0.5s ease forwards;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  animation: slideIn 0.6s ease-out forwards;
 }
 
 /* Animazione di comparsa */
 @keyframes slideIn {
-  0% {
+  from {
     transform: translateY(-30px);
     opacity: 0;
   }
-  100% {
+  to {
     transform: translateY(0);
     opacity: 1;
   }
@@ -57,95 +42,141 @@
 
 /* Titolo */
 .register-container h2 {
-  margin-bottom: 1.5rem;
-  color: #333;
+  margin: 0 0 1.5rem;
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
-/* Form */
+/* Form e campi */
 .register-container form {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
 }
 
-.form-group {
+.register-container .form-group {
   margin-bottom: 1rem;
   text-align: left;
 }
 
-.form-group label {
+.register-container label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-weight: bold;
   color: #555;
-  font-weight: 500;
 }
 
-.form-group input {
+.register-container input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 0.6rem;
+  border: 2px solid #d8cfc4;
+  border-radius: 6px;
+  background: #fdfaf5;
   font-size: 0.95rem;
-  transition: border-color 0.3s;
+  transition: border-color 0.3s, box-shadow 0.3s;
   outline: none;
 }
 
-.form-group input:focus {
-  border-color: #1976d2;
+.register-container input:focus {
+  border-color: #e67e22;
+  box-shadow: 0 0 0 3px rgba(230,126,34,0.2);
 }
 
-/* Pulsante di submit */
-.register-container button {
-  margin-top: 0.5rem;
-  padding: 0.75rem;
-  background: #1976d2;
-  color: #fff;
+/* Pulsante Registrati */
+.register-container button[type="submit"] {
+  margin-top: 1rem;
+  padding: 0.7rem;
+  background: linear-gradient(145deg, #e67e22, #cf711e);
+  color: #ffffff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: bold;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 2px 2px 5px #bd651a, -2px -2px 5px #f08238;
+  transition: box-shadow 0.3s, transform 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 
-.register-container button:hover {
-  background: #1565c0;
+.register-container button[type="submit"]::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.4) 0%, transparent 70%);
+  transform: scale(0);
+  transition: transform 0.5s ease-out;
 }
 
-.register-container button:active {
-  transform: scale(0.97);
+.register-container button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 8px #bd651a, -4px -4px 8px #f08238;
 }
 
-/* Messaggi di errore e successo */
-.error {
-  color: #e74c3c;
+.register-container button[type="submit"]:hover::before {
+  transform: scale(1);
+}
+
+.register-container button[type="submit"]:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 3px #bd651a, -1px -1px 3px #f08238;
+}
+
+.register-container button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Messaggi di feedback */
+.register-container .error {
   margin-top: 1rem;
-  font-weight: 500;
+  color: #c0392b;
+  font-weight: bold;
+  animation: shake 0.3s ease-in-out 2;
 }
 
-.success {
+.register-container .success {
+  margin-top: 1rem;
   color: #27ae60;
-  margin-top: 1rem;
-  font-weight: 500;
+  font-weight: bold;
 }
 
-/* Link di navigazione */
+/* Link al login */
 .register-container p {
   margin-top: 1.5rem;
   font-size: 0.9rem;
-  color: #666;
+  text-align: center;
 }
 
 .register-container p a {
-  color: #1976d2;
-  font-weight: 500;
+  color: #e67e22;
+  font-weight: bold;
   text-decoration: none;
   transition: color 0.3s;
+  cursor: pointer;
 }
 
 .register-container p a:hover {
+  color: #cf711e;
   text-decoration: underline;
-  color: #1565c0;
+}
+
+/* Animazione shake */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .register-container {
+    width: 100%;
+    padding: 1.5rem;
+  }
 }

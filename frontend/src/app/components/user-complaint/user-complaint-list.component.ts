@@ -11,7 +11,7 @@ import {UserComplaintChatComponent} from './chat/user-complaint-chat.component';
   standalone: true,
   imports: [CommonModule, DatePipe, FormsModule, UserComplaintChatComponent],
   templateUrl: './user-complaint-list.component.html',
-  styleUrls: ['./user-complaint-list.component.css']
+  styleUrls: ['./user-complaint-list.component.scss']
 })
 export class UserComplaintListComponent implements OnInit {
   complaints: any[] = [];

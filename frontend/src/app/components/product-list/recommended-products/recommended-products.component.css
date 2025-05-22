@@ -1,0 +1,98 @@
+/* Sezione “Consigliati per te” retrò */
+:host ::ng-deep .recommended-section {
+  background: rgba(255, 251, 244, 0.95);
+  border: 2px solid #d8cfc4;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  font-family: 'Courier New', Courier, monospace;
+  color: #2c3e50;
+}
+
+/* Titolo con glow */
+:host ::ng-deep .recommended-section h3 {
+  font-size: 1.8rem;
+  color: #e67e22;
+  text-shadow: 0 0 6px rgba(230,126,34,0.7), 1px 1px 2px rgba(0,0,0,0.2);
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+/* Griglia prodotti */
+:host ::ng-deep .product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+/* Card prodotto retrò */
+:host ::ng-deep .product-card {
+  background: #fffbf4;
+  border: 2px double #d8cfc4;
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+:host ::ng-deep .product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15), inset 0 0 6px rgba(230,126,34,0.3);
+}
+
+/* Immagine prodotto */
+:host ::ng-deep .product-card img {
+  width: 100%;
+  height: auto;
+  max-height: 100px;
+  object-fit: cover;
+  border: 2px solid #d8cfc4;
+  border-radius: 6px;
+  margin-bottom: 0.8rem;
+}
+
+/* Titolo e prezzo */
+:host ::ng-deep .product-card h4 {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+  color: #2c3e50;
+}
+
+:host ::ng-deep .product-card p {
+  font-size: 0.9rem;
+  color: #8b5e3c;
+  margin-bottom: 0.8rem;
+}
+
+/* Link dettagli */
+:host ::ng-deep .product-card a {
+  display: inline-block;
+  background: linear-gradient(145deg, #e67e22, #cf711e);
+  color: #fff;
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  box-shadow: 2px 2px 6px #bd651a, -2px -2px 6px #f08238;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+:host ::ng-deep .product-card a:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 10px #bd651a, -4px -4px 10px #f08238;
+}
+
+:host ::ng-deep .product-card a:active {
+  transform: translateY(2px);
+  box-shadow: 1px 1px 3px #bd651a, -1px -1px 3px #f08238;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  :host ::ng-deep .product-card {
+    padding: 0.8rem;
+  }
+}

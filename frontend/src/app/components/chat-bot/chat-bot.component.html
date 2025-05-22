@@ -1,4 +1,15 @@
 <div class="chat-container">
+
+  <!-- ✅ DOMANDE FREQUENTI -->
+  <div class="faq-box">
+    <p class="faq-title">❓ Domande frequenti</p>
+    <div class="faq-buttons">
+      <button *ngFor="let q of faqQuestions" (click)="sendFAQ(q)">
+        {{ q }}
+      </button>
+    </div>
+  </div>
+
   <div class="chat-box">
     <div *ngFor="let msg of messages" class="message-wrapper" [ngClass]="msg.sender">
       <div class="message">

@@ -24,6 +24,8 @@ public class ReviewDTO {
     private LocalDateTime createdDate;
     private String userName;
     private List<String> imageUrls;
+    private String productName;
+
 
 
     // Nuovi campi per gli upvote

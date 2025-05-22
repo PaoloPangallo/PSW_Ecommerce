@@ -1,7 +1,4 @@
-
-
-/* Elimina eventuali margini e padding di default
-   e occupa l'intera altezza della finestra */
+/* Stile Generale Retro per Login */
 :host {
   margin: 0;
   padding: 0;
@@ -9,151 +6,172 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(120deg, #0d47a1, #1976d2);
-  font-family: 'Poppins', sans-serif;
-  position: relative; /* Per posizionare le onde */
+  background: linear-gradient(135deg, #f4e8d6, #d8cfc4);
+  font-family: 'Courier New', Courier, monospace;
+  position: relative;
 }
 
-/* Forma ondulata in alto (se desideri aggiungerla al template) */
+/* Onde Retro in Alto */
 .waves {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 250px;
-  background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 320' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23ffffff' fill-opacity='1' d='M0,224L80,208C160,192,320,160,480,160C640,160,800,192,960,208C1120,224,1280,224,1360,224L1440,224L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z'%3E%3C/path%3E%3C/svg%3E");
+  height: 200px;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1440 320' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23ffffff' fill-opacity='1' d='M0,224L80,208C160,192,320,160,480,160C640,160,800,192,960,208C1120,224,1280,224,1360,224L1440,224L1440,0L1360,0C1280,0,1120,0,960,0C800,0,640,0,480,0C320,0,160,0,80,0L0,0Z'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: 0 0;
+  opacity: 0.8;
   z-index: 1;
 }
 
-/* Card centrale */
+/* Card Login Retrò */
 .login-container {
   position: relative;
-  z-index: 2; /* Sopra le onde */
-  width: 400px;
-  background: #fff;
-  border-radius: 12px;
+  z-index: 2;
+  width: 360px;
+  background: #fffbf4;
+  border: 3px double #b08c69;
+  border-radius: 16px;
   padding: 2rem;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    inset 0 0 8px rgba(207,113,30,0.4),
+    0 8px 24px rgba(0, 0, 0, 0.2);
   text-align: center;
-  animation: slideIn 0.5s ease forwards;
+  animation: retroSlideIn 0.6s ease-out forwards;
 }
 
-/* Animazione di comparsa */
-@keyframes slideIn {
-  0% {
-    transform: translateY(-30px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
+/* Animazione Retrò Ingresso */
+@keyframes retroSlideIn {
+  from { transform: translateY(-50px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
 }
 
-/* Titolo */
+/* Titolo Login*/
 .login-container h2 {
   margin-bottom: 1.5rem;
-  color: #333;
+  color: #e67e22;
   font-size: 1.8rem;
-  font-weight: 600;
+  text-shadow:
+    0 0 6px rgba(230,126,34,0.8),
+    1px 1px 2px rgba(0,0,0,0.3);
 }
 
-/* Form */
+/* Form Retrò */
 .login-container form {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  gap: 1rem;
 }
 
 .login-container .form-group {
-  margin-bottom: 1rem;
   text-align: left;
 }
 
 .login-container label {
   display: block;
-  margin-bottom: 0.5rem;
-  color: #555;
-  font-weight: 500;
+  margin-bottom: 0.4rem;
+  color: #51331d;
+  font-weight: bold;
+  font-size: 0.95rem;
 }
 
 .login-container input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 0.7rem;
+  border: 2px solid #d8cfc4;
+  border-radius: 8px;
+  background: #fdfaf5;
   font-size: 0.95rem;
-  transition: border-color 0.3s;
-  outline: none;
+  box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .login-container input:focus {
-  border-color: #1976d2;
+  border-color: #cf711e;
+  box-shadow: 0 0 0 4px rgba(207,113,30,0.2);
+  outline: none;
 }
 
-/* Pulsante di submit */
+/* Pulsante Retrò */
 .login-container button {
-  margin-top: 0.5rem;
-  padding: 0.75rem;
-  background: #1976d2;
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background: linear-gradient(145deg, #e67e22, #cf711e);
   color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: bold;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 2px 2px 8px #bd651a, -2px -2px 8px #f08238;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .login-container button:hover {
-  background: #1565c0;
+  transform: translateY(-3px);
+  box-shadow: 4px 4px 12px #bd651a, -4px -4px 12px #f08238;
 }
 
 .login-container button:active {
-  transform: scale(0.97);
+  transform: translateY(2px);
+  box-shadow: 1px 1px 4px #bd651a, -1px -1px 4px #f08238;
 }
 
-/* Messaggi di errore e successo */
-.error {
-  color: #e74c3c;
+/* Messaggi Feedback */
+.error, .success {
   margin-top: 1rem;
-  font-weight: 500;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.error {
+  color: #c0392b;
+  animation: retroShake 0.4s ease-in-out 2;
 }
 
 .success {
   color: #27ae60;
-  margin-top: 1rem;
-  font-weight: 500;
+  animation: retroFadeIn 0.6s ease-out;
 }
 
-/* Link di navigazione */
+@keyframes retroShake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-8px); }
+  40%,80% { transform: translateX(8px); }
+}
+
+@keyframes retroFadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Link Retrò */
 .login-container p {
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: #666;
+  margin-top: 1.3rem;
+  font-size: 0.85rem;
+  color: #51331d;
 }
 
 .login-container p a {
-  color: #1976d2;
-  font-weight: 500;
+  color: #e67e22;
+  font-weight: bold;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .login-container p a:hover {
-  text-decoration: underline;
-  color: #1565c0;
-}
-.link-button {
-  background: none;
-  border: none;
-  padding: 0;
-  color: #007bff;
-  text-decoration: underline;
-  cursor: pointer;
-  font: inherit;
+  color: #cf711e;
+  text-shadow: 0 0 4px rgba(207,113,30,0.6);
 }
 
+/* Responsività Mobile */
+@media (max-width: 480px) {
+  .login-container {
+    width: 90%;
+    padding: 1.2rem;
+  }
+  .waves {
+    height: 150px;
+  }
+}

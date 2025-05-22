@@ -1,11 +1,12 @@
 package demo.demo_ecommerce.bot;
 
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
+@Service
 public class BotSessionManager {
     private final Map<Long, String> lastIntent = new HashMap<>();
     private final Map<Long, Integer> fallbackCounter = new HashMap<>();

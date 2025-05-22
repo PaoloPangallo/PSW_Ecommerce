@@ -11,6 +11,7 @@ export interface Review {
 
 
 export interface ReviewDTO {
+  productName: string;
   id: number;
   rating: number;
   comment: string;

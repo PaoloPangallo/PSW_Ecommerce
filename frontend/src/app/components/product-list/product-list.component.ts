@@ -14,7 +14,7 @@ import {LirePipe} from '../../services/lire.pipe';
   standalone: true,
   imports: [CommonModule, RouterModule, LirePipe],
   templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.css']
+  styleUrls: ['./product-list.component.scss']
 })
 export class ProductListComponent implements OnInit {
   products: Product[] = [];

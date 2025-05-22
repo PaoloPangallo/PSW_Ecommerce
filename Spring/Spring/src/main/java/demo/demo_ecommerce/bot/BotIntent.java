@@ -15,9 +15,9 @@ public class BotIntent {
     private String botResponse;
 
     private final String response;
-    private final String followUp;
+    private String followUp = "";
 
-    public BotIntent(String name, List<String> examples, String response, String followUp) {
+    public BotIntent(String name, List<String> examples, String response) {
         this.name = name;
         this.examples = examples;
         this.response = response;

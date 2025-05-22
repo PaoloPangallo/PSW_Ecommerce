@@ -1,0 +1,281 @@
+// ===============================
+// Variabili colori & font
+// ===============================
+$col-primary: #002f6c;
+$col-secondary: #d4af37;
+$col-accent: #b33900;
+$col-bg-light: #faf7f0;
+$col-bg-card: #fffef6;
+$col-text: #2c2c2c;
+$col-text-muted: #666;
+
+$font-title: 'Georgia', serif;
+$font-body: 'Open Sans', sans-serif;
+$font-mono: 'Courier New', monospace;
+
+$space-xs: 8px;
+$space-sm: 16px;
+$space-md: 24px;
+$space-lg: 40px;
+
+// ===============================
+// Container principale lista prodotti
+// ===============================
+.product-section {
+  padding: $space-lg $space-md;
+  background: $col-bg-light;
+  text-align: center;
+  font-family: $font-body;
+  color: $col-text;
+
+  h2 {
+    font-family: $font-title;
+    font-size: 2.8rem;
+    margin-bottom: $space-lg;
+    color: $col-primary;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 5px rgba($col-accent, 0.3);
+  }
+}
+
+// ===============================
+// Messaggi e caricamento
+// ===============================
+.success-message {
+  background-color: lighten($col-secondary, 45%);
+  border: 1.5px solid $col-secondary;
+  color: $col-primary;
+  font-weight: 700;
+  padding: $space-sm $space-md;
+  margin-bottom: $space-lg;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 8px rgba($col-secondary, 0.3);
+}
+
+.empty-message,
+.loading-message {
+  font-style: italic;
+  color: $col-text-muted;
+  font-size: 1.3rem;
+  margin: $space-md 0;
+}
+
+// ===============================
+// Griglia prodotti
+// ===============================
+.product-list-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-lg;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $space-md;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ===============================
+// Card singolo prodotto
+// ===============================
+.product-card {
+  background: linear-gradient(145deg, $col-bg-card 0%, lighten($col-bg-card, 8%) 100%);
+  color: $col-primary;
+  border-radius: 16px;
+  padding: $space-md;
+  box-shadow:
+    0 8px 15px rgba(0, 0, 0, 0.1),
+    inset 0 0 40px rgba($col-secondary, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+
+  &:hover {
+    transform: translateY(-7px);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.25),
+      inset 0 0 50px rgba($col-secondary, 0.1);
+  }
+
+  img {
+    width: 100%;
+    max-width: 320px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    margin-bottom: $space-sm;
+    box-shadow: 0 8px 20px rgba($col-primary, 0.15);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    cursor: zoom-in;
+
+    &:hover {
+      transform: scale(1.07);
+      box-shadow: 0 12px 28px rgba($col-accent, 0.5);
+    }
+  }
+
+  h2 {
+    font-family: $font-title;
+    font-size: 1.6rem;
+    margin-bottom: $space-xs;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.15);
+  }
+
+  .description {
+    font-size: 1rem;
+    color: $col-text-muted;
+    margin-bottom: $space-sm;
+    height: 52px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .price {
+    font-family: $font-mono;
+    font-weight: 900;
+    font-size: 1.5rem;
+    color: $col-secondary;
+    margin-bottom: $space-md;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .old-price {
+      text-decoration: line-through;
+      color: lighten($col-secondary, 50%);
+      margin-right: $space-sm;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .new-price {
+      color: $col-accent;
+      font-size: 1.5rem;
+    }
+
+    .discount-badge {
+      background-color: $col-accent;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 4px 14px;
+      border-radius: 30px;
+      margin-left: $space-sm;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      user-select: none;
+    }
+  }
+
+  .stock {
+    font-size: 1rem;
+    color: #8b5e3c; /* marrone-bruciato più intenso */
+    margin-bottom: $space-lg;
+  }
+
+
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: $space-sm;
+
+    button {
+      flex: 1;
+      padding: $space-sm 0;
+      font-family: $font-mono;
+      font-weight: 700;
+      font-size: 1rem;
+      border-radius: 50px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &.details-button {
+        background: linear-gradient(135deg, $col-secondary 0%, lighten($col-secondary, 10%) 100%);
+        color: $col-primary;
+        box-shadow: 0 8px 18px rgba($col-secondary, 0.35);
+
+        &:hover {
+          background: linear-gradient(135deg, lighten($col-secondary, 10%) 0%, $col-secondary 100%);
+          box-shadow: 0 12px 25px rgba($col-secondary, 0.5);
+          transform: scale(1.05);
+        }
+      }
+
+      &.cart-button {
+        background: linear-gradient(135deg, $col-accent 0%, lighten($col-accent, 10%) 100%);
+        color: white;
+        box-shadow: 0 8px 18px rgba($col-accent, 0.45);
+
+        &:hover {
+          background: linear-gradient(135deg, lighten($col-accent, 10%) 0%, $col-accent 100%);
+          box-shadow: 0 14px 30px rgba($col-accent, 0.6);
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+}
+
+// ===============================
+// Paginazione
+// ===============================
+.pagination-controls {
+  margin-top: $space-lg;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: $space-md;
+  font-weight: 700;
+  font-family: $font-mono;
+
+  button {
+    padding: $space-sm $space-md;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    background-color: $col-primary;
+    color: $col-secondary;
+    box-shadow: 0 5px 15px rgba($col-primary, 0.5);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+
+    &:disabled {
+      background-color: lighten($col-primary, 40%);
+      cursor: not-allowed;
+      color: lighten($col-secondary, 50%);
+      box-shadow: none;
+    }
+
+    &:not(:disabled):hover {
+      background-color: lighten($col-primary, 15%);
+      transform: scale(1.1);
+    }
+  }
+
+  span {
+    font-size: 1.2rem;
+    color: $col-primary;
+    user-select: none;
+  }
+}
+
+// ===============================
+// Animazione shimmer immagini
+// ===============================
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

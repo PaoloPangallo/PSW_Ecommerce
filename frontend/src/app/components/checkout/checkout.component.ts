@@ -23,7 +23,7 @@ import { LirePipe } from '../../services/lire.pipe';
     FormsModule
   ],
   templateUrl: './checkout.component.html',
-  styleUrls: ['./checkout.component.css']
+  styleUrls: ['./checkout.component.scss']
 })
 export class CheckoutComponent implements OnInit, OnDestroy {
 

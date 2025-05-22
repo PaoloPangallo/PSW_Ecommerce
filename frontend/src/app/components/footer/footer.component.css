@@ -1,79 +1,107 @@
+/* footer.component.css */
+
+/* Container footer retrò */
 .footer {
-  background-color: #002f6c;
-  color: #ffffff;
-  padding: 30px 20px 10px;
-  margin-top: 50px;
+  background:
+    linear-gradient(135deg, #d8cfc4, #f4e8d6),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 10 10'%3E%3Ccircle cx='5' cy='5' r='1' fill='%23ffffff22'/%3E%3C/svg%3E") repeat;
+  color: #2c3e50;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 2rem 1rem;
+  border-top: 4px double #e67e22;
+  box-shadow: inset 0 6px 10px rgba(0,0,0,0.1);
 }
 
+/* Layout colonne */
 .footer-container {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto 1.5rem;
+  gap: 2rem;
 }
 
 .footer-column {
-  flex: 1 1 250px;
+  flex: 1 1 200px;
 }
 
 .footer-column h4 {
-  font-size: 1.1rem;
-  margin-bottom: 10px;
-  color: #ffd700;
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+  color: #e67e22;
+  text-shadow: 0 0 6px rgba(230,126,34,0.7), 1px 1px 2px rgba(0,0,0,0.2);
+  position: relative;
 }
 
-.footer-column ul {
-  list-style: none;
-  padding: 0;
+.footer-column h4::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 2px;
+  background: #e67e22;
+  margin-top: 4px;
 }
 
+/* Testo e link */
+.footer-column p,
 .footer-column li {
-  margin-bottom: 5px;
+  font-size: 0.9rem;
+  margin: 0.4rem 0;
 }
 
 .footer-column a {
-  color: #ffffff;
+  color: #2c3e50;
   text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s, text-shadow 0.3s;
 }
 
 .footer-column a:hover {
-  text-decoration: underline;
+  color: #e67e22;
+  text-shadow: 0 0 4px rgba(230,126,34,0.6);
 }
 
-.footer-column input,
-.footer-column textarea {
-  width: 100%;
-  padding: 8px;
-  margin-bottom: 10px;
-  border: none;
+/* Lista link senza pallini */
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-column li {
+  margin-bottom: 0.5rem;
+}
+
+/* Link reclami evidenziato */
+.footer-column .reclami-link {
+  display: inline-block;
+  padding: 0.2rem 0.4rem;
+  background: rgba(230,126,34,0.2);
   border-radius: 4px;
+  transition: background 0.3s;
 }
 
-.footer-column button {
-  background-color: #ffd700;
-  color: #002f6c;
-  border: none;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-weight: bold;
-  border-radius: 4px;
+.footer-column .reclami-link:hover {
+  background: rgba(230,126,34,0.4);
 }
 
+/* Bottom line */
 .footer-bottom {
   text-align: center;
-  margin-top: 20px;
-  font-size: 0.9rem;
-  border-top: 1px solid #ffffff33;
-  padding-top: 10px;
+  font-size: 0.85rem;
+  border-top: 1px solid #d8cfc4;
+  padding-top: 1rem;
+  color: #555;
 }
 
-.reclami-link {
-  color: #ffd700;
-  font-weight: bold;
-  text-decoration: none;
-}
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .footer-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 
-.reclami-link:hover {
-  text-decoration: underline;
+  .footer {
+    padding: 1.5rem 1rem;
+  }
 }
-

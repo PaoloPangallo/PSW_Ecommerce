@@ -1,0 +1,82 @@
+/* user-list.component.css */
+
+/* Contenitore e sfondo retrò */
+:host {
+  display: block;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f4e8d6, #d8cfc4);
+  font-family: 'Courier New', Courier, monospace;
+  color: #2c3e50;
+}
+
+/* Titolo */
+:host > h2 {
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+/* Tabella retrò */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255,255,255,0.9);
+  border: 2px solid #d8cfc4;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Header glass */
+thead {
+  background: rgba(230,126,34,0.8);
+  backdrop-filter: blur(4px);
+}
+
+th {
+  padding: 0.8rem 1rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: left;
+  position: relative;
+}
+
+th::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 2px;
+}
+
+/* Celle */
+td {
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Righe alternate e hover */
+tbody tr:nth-child(even) {
+  background: rgba(232,224,212,0.4);
+}
+tbody tr:hover {
+  background: rgba(230,126,34,0.1);
+  transform: scale(1.01);
+  transition: background 0.3s, transform 0.2s;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  th, td {
+    padding: 0.6rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}

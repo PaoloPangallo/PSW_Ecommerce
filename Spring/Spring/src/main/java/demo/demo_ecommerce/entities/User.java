@@ -67,7 +67,10 @@ public class User implements UserDetails {
     @Column(length = 100)
     private String country;
 
+    @Column(name = "profile_image_url", nullable = true)
     private String profileImageUrl;
+
+
 
 
     public User() {

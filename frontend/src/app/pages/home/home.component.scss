@@ -1,0 +1,514 @@
+/*===============================
+= Variables e Palette Retrò       =
+===============================*/
+
+$color-primary: #002f6c;      // Blu profondo d’epoca
+$color-secondary: #ffd700;    // Oro vintage
+$color-accent: #b33900;       // Rosso Lira acceso
+$color-bg-light: #faf7f0;     // Carta ingiallita chiara
+$color-bg-dark: #f0e7d8;      // Carta più scura
+$color-text: #222;
+$color-muted: #555;
+
+$font-heading: 'Georgia', serif;
+$font-body: 'Arial', sans-serif;
+$font-mono: 'Courier New', monospace;
+
+$space-xs: 8px;
+$space-sm: 16px;
+$space-md: 32px;
+$space-lg: 56px;
+$space-xl: 80px;
+
+/*===============================
+= Global Reset e Base Styles      =
+===============================*/
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-body;
+  background: $color-bg-light url('/assets/textures/paper-grain.png') repeat;
+  color: $color-text;
+  line-height: 1.6;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/*===============================
+= Home Container                 =
+===============================*/
+
+.home-container {
+  padding: $space-lg $space-sm;
+}
+
+/*===============================
+= Hero Section                  =
+===============================*/
+
+.hero-section {
+  position: relative;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-accent 100%);
+  color: $color-primary;
+  padding: $space-xl $space-sm;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  overflow: hidden;
+
+  // Watermark simbolo lira (assoluto e leggerissimo)
+  &::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 180px;
+    height: 180px;
+    background: url('/assets/icons/lira-symbol.svg') center/contain no-repeat;
+    opacity: 0.07;
+    transform: rotate(35deg);
+    pointer-events: none;
+  }
+
+  h1 {
+    font-family: $font-heading;
+    font-size: 3.2rem;
+    margin-bottom: $space-sm;
+    text-transform: uppercase;
+    text-shadow:
+      2px 2px 4px rgba(0, 0, 0, 0.15),
+      -2px -2px 4px rgba(255, 215, 0, 0.8);
+  }
+
+  p {
+    font-size: 1.3rem;
+    font-style: italic;
+    margin-bottom: $space-md;
+  }
+
+  .hero-button {
+    background-color: $color-primary;
+    color: $color-secondary;
+    font-weight: 700;
+    font-family: $font-mono;
+    padding: $space-sm $space-lg;
+    border: 3px dashed $color-secondary;
+    border-radius: 50px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background-color: $color-accent;
+      color: #fff;
+      transform: scale(1.1) translateY(-2px);
+      border-color: transparent;
+      box-shadow: 0 6px 12px rgba(255, 215, 0, 0.7);
+    }
+  }
+}
+
+/*===============================
+= Promo Video Section           =
+===============================*/
+
+.promo-video {
+  margin: $space-xl 0;
+  text-align: center;
+
+  .promo-video-wrapper {
+    position: relative;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .promo-video-element {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  }
+
+  .replay-button {
+    position: absolute;
+    bottom: $space-md;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: $color-primary;
+    color: $color-secondary;
+    border: none;
+    padding: $space-sm $space-lg;
+    border-radius: 8px;
+    font-family: $font-mono;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    transition: background-color 0.3s ease;
+
+    &:hover {
+      background-color: $color-accent;
+    }
+  }
+}
+
+/*===============================
+= Promo Carousel                =
+===============================*/
+
+.promo-carousel {
+  position: relative;
+  margin: $space-md 0;
+  border-radius: 10px;
+  box-shadow: 0 5px 18px rgba(0,0,0,0.15);
+  overflow: hidden;
+
+  .carousel-slide {
+    position: relative;
+    animation: fadeIn 4s ease-in-out infinite;
+  }
+
+  img {
+    width: 100%;
+    border-radius: 10px;
+    display: block;
+  }
+
+  .slide-caption {
+    position: absolute;
+    bottom: 15%;
+    left: 5%;
+    background-color: rgba(0, 0, 0, 0.55);
+    padding: $space-sm $space-md;
+    border-radius: 8px;
+    color: $color-secondary;
+
+    h3 {
+      font-size: 1.8rem;
+      margin-bottom: $space-xs;
+      font-weight: 700;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.4);
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin: 0;
+      font-style: italic;
+    }
+  }
+}
+
+@keyframes fadeIn {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/*===============================
+= Categories Highlight          =
+===============================*/
+
+.categories-highlight {
+  margin: $space-xl 0;
+  text-align: center;
+
+  .section-title {
+    font-family: $font-heading;
+    font-size: 2.2rem;
+    color: $color-primary;
+    margin-bottom: $space-md;
+    position: relative;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background-color: $color-accent;
+      margin: $space-xs auto 0;
+      border-radius: 2px;
+      box-shadow: 0 2px 6px rgba($color-accent, 0.5);
+    }
+  }
+
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: $space-md;
+    justify-items: center;
+  }
+
+  .category-box {
+    background-color: #fff;
+    border: 2px solid $color-accent;
+    border-radius: 12px;
+    padding: $space-md;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 8px 18px rgba(179, 57, 0, 0.35);
+      transform: translateY(-6px);
+      border-color: $color-primary;
+    }
+
+    img {
+      width: 80px;
+      height: auto;
+      margin-bottom: $space-sm;
+      filter: drop-shadow(1px 1px 2px rgba(0,0,0,0.1));
+    }
+
+    h3 {
+      font-family: $font-body;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: $color-primary;
+    }
+  }
+}
+
+/*===============================
+= Perché Sceglierci Section     =
+===============================*/
+
+.why-choose-us {
+  background-color: $color-bg-dark;
+  padding: $space-xl 0;
+  text-align: center;
+
+  .why-title {
+    font-family: $font-heading;
+    font-size: 2.4rem;
+    color: $color-primary;
+    margin-bottom: $space-lg;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: $space-lg;
+    justify-items: center;
+  }
+
+  .why-card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    max-width: 320px;
+
+    &:hover {
+      box-shadow: 0 14px 35px rgba(0,0,0,0.2);
+      transform: translateY(-6px);
+    }
+
+    .why-card-image {
+      height: 220px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+      }
+    }
+
+    &:hover .why-card-image img {
+      transform: scale(1.05);
+    }
+
+    .why-card-content {
+      padding: $space-md;
+      text-align: left;
+
+      h3 {
+        font-family: $font-heading;
+        font-size: 1.6rem;
+        margin-bottom: $space-sm;
+        color: $color-primary;
+      }
+
+      p {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: $color-muted;
+      }
+    }
+  }
+}
+
+/*===============================
+= Prodotti in Evidenza & Lista    =
+===============================*/
+
+.featured-section,
+.products-section {
+  padding: $space-xl 0;
+  text-align: center;
+
+  h2 {
+    font-family: $font-heading;
+    font-size: 2rem;
+    color: $color-primary;
+    margin-bottom: $space-lg;
+  }
+}
+
+.featured-grid,
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $space-lg;
+  justify-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.featured-card,
+.product-card {
+  background-color: $color-primary;
+  color: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  transition: transform 0.3s ease;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 18px 40px rgba(0,0,0,0.4);
+  }
+
+  img {
+    width: 100%;
+    object-fit: cover;
+    border-bottom: 4px solid $color-secondary;
+  }
+
+  h3 {
+    font-family: $font-heading;
+    font-size: 1.5rem;
+    margin: $space-sm 0;
+  }
+
+  .price {
+    font-family: $font-mono;
+    font-size: 1.1rem;
+    color: $color-secondary;
+    font-weight: 700;
+    margin-bottom: $space-md;
+  }
+
+  .details-button {
+    align-self: center;
+    margin-bottom: $space-md;
+    background: $color-secondary;
+    color: $color-primary;
+    border: none;
+    padding: $space-sm $space-lg;
+    border-radius: 50px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: $font-mono;
+    font-size: 1rem;
+    transition: transform 0.3s ease, background 0.3s ease;
+
+    &:hover {
+      background: lighten($color-secondary, 15%);
+      transform: scale(1.05);
+    }
+  }
+}
+
+/*===============================
+= Bottoni assistenza e chat       =
+===============================*/
+
+.help-button {
+  position: fixed;
+  bottom: $space-md;
+  right: $space-md;
+  background: $color-secondary;
+  color: $color-primary;
+  border-radius: 50px;
+  padding: $space-sm $space-lg;
+  font-family: $font-mono;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  cursor: pointer;
+  border: 2px solid $color-primary;
+  z-index: 1100;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: $color-primary;
+    color: $color-secondary;
+  }
+}
+
+.chat-panel {
+  position: fixed;
+  bottom: calc(#{$space-md} * 4);
+  right: $space-md;
+  width: 360px;
+  height: 480px;
+  background: $color-bg-light;
+  border-radius: 16px;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.3);
+  border: 1px solid $color-primary;
+  overflow: hidden;
+  z-index: 1110;
+}
+
+/*===============================
+= Responsive                     =
+===============================*/
+
+@media (max-width: 992px) {
+  .hero-section h1 {
+    font-size: 2.6rem;
+  }
+  .featured-grid,
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .hero-section h1 {
+    font-size: 2rem;
+  }
+  .hero-section p {
+    font-size: 1rem;
+  }
+  .hero-button {
+    width: 100%;
+    padding: 1rem 0;
+  }
+  .categories-grid,
+  .featured-grid,
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+}

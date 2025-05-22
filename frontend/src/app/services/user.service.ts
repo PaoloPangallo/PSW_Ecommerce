@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, throwError } from 'rxjs';
 import {User, UserProfileSummary} from '../models/user.model';
+import {ReviewDTO} from '../models/review.models';
 
 @Injectable({
   providedIn: 'root'
@@ -59,6 +60,13 @@ export class UserService {
 
   removeProfileImage(userId: number) {
     return this.http.put<void>(`http://localhost:8080/api/users/${userId}/remove-image`, {});
+  }
+
+
+  getUserReviews(userId: number, page: number = 0, size: number = 5) {
+    return this.http.get<{ content: ReviewDTO[], last: boolean }>(
+      `http://localhost:8080/api/users/${userId}/reviews?page=${page}&size=${size}&sort=createdDate,desc`
+    );
   }
 
 }

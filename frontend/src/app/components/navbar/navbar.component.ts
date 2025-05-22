@@ -12,7 +12,7 @@ import { NgOptimizedImage } from '@angular/common';
   selector: 'app-navbar',
   standalone: true,
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'],
+  styleUrls: ['./navbar.component.scss'],
   imports: [RouterModule, CommonModule, ReactiveFormsModule, NgOptimizedImage]
 })
 export class NavbarComponent {

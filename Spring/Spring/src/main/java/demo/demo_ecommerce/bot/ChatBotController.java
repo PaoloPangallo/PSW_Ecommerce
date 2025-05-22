@@ -20,8 +20,8 @@ public class ChatBotController {
     // 1. Endpoint principale: invia messaggio e ricevi risposta dal bot
     @PostMapping("/message")
     public ResponseEntity<String> handleMessage(@RequestParam Long userId, @RequestBody String userMessage) {
-        String sessionId = "user-" + userId; // costruzione semplice sessione
-        String response = smartBotService.getBotResponse(sessionId, userMessage);
+        String sessionId = "user-" + userId;
+        String response = smartBotService.getBotResponse(userId, sessionId, userMessage);
 
         // 🔄 Salva log (opzionale, attiva se ChatLog è configurato)
         ChatLog log = new ChatLog();

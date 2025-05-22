@@ -1,9 +1,6 @@
 package demo.demo_ecommerce.Controllers;
 
-import demo.demo_ecommerce.dtos.UpdateUserDTO;
-import demo.demo_ecommerce.dtos.UserDTO;
-import demo.demo_ecommerce.dtos.UserProfileSummaryDTO;
-import demo.demo_ecommerce.dtos.UserResponseDTO;
+import demo.demo_ecommerce.dtos.*;
 import demo.demo_ecommerce.entities.Role;
 import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.services.UsersService;
@@ -13,6 +10,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -117,13 +116,30 @@ public class UsersController {
     public ResponseEntity<String> uploadProfileImage(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         String imageUrl = usersService.uploadProfileImage(id, file);
         return ResponseEntity.ok(imageUrl);
+
+    }
+    @PutMapping("/{id}/remove-image")
+    public ResponseEntity<Void> removeProfileImage(@PathVariable Long id) {
+        try {
+            usersService.removeProfileImage(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    @PutMapping("/users/{id}/remove-image")
-    public ResponseEntity<Void> removeProfileImage(@PathVariable Long id) {
-        usersService.removeProfileImage(id);
-        return ResponseEntity.ok().build();
+
+
+    @GetMapping("/{id}/reviews")
+    public Page<ReviewDTO> getUserReviews(
+            @PathVariable Long id,
+            @PageableDefault(size = 5, sort = "createdDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        return usersService.getUserReviews(id, pageable);
     }
+
+
+
 
 
 

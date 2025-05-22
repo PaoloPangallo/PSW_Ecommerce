@@ -1,77 +1,179 @@
+/* reclami.component.css */
+
+/* Sfondo retrò con texture a pois e gradient */
+:host {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  background:
+    linear-gradient(135deg, #f4e8d6, #d8cfc4),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 10 10'%3E%3Ccircle cx='5' cy='5' r='1' fill='%23ffffff22'/%3E%3C/svg%3E") repeat;
+  font-family: 'Courier New', Courier, monospace;
+  color: #2c3e50;
+}
+
+/* Wrapper retrò con cornice e ombra profonda */
 .reclami-wrapper {
-  max-width: 700px;
-  margin: 40px auto;
-  padding: 32px;
-  background: #ffffff;
+  width: 100%;
+  max-width: 520px;
+  background: rgba(255, 251, 244, 0.95);
+  border: 3px double #d8cfc4;
   border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Effetto lampo retrò sulle edges */
+.reclami-wrapper::before,
+.reclami-wrapper::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, rgba(230,126,34,0.8), transparent);
+  top: 0;
+  animation: edgeGlow 2s infinite;
+}
+.reclami-wrapper::after {
+  bottom: 0;
+  top: auto;
+  animation-delay: 1s;
+}
+
+@keyframes edgeGlow {
+  0%,100% { transform: translateX(-100%); }
+  50%     { transform: translateX(100%); }
+}
+
+/* Titolo “glass” con neon glow */
 .reclami-title {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #0d3c84;
-  margin-bottom: 24px;
+  margin: 0 0 2rem;
+  font-size: 2.2rem;
   text-align: center;
+  color: #e67e22;
+  text-shadow:
+    0 0 6px rgba(230,126,34,0.8),
+    0 0 12px rgba(230,126,34,0.6),
+    1px 1px 2px rgba(0,0,0,0.3);
+  position: relative;
 }
 
-.reclami-form {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-label {
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: #343a40;
-}
-
-select,
-textarea {
-  border: 1px solid #ced4da;
-  border-radius: 10px;
-  padding: 12px 16px;
-  font-size: 1rem;
-  resize: none;
-  transition: border 0.3s;
-}
-
-select:focus,
-textarea:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
+/* Pulsante fluttuante */
 .reclami-button {
-  align-self: flex-end;
-  background: linear-gradient(135deg, #0d6efd, #6610f2);
+  align-self: center;
+  background: linear-gradient(145deg, #e67e22, #cf711e);
   color: #fff;
-  font-weight: 600;
-  padding: 12px 24px;
   border: none;
-  border-radius: 12px;
+  border-radius: 50px;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.2),
+    inset 0 -2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.reclami-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -50%;
+  width: 50%;
+  height: 200%;
+  background: rgba(255,255,255,0.3);
+  transform: skewX(-25deg) translateX(0);
+  transition: transform 0.7s ease-in-out;
+}
+
+.reclami-button:hover::before {
+  transform: skewX(-25deg) translateX(200%);
 }
 
 .reclami-button:hover {
-  background: linear-gradient(135deg, #0056b3, #20c997);
-  transform: translateY(-1px);
+  transform: translateY(-4px);
+  box-shadow:
+    0 6px 14px rgba(0,0,0,0.25),
+    inset 0 -2px 6px rgba(0,0,0,0.1);
 }
 
+.reclami-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.reclami-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Form-group retrò con bordi accentuati */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.form-group label {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #2c3e50;
+}
+
+.form-group select,
+.form-group textarea {
+  padding: 0.8rem;
+  border: 3px solid #d8cfc4;
+  border-radius: 10px;
+  background: #fdfaf5;
+  font-size: 1rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  outline: none;
+  resize: vertical;
+}
+
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #e67e22;
+  box-shadow: 0 0 0 6px rgba(230,126,34,0.2);
+}
+
+/* Success message retrò */
 .success-message {
-  margin-top: 24px;
-  padding: 16px;
-  background-color: #d1e7dd;
-  color: #0f5132;
-  border-left: 4px solid #0f5132;
-  border-radius: 8px;
-  font-weight: 500;
+  margin-top: 2rem;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  color: #27ae60;
+  text-shadow: 0 0 6px rgba(39,174,96,0.6);
+  animation: retroShake 0.5s ease-in-out 1;
+}
+
+/* Animazione shake retrò */
+@keyframes retroShake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-8px); }
+  40%,80% { transform: translateX(8px); }
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  .reclami-wrapper {
+    padding: 1.5rem;
+  }
+  .reclami-title {
+    font-size: 1.8rem;
+  }
+  .reclami-button {
+    width: 100%;
+    padding: 0.8rem;
+  }
 }

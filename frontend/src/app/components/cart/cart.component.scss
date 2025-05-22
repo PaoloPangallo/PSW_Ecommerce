@@ -1,0 +1,397 @@
+@import '../../../styles/variables';
+
+
+
+// ===============================
+// Variabili colori e font
+// ===============================
+$col-primary: #002f6c;         // Blu Unilire
+$col-secondary: #d4af37;       // Oro retrò
+$col-accent: #b33900;          // Rosso vintage
+$col-bg: #fffef6;              // Sfondo leggermente crema
+$col-text-dark: #2e2e2e;
+$col-text-muted: #666666;
+
+$font-title: 'Georgia', serif;
+$font-body: 'Open Sans', sans-serif;
+
+$space-xs: 8px;
+$space-sm: 16px;
+$space-md: 24px;
+$space-lg: 40px;
+
+// ===============================
+// Contenitore principale carrello
+// ===============================
+.cart-wrapper {
+  margin: $space-lg auto;
+  max-width: 1200px;
+  padding: $space-md;
+  background: $col-bg;
+  border-radius: 12px;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.1),
+    inset 0 0 30px rgba($col-secondary, 0.1);
+  font-family: $font-body;
+  color: $col-text-dark;
+}
+
+// ===============================
+// Titolo del carrello
+// ===============================
+.mat-card-title {
+  font-family: $font-title;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: $col-primary;
+  text-align: center;
+  margin-bottom: $space-lg;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 1px 1px 3px rgba($col-accent, 0.3);
+}
+
+// ===============================
+// Stile tabella principale
+// ===============================
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  margin-bottom: $space-lg;
+
+  th.mat-header-cell,
+  td.mat-cell {
+    padding: $space-sm $space-md;
+    text-align: center;
+    vertical-align: middle;
+    background: $col-bg;
+    border-radius: 8px;
+  }
+
+  th.mat-header-cell {
+    background-color: lighten($col-primary, 40%);
+    color: darken($col-primary, 10%);
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: none;
+    box-shadow: inset 0 -4px 8px rgba($col-secondary, 0.15);
+  }
+
+  td.mat-cell {
+    font-size: 1rem;
+    color: $col-text-dark;
+    border: none;
+    box-shadow:
+      0 4px 8px rgba(0,0,0,0.05);
+  }
+}
+
+// ===============================
+// Prezzi e sconti
+// ===============================
+.old-price {
+  color: darken($col-secondary, 30%);
+  text-decoration: line-through;
+  margin-right: $space-xs;
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: $font-body;
+}
+
+.new-price {
+  color: $col-accent;
+  font-weight: 700;
+  font-size: 1.2rem;
+  font-family: $font-body;
+}
+
+.discount-badge {
+  background: linear-gradient(135deg, $col-accent 0%, darken($col-accent, 10%) 100%);
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 4px 12px;
+  border-radius: 30px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+  user-select: none;
+  margin-left: $space-sm;
+  vertical-align: middle;
+}
+
+// ===============================
+// Input coupon
+// ===============================
+input {
+  padding: $space-xs $space-sm;
+  border: 2px solid lighten($col-primary, 40%);
+  border-radius: 8px;
+  font-size: 1rem;
+  width: 140px;
+  text-align: center;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    border-color: $col-accent;
+    outline: none;
+    box-shadow: 0 0 8px rgba($col-accent, 0.6);
+  }
+}
+
+// ===============================
+// Pulsanti base
+// ===============================
+button {
+  padding: $space-xs $space-md;
+  font-weight: 700;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  font-family: $font-body;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+
+  &.mat-button, &.mat-raised-button {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  &:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.2);
+  }
+}
+
+// ===============================
+// Pulsanti specifici
+// ===============================
+.clear-btn-container {
+  text-align: right;
+  margin-top: $space-md;
+
+  button {
+    background: linear-gradient(135deg, darken($col-secondary, 10%) 0%, $col-secondary 100%);
+    color: $col-primary;
+    box-shadow: 0 5px 12px rgba($col-secondary, 0.5);
+
+    &:hover {
+      background: linear-gradient(135deg, $col-secondary 0%, darken($col-secondary, 10%) 100%);
+      color: $col-bg;
+      box-shadow: 0 10px 24px rgba($col-secondary, 0.75);
+    }
+  }
+}
+
+.cart-summary {
+  margin: $space-lg;
+  display: flex;
+  justify-content: flex-end;
+
+  button {
+    background: linear-gradient(135deg, $col-primary 0%, darken($col-primary, 10%) 100%);
+    color: $col-secondary;
+    box-shadow: 0 5px 18px rgba($col-primary, 0.6);
+
+    &:hover {
+      background: linear-gradient(135deg, darken($col-primary, 10%) 0%, $col-primary 100%);
+      color: $col-bg;
+      box-shadow: 0 12px 30px rgba($col-primary, 0.85);
+    }
+  }
+}
+
+// ===============================
+// Link salvati per dopo
+// ===============================
+.saved-link {
+  margin: $space-md 0;
+  text-align: right;
+
+  a {
+    font-weight: 700;
+    font-family: $font-body;
+    color: $col-primary;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: $col-accent;
+      text-decoration: none;
+    }
+  }
+}
+
+// ===============================
+// Sezione Prodotti Salvati per Dopo
+// ===============================
+.saved-container {
+  margin-top: $space-lg;
+  padding: $space-md;
+  background: lighten($col-primary, 90%);
+  border-radius: 16px;
+  box-shadow: inset 0 0 50px rgba($col-secondary, 0.05);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: $space-lg;
+  color: $col-primary;
+
+  mat-icon {
+    margin-right: 12px;
+    font-size: 2rem;
+    color: $col-accent;
+  }
+}
+
+.saved-card {
+  margin-bottom: $space-lg;
+
+  mat-card {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 8px 15px rgba(0,0,0,0.07),
+      inset 0 0 20px rgba($col-secondary, 0.1);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      box-shadow:
+        0 12px 28px rgba(0,0,0,0.15),
+        inset 0 0 30px rgba($col-secondary, 0.2);
+      transform: translateY(-5px);
+    }
+
+    mat-card-header {
+      .product-avatar {
+        background-color: lighten($col-primary, 70%);
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        width: 56px;
+        height: 56px;
+      }
+
+      mat-card-title {
+        font-family: $font-title;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: $col-primary;
+      }
+
+      mat-card-subtitle {
+        font-size: 1rem;
+        color: $col-text-muted;
+      }
+    }
+
+    mat-card-content {
+      p.price {
+        font-family: $font-mono;
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: $col-accent;
+
+        .old-price {
+          text-decoration: line-through;
+          color: darken($col-accent, 25%);
+          margin-right: $space-xs;
+          font-weight: 500;
+          font-size: 1rem;
+        }
+
+        .discount-badge {
+          background: $col-accent;
+          color: white;
+          font-weight: 700;
+          padding: 4px 14px;
+          border-radius: 30px;
+          margin-left: $space-sm;
+          user-select: none;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+      }
+    }
+
+    mat-card-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: $space-md;
+      padding: $space-md;
+
+      button {
+        font-weight: 700;
+        border-radius: 50px;
+        padding: $space-sm $space-md;
+        font-family: $font-body;
+        font-size: 1rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+          transform: scale(1.05);
+        }
+      }
+
+      button[color="warn"] {
+        background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+        color: white;
+      }
+      button[color="primary"] {
+        background: linear-gradient(135deg, $col-primary 0%, darken($col-primary, 15%) 100%);
+        color: $col-secondary;
+      }
+    }
+  }
+}
+
+// ===============================
+// Carrello vuoto fallback
+// ===============================
+.cart-wrapper p {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: $col-text-muted;
+  text-align: center;
+  padding: $space-lg 0;
+}
+
+// ===============================
+// Responsività
+// ===============================
+@media (max-width: 992px) {
+  .product-card img {
+    max-width: 120px;
+    height: auto;
+  }
+}
+
+@media (max-width: 576px) {
+  .product-card,
+  .saved-card mat-card {
+    flex-direction: column;
+    padding: $space-sm;
+  }
+
+  table {
+    font-size: 0.9rem;
+
+    th.mat-header-cell,
+    td.mat-cell {
+      padding: 6px 4px;
+    }
+  }
+
+  .cart-summary,
+  .clear-btn-container {
+    justify-content: center !important;
+    margin: $space-sm 0 !important;
+  }
+}

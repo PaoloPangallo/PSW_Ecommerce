@@ -1,55 +1,174 @@
-.saved-container {
-  padding: 24px;
-  max-width: 900px;
-  margin: auto;
+/* saved-items.component.css */
+
+/* Sfondo retrò con pattern leggero */
+:host {
+  display: block;
+  padding: 2rem;
+  background:
+    linear-gradient(135deg, #f4e8d6, #d8cfc4) fixed,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 10 10'%3E%3Ccircle cx='5' cy='5' r='1' fill='%23ffffff11'/%3E%3C/svg%3E") repeat;
+  font-family: 'Courier New', Courier, monospace;
+  color: #2c3e50;
 }
 
-h2 {
+/* Titolo con neon glow */
+.saved-container > h2 {
+  font-size: 2rem;
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 2rem;
+  color: #e67e22;
+  text-shadow:
+    0 0 8px rgba(230,126,34,0.9),
+    0 0 16px rgba(230,126,34,0.6),
+    1px 1px 2px rgba(0,0,0,0.3);
 }
 
+/* Messaggio vuoto retrò */
 .empty-message {
   text-align: center;
-  font-style: italic;
-  color: #777;
-  margin-top: 20px;
+  font-size: 1rem;
+  color: #555;
+  padding: 2rem 0;
+  border: 2px dashed #d8cfc4;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.7);
+  animation: pulse 2s infinite;
 }
 
+@keyframes pulse {
+  0%,100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Card singolo prodotto salvato */
 .saved-card {
+  background: rgba(255,255,255,0.95);
+  border: 3px double #d8cfc4;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 16px 24px;
-  margin-bottom: 20px;
-  background-color: #fafafa;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease;
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .saved-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-6px);
+  box-shadow:
+    0 12px 36px rgba(0,0,0,0.3),
+    inset 0 0 8px rgba(230,126,34,0.4);
 }
 
-.product-info {
-  flex: 1;
-}
-
+/* Info prodotto */
 .product-info h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.2em;
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
 .product-info p {
-  margin: 4px 0;
-  color: #555;
+  margin: 0.2rem 0;
+  font-size: 0.95rem;
 }
 
+/* Azioni bottone retrò */
 .actions {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 0.8rem;
+}
+
+.actions button {
+  font-family: inherit;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 50px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.2),
+    inset 0 -2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Sposta nel carrello */
+.actions button:first-child {
+  background: linear-gradient(145deg, #27ae60, #1e8449);
+  color: #fff;
+}
+
+.actions button:first-child::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -50%;
+  width: 50%;
+  height: 200%;
+  background: rgba(255,255,255,0.3);
+  transform: skewX(-25deg) translateX(0);
+  transition: transform 0.7s ease-in-out;
+}
+
+.actions button:first-child:hover::before {
+  transform: skewX(-25deg) translateX(200%);
+}
+
+.actions button:first-child:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.25),
+    inset 0 -2px 6px rgba(0,0,0,0.1);
+}
+
+.actions button:first-child:active {
+  transform: translateY(2px);
+}
+
+/* Rimuovi */
+.actions button:last-child {
+  background: linear-gradient(145deg, #c0392b, #922b21);
+  color: #fff;
+}
+
+.actions button:last-child::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -50%;
+  width: 50%;
+  height: 200%;
+  background: rgba(255,255,255,0.3);
+  transform: skewX(-25deg) translateX(0);
+  transition: transform 0.7s ease-in-out;
+}
+
+.actions button:last-child:hover::before {
+  transform: skewX(-25deg) translateX(200%);
+}
+
+.actions button:last-child:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    0 6px 16px rgba(0,0,0,0.25),
+    inset 0 -2px 6px rgba(0,0,0,0.1);
+}
+
+.actions button:last-child:active {
+  transform: translateY(2px);
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .saved-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .actions {
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: flex-start;
+  }
 }

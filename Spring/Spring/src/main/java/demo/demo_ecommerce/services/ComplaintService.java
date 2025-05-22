@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,14 +50,6 @@ public class ComplaintService {
         msgRepo.save(first);
     }
 
-    public Complaint submitComplaint(Complaint complaint) {
-        return complaintRepository.save(complaint);
-    }
-
-
-    public Complaint createComplaint(Complaint complaint) {
-        return complaintRepository.save(complaint);
-    }
 
     public List<Complaint> getComplaintsByEmail(String email) {
         return complaintRepository.findByEmail(email);
@@ -66,10 +57,6 @@ public class ComplaintService {
 
     public List<Complaint> getAllComplaints() {
         return complaintRepository.findAll();
-    }
-
-    public Optional<Complaint> getComplaintById(Long id) {
-        return complaintRepository.findById(id);
     }
 
     public ComplaintMessage addMessage(Long complaintId, ComplaintMessage message) {

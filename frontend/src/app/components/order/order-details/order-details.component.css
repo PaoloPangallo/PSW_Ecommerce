@@ -1,0 +1,147 @@
+/* order-details.component.css */
+
+/* Contenitore principale e font retrò */
+:host {
+  display: block;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f4e8d6, #d8cfc4);
+  font-family: 'Courier New', Courier, monospace;
+  color: #2c3e50;
+}
+
+/* Card principale */
+.order-details-card {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #fffbf4;
+  border: 2px solid #d8cfc4;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.order-details-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0,0,0,0.2);
+}
+
+/* Header card con effetto glass */
+.order-details-card ::ng-deep .mat-card-header {
+  background: rgba(230, 126, 34, 0.8);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  padding: 0.8rem 1rem;
+  border-bottom: 2px solid #d8cfc4;
+}
+
+.order-details-card ::ng-deep .mat-card-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.order-details-card ::ng-deep .mat-card-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Contenuto card */
+.order-details-card ::ng-deep .mat-card-content {
+  padding: 1rem;
+}
+
+.order-details-card p {
+  margin: 0.6rem 0;
+  font-size: 0.95rem;
+}
+
+.order-details-card h3 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+  border-bottom: 1px dashed #d8cfc4;
+  padding-bottom: 0.3rem;
+}
+
+/* Lista prodotti */
+.order-details-card ::ng-deep .mat-list-item {
+  background: #fdfaf5;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  transition: background 0.3s;
+}
+
+.order-details-card ::ng-deep .mat-list-item:hover {
+  background: rgba(230,126,34,0.1);
+}
+
+/* Azioni */
+.order-details-card ::ng-deep .mat-card-actions {
+  padding: 0.8rem 1rem;
+  text-align: right;
+}
+
+.order-details-card ::ng-deep .mat-button {
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: bold;
+  background: linear-gradient(145deg, #e67e22, #cf711e);
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  box-shadow: 2px 2px 5px #bd651a, -2px -2px 5px #f08238;
+  text-transform: uppercase;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.order-details-card ::ng-deep .mat-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 8px #bd651a, -4px -4px 8px #f08238;
+}
+
+.order-details-card ::ng-deep .mat-button:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 3px #bd651a, -1px -1px 3px #f08238;
+}
+
+/* Loading container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+  color: #2c3e50;
+  font-size: 1rem;
+}
+
+/* Error message */
+.error-message {
+  margin-top: 1rem;
+  text-align: center;
+  color: #c0392b;
+  font-weight: bold;
+  animation: shake 0.3s ease-in-out 2;
+}
+
+/* Shake animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .order-details-card {
+    margin: 1rem;
+  }
+  .order-details-card ::ng-deep .mat-card-header,
+  .order-details-card ::ng-deep .mat-card-content,
+  .order-details-card ::ng-deep .mat-card-actions {
+    padding: 0.6rem;
+  }
+}

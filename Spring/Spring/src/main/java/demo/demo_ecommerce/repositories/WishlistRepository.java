@@ -23,6 +23,10 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
 
 
 
+
+
+
+
     // Verifica se una wishlist esiste per un determinato utente
     boolean existsByUserId(Long userId);
 

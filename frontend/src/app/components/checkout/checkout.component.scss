@@ -1,0 +1,312 @@
+/* ========================================================================
+   Checkout Component Styles (stand-alone SCSS)
+   ======================================================================== */
+
+/* -------------------------------
+   Container Principale
+   ------------------------------- */
+.checkout-container {
+  max-width: 800px;
+  margin: 2.5rem auto;
+  padding: 2rem;
+  background: #fffef6;              /* Carta vintage */
+  border-radius: 12px;
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.1),
+    inset 0 0 40px rgba(212, 175, 55, 0.05);
+  font-family: "Open Sans", sans-serif;
+  color: #2e2e2e;
+
+  h2 {
+    font-family: "Georgia", serif;
+    font-size: 2.8rem;
+    color: #002f6c;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 1px 1px 3px rgba(179, 57, 0, 0.3);
+  }
+}
+
+/* -------------------------------
+   Step Comune (box + titolo)
+   ------------------------------- */
+.checkout-step {
+  background: linear-gradient(145deg, #faf7f0 0%, #fdfbf8 100%);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  border-left: 5px solid #002f6c;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  }
+
+  h3 {
+    margin: 0 0 1rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #b33900;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+  }
+}
+
+/* ==============================
+   STEP 1: Riepilogo Carrello
+   ============================== */
+.step1 .cart-summary {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.cart-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .item-name {
+      font-weight: 500;
+      color: #555;
+    }
+
+    .item-price {
+      font-weight: 600;
+      color: #2e2e2e;
+    }
+  }
+}
+
+.cart-total {
+  text-align: right;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2e2e2e;
+}
+
+/* -------------------------------
+   Discount Badge (lista carrello)
+   ------------------------------- */
+.discount-badge {
+  background: #b33900;
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  margin-left: 0.5rem;
+  font-weight: 600;
+}
+
+/* -------------------------------
+   Pulsante "Procedi al Checkout"
+   (usato in STEP1)
+   ------------------------------- */
+.step1 .next-button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.75rem;
+  background: #ff9800;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+
+  &:hover {
+    background: #fb8c00;
+    transform: translateY(-1px);
+  }
+}
+
+/* ==============================
+   STEP 2 & STEP 3: Form
+   ============================== */
+.checkout-container {
+  label {
+    display: block;
+    margin-top: 1rem;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+    color: #444;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #f9f9f9;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #002f6c;
+      box-shadow: 0 0 8px rgba(0, 47, 108, 0.3);
+    }
+  }
+
+  .error {
+    color: #e53935;
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+  }
+}
+
+/* -------------------------------
+   Pulsanti "Indietro" / "Avanti"
+   ------------------------------- */
+.btn-group {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+
+  button {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+
+    &.back-button {
+      background: #1976d2;
+      &:hover {
+        background: #1565c0;
+        transform: translateY(-1px);
+      }
+    }
+
+    &.next-button,
+    &.submit-button {
+      background: #ff9800;
+      &:hover {
+        background: #fb8c00;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+/* ==============================
+   STEP 4: Riepilogo Ordine
+   ============================== */
+.address-summary {
+  background: #f5f9ff;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  border-left: 4px solid #1976d2;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+
+  p {
+    margin: 0.25rem 0;
+    color: #444;
+    font-size: 0.95rem;
+
+    strong {
+      color: #1976d2;
+      font-weight: 600;
+    }
+  }
+}
+
+/* -------------------------------
+   Pulsante "Conferma" + Spinner
+   ------------------------------- */
+.submit-button {
+  position: relative;
+
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 0.5rem;
+    border: 2px solid #fff;
+    border-top: 2px solid #333;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    vertical-align: middle;
+  }
+}
+
+@keyframes spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* -------------------------------
+   Messaggio Successo / Errore
+   ------------------------------- */
+.order-error {
+  background: #ffe6e6;
+  border: 1px solid #e53935;
+  color: #e53935;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+/* -------------------------------
+   Media Queries (Mobile)
+   ------------------------------- */
+@media (max-width: 600px) {
+  .checkout-container {
+    padding: 1rem;
+
+    h2 {
+      font-size: 2.4rem;
+    }
+  }
+
+  .checkout-step {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-group {
+    flex-direction: column;
+
+    button {
+      width: 100% !important;
+    }
+  }
+
+  .cart-items li {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .item-price {
+      margin-top: 0.5rem;
+    }
+  }
+}

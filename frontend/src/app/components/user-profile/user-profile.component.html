@@ -5,22 +5,18 @@
     <!-- FOTO PROFILO -->
     <div class="profile-image-container">
       <img
-        [src]="previewUrl || user?.profileImageUrl || 'assets/default-avatar.png'"
-        alt="Foto profilo"
+        [src]="previewUrl || user?.profileImageUrl || '/assets/icons/default-avatar.svg'"
         class="profile-image"
+        alt="Foto profilo"
       />
-
       <div class="image-actions">
         <label for="fileInput" class="upload-btn">📷 Cambia foto</label>
         <input id="fileInput" type="file" (change)="onImageSelected($event)" hidden />
-
         <button type="button" class="remove-btn" (click)="removeProfileImage()">🗑️ Rimuovi foto</button>
       </div>
     </div>
 
-
-
-    <!-- ✅ FORM CORRETTAMENTE APERTA -->
+    <!-- FORM PROFILO -->
     <form (ngSubmit)="updateProfile()" #profileForm="ngForm">
       <div class="form-group">
         <label for="username">Username:</label>
@@ -109,9 +105,15 @@
         />
       </div>
 
-      <button type="submit" [disabled]="profileForm.invalid">
-        Aggiorna Profilo
-      </button>
+      <dialog #confirmDialog class="confirm-dialog">
+        <p>Vuoi davvero rimuovere la foto profilo?</p>
+        <div class="confirm-actions">
+          <button (click)="confirmRemove()">Sì</button>
+          <button (click)="cancelRemove()">Annulla</button>
+        </div>
+      </dialog>
+
+      <button type="submit" [disabled]="profileForm.invalid">Aggiorna Profilo</button>
     </form>
 
     <!-- MESSAGGI -->
@@ -129,6 +131,49 @@
         <li>🧡 Wishlist: <strong>{{ summary.wishlistCount }}</strong></li>
         <li>📝 Recensioni: <strong>{{ summary.reviewsCount }}</strong></li>
       </ul>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- SEZIONE RECENSIONI -->
+    <h3 class="section-header">Le mie recensioni</h3>
+    <div class="review-list-container">
+      <!-- Nessuna recensione -->
+      <div *ngIf="reviews.length === 0" class="no-reviews-text">
+        Non hai ancora lasciato recensioni.
+      </div>
+
+      <!-- Lista recensioni -->
+      <div *ngFor="let review of reviews" class="review-card">
+        <div class="review-header">
+          <div>
+            <strong>Prodotto:</strong>
+            <a [routerLink]="['/product', review.productId]">
+              {{ review.productName || 'Prodotto #' + review.productId }}
+            </a>
+          </div>
+          <span class="review-date">{{ review.createdDate | date:'short' }}</span>
+        </div>
+
+        <div class="rating-container">
+          <span *ngFor="let star of [1,2,3,4,5]" [ngClass]="{ 'filled': star <= review.rating }">★</span>
+          <span class="rating-value">({{ review.rating }}/5)</span>
+        </div>
+
+        <div class="review-comment">
+          {{ review.comment }}
+        </div>
+
+        <div *ngIf="review.imageUrls && review.imageUrls.length > 0" class="review-images">
+          <img
+            *ngFor="let url of review.imageUrls"
+            [src]="url"
+            alt="Immagine recensione"
+            class="review-image"
+            (error)="onImageError($event)"
+          />
+        </div>
+      </div>
     </div>
 
     <!-- LINK AI RECLAMI -->

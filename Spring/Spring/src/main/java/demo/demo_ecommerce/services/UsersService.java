@@ -1,10 +1,7 @@
 package demo.demo_ecommerce.services;
 
 import demo.demo_ecommerce.Utility.UserNotFoundException;
-import demo.demo_ecommerce.dtos.UpdateUserDTO;
-import demo.demo_ecommerce.dtos.UserDTO;
-import demo.demo_ecommerce.dtos.UserProfileSummaryDTO;
-import demo.demo_ecommerce.dtos.UserResponseDTO;
+import demo.demo_ecommerce.dtos.*;
 import demo.demo_ecommerce.entities.Cart;
 import demo.demo_ecommerce.entities.Order;
 import demo.demo_ecommerce.entities.Role;
@@ -253,13 +250,33 @@ public class UsersService {
         return imageUrl;
     }
 
-
     @Transactional
     public void removeProfileImage(Long userId) {
         User user = findUserById(userId);
+
+        // Debug log
+        System.out.println(">> Prima: " + user.getProfileImageUrl());
+
         user.setProfileImageUrl(null);
         usersRepository.save(user);
+
+        System.out.println(">> Dopo: " + user.getProfileImageUrl());
     }
+
+
+    @Transactional
+    public Page<ReviewDTO> getUserReviews(Long userId, Pageable pageable) {
+        // Verifica che l’utente esista
+        findUserById(userId);
+
+        return reviewRepository.findByUserId(userId, pageable)
+                .map(ReviewDTO::fromEntity);
+    }
+
+
+
+
+
 
 
 

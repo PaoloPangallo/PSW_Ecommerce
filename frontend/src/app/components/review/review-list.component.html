@@ -22,7 +22,7 @@
         <p class="review-comment">{{ review.comment }}</p>
 
         <!-- 👇 NUOVO BLOCCO IMMAGINI -->
-        <div *ngIf="Array.isArray(review.imageUrls) && review.imageUrls.length > 0" class="review-images">
+        <div *ngIf="review.imageUrls && review.imageUrls.length > 0" class="review-images">
           <img
             *ngFor="let imgUrl of review.imageUrls"
             [src]="imgUrl"

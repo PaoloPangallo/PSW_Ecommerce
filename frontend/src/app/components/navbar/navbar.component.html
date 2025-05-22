@@ -1,97 +1,175 @@
-<!-- NAVBAR (una sola, pulita) -->
+<!-- ╔═══════════════════════════════════════════╗
+     ║               NAVBAR RETRO               ║
+     ╚═══════════════════════════════════════════╝ -->
 <nav class="navbar">
   <div class="nav-top">
-    <div class="logo">
-      <a routerLink="/">
-        <img ngSrc="assets/logo_unilire.svg" alt="Unilire" width="200" height="60" />
+
+    <!-- ① USER AREA (icone a sinistra) -->
+    <div class="user-area">
+      <a (click)="handleAccount()">👤 Account</a>
+      <a routerLink="/cart">🛒 Carrello</a>
+      <a routerLink="/wishlist">❤️ Wishlist</a>
+      <a *ngIf="isLoggedIn()" routerLink="/order-history">📦 Ordini</a>
+      <a *ngIf="isLoggedIn()" (click)="logout()" style="cursor:pointer">🚪 Logout</a>
+    </div>
+
+    <!-- ② PULSANTE ADMIN (al centro) -->
+    <div class="admin-area">
+      <button
+        *ngIf="authService.isAdmin()"
+        class="admin-btn"
+        routerLink="/admin">
+        Console Admin
+      </button>
+    </div>
+
+    <!-- ③ LOGO + SEARCH (a destra) -->
+    <div class="brand-area">
+      <a routerLink="/" class="logo">
+        <img
+          ngSrc="assets/logo_unilire.svg"
+          alt="Unilire"
+          width="200"
+          height="60"
+        />
       </a>
-    </div>
 
-    <div class="search-box" tabindex="0" (focusout)="onFocusOut($event)">
-      <input [formControl]="searchControl" type="text" placeholder="Cerca un prodotto..." />
+      <div
+        class="search-box"
+        tabindex="0"
+        (focusout)="onFocusOut($event)"
+      >
+        <input
+          [formControl]="searchControl"
+          type="text"
+          placeholder="Cerca un prodotto…"
+        />
 
-      <!-- LOADING -->
-      <div class="spinner" *ngIf="isLoading"></div>
+        <!-- LOADING -->
+        <div class="spinner" *ngIf="isLoading"></div>
 
-      <!-- RISULTATI -->
-      <ul class="search-suggestions" *ngIf="isDropdownOpen && searchResults.length > 0">
-        <li *ngFor="let product of searchResults" (click)="onSelectProduct(product)">
-          <img [src]="product.imageUrl" alt="{{ product.name }}" />
-          <div class="info">
-            <span class="name">{{ product.name }}</span>
-            <span class="price">{{ product.price | number:'1.0-0' }} L</span>
-          </div>
-        </li>
-      </ul>
+        <!-- RISULTATI -->
+        <ul
+          class="search-suggestions"
+          *ngIf="isDropdownOpen && searchResults.length > 0"
+        >
+          <li
+            *ngFor="let product of searchResults"
+            (click)="onSelectProduct(product)"
+          >
+            <img [src]="product.imageUrl" [alt]="product.name" />
+            <div class="info">
+              <span class="name">{{ product.name }}</span>
+              <span class="price">
+                {{ product.price | number: '1.0-0' }} L
+              </span>
+            </div>
+          </li>
+        </ul>
 
-
-      <!-- NESSUN RISULTATO -->
-      <div class="no-results" *ngIf="noResults">
-        Nessun prodotto trovato
+        <!-- NESSUN RISULTATO -->
+        <div class="no-results" *ngIf="noResults">
+          Nessun prodotto trovato
+        </div>
       </div>
-
-
-    </div>
-
-
-
-
-    <button *ngIf="authService.isAdmin()" class="search-button" routerLink="/admin">
-      Console Admin
-    </button>
-
-    <div class="user-icons">
-      <span><a (click)="handleAccount()">👤 Account</a></span>
-      <span><a routerLink="/cart">🛒 Carrello</a></span>
-      <span><a routerLink="/wishlist">❤️ Wishlist</a></span>
-      <span *ngIf="isLoggedIn()"><a routerLink="/order-history">I miei Ordini</a></span>
-      <span *ngIf="isLoggedIn()"><a (click)="logout()" style="cursor: pointer;">Logout</a></span>
     </div>
   </div>
 </nav>
 
-
-<!-- LAYOUT A 2 COLONNE -->
+<!-- ╔═══════════════════════════════════════════╗
+     ║          LAYOUT A 2 COLONNE               ║
+     ╚═══════════════════════════════════════════╝ -->
 <div class="page-container">
-  <!-- SIDEBAR MODERNA CON CATEGORIE -->
+  <!-- Sidebar categorie -->
   <aside class="sidebar modern">
     <div class="category-grid">
+      <!-- ESEMPIO DI CATEGORIE -->
       <a class="category-box" routerLink="/category/Smartphone e Telefonia">
-        <img ngSrc="assets/icons/telefonia.jpg" alt="Smartphone e Telefonia" height="1200" width="1200"/>
+        <img
+          ngSrc="assets/icons/telefonia.jpg"
+          alt="Smartphone e Telefonia"
+          height="1200"
+          width="1200"
+        />
         <span>Smartphone</span>
       </a>
+
       <a class="category-box" routerLink="/category/TV e Home Entertainment">
-        <img ngSrc="assets/icons/tv.jpg" alt="TV e Home Entertainment" height="980" width="1540"/>
+        <img
+          ngSrc="assets/icons/tv.jpg"
+          alt="TV e Home Entertainment"
+          height="980"
+          width="1540"
+        />
         <span>TV e Home</span>
       </a>
+
       <a class="category-box" routerLink="/category/Informatica e Accessori">
-        <img src="assets/icons/informatica.png" alt="Informatica e Accessori" />
+        <img
+          src="assets/icons/informatica.png"
+          alt="Informatica e Accessori"
+        />
         <span>Informatica</span>
       </a>
+
       <a class="category-box" routerLink="/category/Elettrodomestici">
-        <img src="assets/icons/elettrodomestici.png" alt="Elettrodomestici" />
+        <img
+          src="assets/icons/elettrodomestici.png"
+          alt="Elettrodomestici"
+        />
         <span>Elettrodomestici</span>
       </a>
+
       <a class="category-box" routerLink="/category/Gaming e Console">
-        <img ngSrc="assets/icons/console.jpg" alt="Gaming e Console" height="360" width="360"/>
+        <img
+          ngSrc="assets/icons/console.jpg"
+          alt="Gaming e Console"
+          height="360"
+          width="360"
+        />
         <span>Gaming</span>
       </a>
+
       <a class="category-box" routerLink="/category/Audio e Hi-Fi">
-        <img ngSrc="assets/icons/audio.png" alt="Audio e Hi-Fi" height="512" width="512"/>
+        <img
+          ngSrc="assets/icons/audio.png"
+          alt="Audio e Hi-Fi"
+          height="512"
+          width="512"
+        />
         <span>Audio</span>
       </a>
+
       <a class="category-box" routerLink="/category/Fotocamere e Videocamere">
-        <img ngSrc="assets/icons/fotocamera.png" alt="Fotocamere e Videocamere" height="600" width="600"/>
+        <img
+          ngSrc="assets/icons/fotocamera.png"
+          alt="Fotocamere e Videocamere"
+          height="600"
+          width="600"
+        />
         <span>Foto/Video</span>
       </a>
+
       <a class="category-box" routerLink="/category/Climatizzazione e Riscaldamento">
-        <img ngSrc="assets/icons/clima.png" alt="Climatizzazione e Riscaldamento" height="512" width="512"/>
+        <img
+          ngSrc="assets/icons/clima.png"
+          alt="Climatizzazione e Riscaldamento"
+          height="512"
+          width="512"
+        />
         <span>Clima</span>
       </a>
+
       <a class="category-box" routerLink="/category/Smartwatch e Wearable">
-        <img ngSrc="assets/icons/smartwatch.jpg" alt="Smartwatch e Wearable" height="980" width="980"/>
+        <img
+          ngSrc="assets/icons/smartwatch.jpg"
+          alt="Smartwatch e Wearable"
+          height="980"
+          width="980"
+        />
         <span>Wearable</span>
       </a>
+
       <a class="category-box" routerLink="/category/Droni e Mobilità Elettrica">
         <img src="assets/icons/droni.png" alt="Droni e Mobilità Elettrica" />
         <span>Droni</span>
@@ -99,7 +177,7 @@
     </div>
   </aside>
 
-  <!-- CONTENUTO PRINCIPALE -->
+  <!-- Contenuto principale -->
   <div class="main-content">
     <router-outlet></router-outlet>
   </div>

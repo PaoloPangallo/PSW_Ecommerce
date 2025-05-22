@@ -1,0 +1,107 @@
+/* Complaints section retro style */
+.complaint-section {
+  background: rgba(255, 251, 244, 0.95);
+  border: 2px solid #d8cfc4;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.complaint-title {
+  font-size: 1.8rem;
+  color: #e67e22;
+  text-shadow: 0 0 6px rgba(230,126,34,0.7), 1px 1px 2px rgba(0,0,0,0.2);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.complaint-loading,
+.complaint-error {
+  font-size: 1rem;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.complaint-error {
+  color: #c0392b;
+  animation: retroShake 0.4s ease-in-out 2;
+}
+
+/* Tabella retrò */
+.complaint-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.complaint-table th,
+.complaint-table td {
+  padding: 0.8rem 1rem;
+  background: rgba(249, 245, 240, 0.9);
+  border: 1px solid #d8cfc4;
+}
+
+.complaint-table th {
+  background: rgba(230, 126, 34, 0.2);
+  color: #2c3e50;
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(0,0,0,0.1);
+}
+
+/* Status pills */
+.status-pending,
+.status-resolved {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background: #f1c40f33;
+  color: #f39c12;
+  border: 1px solid #f39c12;
+}
+
+.status-resolved {
+  background: #2ecc7133;
+  color: #27ae60;
+  border: 1px solid #27ae60;
+}
+
+/* Bottone chat retrò */
+.chat-button {
+  background: linear-gradient(145deg, #e67e22, #cf711e);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 2px 2px 6px #bd651a, -2px -2px 6px #f08238;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.chat-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 10px #bd651a, -4px -4px 10px #f08238;
+}
+
+.chat-button:active {
+  transform: translateY(2px);
+  box-shadow: 1px 1px 3px #bd651a, -1px -1px 3px #f08238;
+}
+
+/* Riutilizza animazione shake già definita */
+@keyframes retroShake {
+  0%,100% { transform: translateX(0); }
+  20%,60% { transform: translateX(-7px); }
+  40%,80% { transform: translateX(7px); }
+}

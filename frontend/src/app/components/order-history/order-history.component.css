@@ -1,37 +1,176 @@
-.order-history-container {
-  margin: 20px;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+/* order-history.component.css */
+
+/* Contenitore principale e sfondo retrò con texture */
+:host {
+  display: block;
+  padding: 2rem;
+  background:
+    linear-gradient(135deg, #f4e8d6, #d8cfc4) fixed,
+    url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 10 10"%3E%3Cpath fill="%23ffffff22" d="M0 0L10 0L10 10Z"%3E%3C/path%3E%3C/svg%3E') repeat;
+  font-family: 'Courier New', Courier, monospace;
+  color: #2c3e50;
 }
 
-h2 {
-  text-align: center;
-  color: #ff9800;
-  margin-bottom: 20px;
-}
-
-.error-message {
-  color: red;
+/* Titolo con ombra di testo morbida */
+.order-history-container h2 {
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
   text-align: center;
-  margin-bottom: 20px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
 }
 
-table {
+/* Messaggio di errore */
+.error-message {
+  margin: 0 0 1rem;
+  color: #c0392b;
+  font-weight: bold;
+  text-align: center;
+  animation: shake 0.3s ease-in-out 2;
+}
+
+/* Tabella retrò con header “glass” */
+table.mat-elevation-z8 {
   width: 100%;
-  margin-bottom: 20px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #d8cfc4;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.mat-elevation-z8 {
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+/* Header con blur e gradient glassmorphism */
+th.mat-header-cell {
+  background: rgba(230, 126, 34, 0.8);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 2px solid #d8cfc4;
+  position: relative;
 }
 
+th.mat-header-cell::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: rgba(255,255,255,0.5);
+  border-radius: 2px;
+}
+
+/* Celle con zebra stripes e hover animato */
+td.mat-cell {
+  padding: 0.7rem 1rem;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #ddd;
+}
+
+tr.mat-row:nth-child(even) td.mat-cell {
+  background: rgba(232, 224, 212, 0.4);
+}
+
+tr.mat-row:hover td.mat-cell {
+  background: rgba(230, 126, 34, 0.1);
+  transform: scale(1.01);
+  transition: background 0.3s, transform 0.2s;
+}
+
+/* Pulsanti retrò con micro-animazioni */
+button.mat-button {
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  background: linear-gradient(145deg, #e67e22, #cf711e);
+  color: #ffffff;
+  padding: 0.5rem 1rem;
+  margin: 0.2rem 0;
+  border: none;
+  border-radius: 6px;
+  box-shadow:  2px 2px 5px #bd651a, -2px -2px 5px #f08238;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow 0.3s, transform 0.2s;
+}
+
+button.mat-button::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(255,255,255,0.4) 0%, transparent 70%);
+  transform: scale(0);
+  transition: transform 0.5s ease-out;
+}
+
+button.mat-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 8px #bd651a, -4px -4px 8px #f08238;
+}
+
+button.mat-button:hover::before {
+  transform: scale(1);
+}
+
+button.mat-button:active {
+  transform: translateY(1px);
+  box-shadow: 1px 1px 3px #bd651a, -1px -1px 3px #f08238;
+}
+
+/* Pulsanti disabilitati */
+button.mat-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Navigazione pagine con icone */
 .pagination-buttons {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
-  margin-top: 15px;
+  margin-top: 1.5rem;
+  gap: 1rem;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.pagination-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.pagination-buttons span {
+  color: #2c3e50;
+}
+
+/* Animazione shake per errore */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* Responsive mobile */
+@media (max-width: 600px) {
+  th.mat-header-cell,
+  td.mat-cell {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .pagination-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }

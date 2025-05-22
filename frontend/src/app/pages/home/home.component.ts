@@ -29,7 +29,7 @@ import {LirePipe} from '../../services/lire.pipe';
   ],
 
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, AfterViewInit {
   featuredProducts: Product[] = [];
@@ -44,9 +44,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   productName: string = 'Prodotto';
   prompt: string = '';
   loading: boolean = false;
-  errorMsg: string = '';
-  generatedImageUrl: string = '';
-
   private productService = inject(ProductService);
 
   constructor(
@@ -95,38 +92,5 @@ export class HomeComponent implements OnInit, AfterViewInit {
         console.error('Errore nel caricamento dei prodotti in evidenza:', err);
       }
     });
-  }
-
-  subscribeToNewsletter(event: Event): void {
-    event.preventDefault();
-    const form = event.target as HTMLFormElement;
-    const emailInput = form.querySelector('input[type="email"]') as HTMLInputElement;
-    const email = emailInput?.value.trim();
-    if (email) {
-      console.log('Iscrizione newsletter, email:', email);
-      emailInput.value = '';
-      // chiamata a backend qui se servisse
-    }
-  }
-
-  onGenerate(): void {
-    this.loading = true;
-    this.errorMsg = '';
-
-    setTimeout(() => {
-      if (this.prompt.trim() === '') {
-        this.errorMsg = 'Inserisci un prompt valido.';
-        this.loading = false;
-      } else {
-        this.generatedImageUrl = 'https://example.com/path/to/generated/image.jpg';
-        this.loading = false;
-      }
-    }, 2000);
-  }
-
-  goBack(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      window.history.back();
-    }
   }
 }

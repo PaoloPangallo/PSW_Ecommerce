@@ -1,0 +1,509 @@
+// ===============================
+// Variabili colori & font
+// ===============================
+$col-primary: #002f6c;          // Blu profondo
+$col-secondary: #d4af37;        // Oro vintage
+$col-accent: #b33900;           // Rosso Lira caldo
+$col-bg-light: #faf7f0;         // Carta ingiallita chiara
+$col-bg-card: #fffef6;          // Carta quasi bianca
+$col-text: #333333;
+$col-text-muted: #666666;
+
+$font-title: 'Georgia', serif;
+$font-body: 'Open Sans', sans-serif;
+$font-mono: 'Courier New', monospace;
+
+$space-xs: 8px;
+$space-sm: 16px;
+$space-md: 32px;
+$space-lg: 48px;
+
+// ===============================
+// Wrapper principale
+// ===============================
+.product-details-wrapper {
+  max-width: 1200px;
+  margin: $space-md auto;
+  padding: $space-md;
+  background-color: $col-bg-light;
+  font-family: $font-body;
+  color: $col-text;
+}
+
+// ===============================
+// Card prodotto
+// ===============================
+.product-card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-lg;
+  background-color: $col-bg-card;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  padding: $space-md;
+  margin-bottom: $space-md;
+
+  .image-container {
+    flex: 1 1 320px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 2px solid lighten($col-primary, 80%);
+    padding-right: $space-md;
+    border-radius: 12px 0 0 12px;
+    overflow: hidden;
+    box-shadow: inset 0 0 20px rgba($col-primary, 0.05);
+
+    img {
+      max-width: 100%;
+      border-radius: 12px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+      cursor: zoom-in;
+
+      &:hover {
+        transform: scale(1.06);
+      }
+    }
+  }
+
+  .details-container {
+    flex: 2 1 500px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: $space-md;
+
+    .product-title {
+      font-family: $font-title;
+      font-size: 2.2rem;
+      margin-bottom: $space-sm;
+      color: $col-primary;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 0 rgba($col-accent, 0.6);
+    }
+
+    .description {
+      font-size: 1rem;
+      color: $col-text-muted;
+      margin-bottom: $space-md;
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    .price {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: $space-md;
+      font-family: $font-mono;
+      color: $col-secondary;
+
+      .old-price {
+        color: $col-text-muted;
+        text-decoration: line-through;
+        margin-right: $space-sm;
+        font-weight: 400;
+      }
+
+      .new-price {
+        color: $col-accent;
+        margin-right: $space-sm;
+        font-weight: 900;
+      }
+
+      .discount-badge {
+        background-color: $col-accent;
+        color: #fff;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 1rem;
+        vertical-align: middle;
+        user-select: none;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: $space-sm;
+      margin-bottom: $space-md;
+
+      button {
+        flex: 1 1 140px;
+        padding: $space-sm;
+        font-family: $font-mono;
+        font-weight: 700;
+        border-radius: 50px;
+        font-size: 1rem;
+        text-transform: uppercase;
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+
+        &.cart-button {
+          background-color: $col-secondary;
+          color: $col-primary;
+
+          &:hover {
+            background-color: lighten($col-secondary, 10%);
+            box-shadow: 0 10px 20px rgba($col-secondary, 0.5);
+            transform: translateY(-3px);
+          }
+        }
+
+        &.wishlist-button {
+          background-color: transparent;
+          border: 2px solid $col-primary;
+          color: $col-primary;
+
+          &:hover {
+            background-color: $col-primary;
+            color: white;
+            transform: translateY(-3px);
+          }
+        }
+      }
+    }
+
+    .admin-button-container {
+      margin-top: $space-md;
+
+      button {
+        background-color: $col-accent;
+        color: white;
+        padding: $space-xs $space-md;
+        border-radius: 12px;
+        font-family: $font-mono;
+        font-weight: 700;
+        box-shadow: 0 6px 15px rgba($col-accent, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background-color: darken($col-accent, 10%);
+          box-shadow: 0 8px 25px rgba($col-accent, 0.7);
+          transform: scale(1.05);
+        }
+      }
+    }
+
+    .success-message {
+      margin-top: $space-sm;
+      color: darkgreen;
+      font-weight: 700;
+      font-style: italic;
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// ===============================
+// Sezione Upload Immagine Admin
+// ===============================
+.image-upload-container {
+  background-color: $col-bg-card;
+  padding: $space-md;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: $space-md;
+
+  .upload-title {
+    font-family: $font-title;
+    font-size: 1.6rem;
+    color: $col-primary;
+    margin-bottom: $space-sm;
+  }
+
+  .upload-controls {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    flex-wrap: wrap;
+
+    .file-input-wrapper {
+      position: relative;
+      overflow: hidden;
+      border: 2px dashed $col-secondary;
+      border-radius: 12px;
+      padding: $space-sm $space-md;
+      cursor: pointer;
+      font-family: $font-mono;
+      color: $col-primary;
+      font-weight: 700;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: lighten($col-secondary, 30%);
+      }
+
+      input[type='file'] {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+    }
+
+    .upload-button {
+      background-color: $col-secondary;
+      border: none;
+      padding: $space-sm $space-lg;
+      border-radius: 50px;
+      font-family: $font-mono;
+      font-weight: 700;
+      cursor: pointer;
+      color: $col-primary;
+      box-shadow: 0 6px 15px rgba($col-secondary, 0.4);
+      transition: all 0.3s ease;
+
+      &:disabled {
+        background-color: lighten($col-secondary, 40%);
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      &:not(:disabled):hover {
+        background-color: darken($col-secondary, 10%);
+        box-shadow: 0 8px 20px rgba($col-secondary, 0.7);
+        transform: scale(1.05);
+      }
+    }
+  }
+}
+
+// ===============================
+// Sezione Coupon
+// ===============================
+.coupon-section {
+  background-color: $col-bg-card;
+  padding: $space-md;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  margin-bottom: $space-md;
+
+  h3 {
+    font-family: $font-title;
+    color: $col-primary;
+    margin-bottom: $space-sm;
+    font-size: 1.6rem;
+  }
+
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .coupon-item {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-sm;
+    align-items: center;
+    margin-bottom: $space-xs;
+    border-bottom: 1px solid lighten($col-primary, 80%);
+    padding-bottom: $space-xs;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    .coupon-code {
+      font-weight: 700;
+      font-family: $font-mono;
+      color: $col-accent;
+      min-width: 130px;
+    }
+
+    .coupon-discount {
+      font-weight: 700;
+      color: $col-primary;
+      min-width: 140px;
+      text-align: center;
+    }
+
+    .coupon-expiry {
+      font-style: italic;
+      color: $col-text-muted;
+      min-width: 160px;
+      text-align: right;
+      font-size: 0.9rem;
+    }
+
+    .copy-coupon-button {
+      background-color: $col-secondary;
+      border: none;
+      padding: $space-xs $space-sm;
+      border-radius: 8px;
+      font-family: $font-mono;
+      font-weight: 700;
+      cursor: pointer;
+      color: $col-primary;
+      box-shadow: 0 4px 12px rgba($col-secondary, 0.4);
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: darken($col-secondary, 10%);
+      }
+    }
+  }
+
+  .coupon-message {
+    margin-top: $space-sm;
+    font-style: italic;
+    color: darkgreen;
+  }
+}
+
+// ===============================
+// Sezione Recensioni
+// ===============================
+.reviews-section {
+  margin-top: $space-lg;
+
+  .review-info {
+    font-style: italic;
+    color: $col-text-muted;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-top: $space-md;
+  }
+}
+
+// ===============================
+// Sezione Spesso Acquistati Insieme
+// ===============================
+.also-bought-section {
+  margin-top: $space-lg;
+
+  h3 {
+    font-family: $font-title;
+    font-size: 2rem;
+    color: $col-primary;
+    margin-bottom: $space-lg;
+    text-align: center;
+  }
+
+  .recommended-products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: $space-md;
+    justify-items: center;
+  }
+
+  .recommended-card {
+    background: $col-bg-card;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    padding: $space-sm;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: $space-xs;
+    }
+
+    h4 {
+      font-family: $font-title;
+      color: $col-primary;
+      margin-bottom: $space-xs;
+      font-size: 1.1rem;
+    }
+
+    p {
+      font-weight: 700;
+      font-family: $font-mono;
+      color: $col-secondary;
+      margin-bottom: $space-xs;
+    }
+
+    a {
+      font-size: 0.9rem;
+      color: $col-primary;
+      text-decoration: underline;
+
+      &:hover {
+        color: $col-accent;
+      }
+    }
+  }
+
+  .no-recommendations {
+    text-align: center;
+    font-style: italic;
+    color: $col-text-muted;
+  }
+}
+
+// ===============================
+// Pulsante Indietro
+// ===============================
+.back-button-container {
+  text-align: center;
+  margin-top: $space-lg;
+
+  .back-button {
+    background-color: $col-secondary;
+    color: $col-primary;
+    border-radius: 40px;
+    padding: $space-sm $space-lg;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    font-family: $font-mono;
+    font-size: 1.1rem;
+    box-shadow: 0 6px 20px rgba($col-secondary, 0.6);
+    transition: background-color 0.3s ease, transform 0.3s ease;
+
+    &:hover {
+      background-color: $col-accent;
+      color: #fff;
+      transform: scale(1.05);
+    }
+  }
+}
+
+// ===============================
+// Responsive
+// ===============================
+@media (max-width: 768px) {
+  .product-card {
+    flex-direction: column;
+
+    .image-container {
+      border-right: none;
+      padding-right: 0;
+      border-bottom: 1px solid lighten($col-primary, 80%);
+      padding-bottom: $space-md;
+      margin-bottom: $space-md;
+    }
+
+    .details-container {
+      flex: 1 1 auto;
+      padding-left: 0;
+    }
+  }
+
+  .button-container {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}

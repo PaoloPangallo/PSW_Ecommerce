@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.services';
 import { UserService } from '../../services/user.service';
-import {User, UserProfileSummary} from '../../models/user.model';
-import {RouterLink} from '@angular/router';
+import { User, UserProfileSummary } from '../../models/user.model';
+import { RouterLink } from '@angular/router';
+import { ReviewDTO } from '../../models/review.models';
 
 @Component({
   selector: 'app-user-profile',
@@ -20,6 +21,11 @@ export class UserProfileComponent implements OnInit {
   successMessage = '';
   previewUrl: string | ArrayBuffer | null = null;
 
+  reviews: ReviewDTO[] = [];
+  reviewsPage = 0;
+  hasMoreReviews = false;
+
+  private userId: number | null = null;
 
   constructor(
     private authService: AuthService,
@@ -27,12 +33,13 @@ export class UserProfileComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const userId = this.authService.getCurrentUserId();
-    if (userId !== null) {
+    this.userId = this.authService.getCurrentUserId();
 
-      // Carica dati anagrafici
-      this.userService.getUserById(userId).subscribe({
-        next: (serverUser: any) => {
+    if (this.userId !== null) {
+      this.loadUserReviews(this.userId);
+
+      this.userService.getUserById(this.userId).subscribe({
+        next: (serverUser) => {
           this.user = this.mapServerUser(serverUser);
         },
         error: (err) => {
@@ -41,8 +48,7 @@ export class UserProfileComponent implements OnInit {
         }
       });
 
-      // Carica riepilogo statistico
-      this.userService.getUserProfileSummary(userId).subscribe({
+      this.userService.getUserProfileSummary(this.userId).subscribe({
         next: (summary) => {
           this.summary = summary;
         },
@@ -56,16 +62,11 @@ export class UserProfileComponent implements OnInit {
     }
   }
 
-
   updateProfile(): void {
-    if (this.user) {
-      console.log('Aggiornamento profilo con dati:', this.user);
-      // Mappiamo l'oggetto user nel formato richiesto dal server
+    if (this.user && this.userId !== null) {
       const serverUserPayload = this.mapUserToServerUser(this.user);
-      this.userService.updateUser(this.user.id, serverUserPayload).subscribe({
-        next: (updatedServerUser: any) => {
-          console.log('Server ha restituito:', updatedServerUser);
-          // Aggiorniamo l'oggetto user mappando i dati restituiti dal server
+      this.userService.updateUser(this.userId, serverUserPayload).subscribe({
+        next: (updatedServerUser) => {
           this.user = this.mapServerUser(updatedServerUser);
           this.successMessage = 'Profilo aggiornato con successo!';
           this.errorMessage = '';
@@ -79,10 +80,88 @@ export class UserProfileComponent implements OnInit {
     }
   }
 
-  /**
-   * Mappa i dati provenienti dal server (che ora usa nomi in inglese)
-   * nel nostro modello User (stesso naming in inglese).
-   */
+  onImageSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file && this.userId !== null) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.previewUrl = reader.result;
+      };
+      reader.readAsDataURL(file);
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      this.userService.uploadProfileImage(this.userId, formData).subscribe({
+        next: (imageUrl: string) => {
+          if (this.user) {
+            this.user.profileImageUrl = imageUrl;
+            this.previewUrl = null;
+          }
+        },
+        error: (err) => {
+          console.error('Errore durante il caricamento dell\'immagine', err);
+        }
+      });
+    }
+  }
+
+  removeProfileImage(): void {
+    const dialog = document.querySelector('dialog') as HTMLDialogElement;
+    dialog?.showModal();
+  }
+
+  confirmRemove(): void {
+    if (this.user && this.userId !== null) {
+      this.user.profileImageUrl = undefined;
+      this.previewUrl = null;
+
+      this.userService.removeProfileImage(this.userId).subscribe({
+        next: () => {
+          this.successMessage = 'Foto profilo rimossa con successo!';
+          this.errorMessage = '';
+          const dialog = document.querySelector('dialog') as HTMLDialogElement;
+          dialog?.close();
+        },
+        error: (err) => {
+          this.errorMessage = 'Errore durante la rimozione dell\'immagine';
+          this.successMessage = '';
+          console.error(err);
+          const dialog = document.querySelector('dialog') as HTMLDialogElement;
+          dialog?.close();
+        }
+      });
+    }
+  }
+
+  cancelRemove(): void {
+    const dialog = document.querySelector('dialog') as HTMLDialogElement;
+    dialog?.close();
+  }
+
+  onImageError(event: Event): void {
+    (event.target as HTMLImageElement).src = 'assets/icons/default-avatar.svg';
+  }
+
+  loadUserReviews(userId: number): void {
+    this.userService.getUserReviews(userId, this.reviewsPage).subscribe({
+      next: (res) => {
+        this.reviews.push(...res.content);
+        this.hasMoreReviews = !res.last;
+      },
+      error: (err) => {
+        console.error('Errore nel caricamento delle recensioni', err);
+      }
+    });
+  }
+
+  loadMoreReviews(): void {
+    if (this.userId !== null && this.hasMoreReviews) {
+      this.reviewsPage++;
+      this.loadUserReviews(this.userId);
+    }
+  }
+
   private mapServerUser(serverUser: any): User {
     return {
       id: serverUser.id,
@@ -95,15 +174,10 @@ export class UserProfileComponent implements OnInit {
       city: serverUser.city,
       region: serverUser.region,
       country: serverUser.country,
-      profileImageUrl: serverUser.profileImageUrl // ✅ aggiunto!
+      profileImageUrl: serverUser.profileImageUrl
     };
   }
 
-
-  /**
-   * Mappa l'oggetto User nel formato richiesto dal server per l'update,
-   * ovvero con campi in inglese.
-   */
   private mapUserToServerUser(user: User): any {
     return {
       email: user.email,
@@ -115,52 +189,4 @@ export class UserProfileComponent implements OnInit {
       country: user.country
     };
   }
-
-  onImageSelected(event: any): void {
-    const file: File = event.target.files[0];
-    if (file) {
-      // Preview immediata
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.previewUrl = reader.result;
-      };
-      reader.readAsDataURL(file);
-
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const userId = this.authService.getCurrentUserId();
-      if (userId) {
-        this.userService.uploadProfileImage(userId, formData).subscribe({
-          next: (imageUrl: string) => {
-            if (this.user) {
-              this.user.profileImageUrl = imageUrl;
-              this.previewUrl = null; // resetta dopo l'upload
-            }
-          },
-          error: (err) => {
-            console.error('Errore durante il caricamento dell\'immagine', err);
-          }
-        });
-      }
-    }
-
-  }
-  removeProfileImage(): void {
-    if (this.user) {
-      this.user.profileImageUrl = undefined;
-      this.previewUrl = null;
-
-      // Notifica il backend se vuoi salvare la rimozione nel DB
-      this.userService.removeProfileImage(this.user.id).subscribe({
-        next: () => console.log('Immagine rimossa'),
-        error: err => console.error('Errore nella rimozione immagine', err)
-      });
-    }
-  }
-
-
-
-
-
 }
