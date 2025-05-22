@@ -3,6 +3,8 @@ package demo.demo_ecommerce.bot;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -18,20 +20,7 @@ public class ChatBotController {
     }
 
     // 1. Endpoint principale: invia messaggio e ricevi risposta dal bot
-    @PostMapping("/message")
-    public ResponseEntity<String> handleMessage(@RequestParam Long userId, @RequestBody String userMessage) {
-        String sessionId = "user-" + userId;
-        String response = smartBotService.getBotResponse(userId, sessionId, userMessage);
 
-        // 🔄 Salva log (opzionale, attiva se ChatLog è configurato)
-        ChatLog log = new ChatLog();
-        log.setUserId(userId);
-        log.setUserMessage(userMessage);
-        log.setBotResponse(response);
-        chatLogRepository.save(log);
-
-        return ResponseEntity.ok(response);
-    }
 
     // 2. Endpoint per correggere manualmente l'intento riconosciuto
     @PostMapping("/correct-intent")
@@ -46,4 +35,20 @@ public class ChatBotController {
             return ResponseEntity.badRequest().body("Log non trovato.");
         }
     }
+
+    @PostMapping("/message")
+    public ResponseEntity<BotResponseDTO> handleMessage(@RequestParam Long userId, @RequestBody String userMessage) {
+        String sessionId = "user-" + userId;
+        BotResponseDTO response = smartBotService.getBotResponse(userId, sessionId, userMessage);
+
+        ChatLog log = new ChatLog();
+        log.setUserId(userId);
+        log.setUserMessage(userMessage);
+        log.setBotResponse(response.getText());
+        chatLogRepository.save(log);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

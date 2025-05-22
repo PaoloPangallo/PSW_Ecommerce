@@ -1,27 +1,28 @@
 // src/main/java/demo/demo_ecommerce/entities/BotIntent.java
 package demo.demo_ecommerce.bot;
 
-import jakarta.persistence.Column;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 public class BotIntent {
     private final String name;
     private final List<String> examples;
-
-    @Column(length = 2048)
-    private String botResponse;
-
     private final String response;
-    private String followUp = "";
+    private final List<BotResponseDTO.BotButton> buttons;
 
     public BotIntent(String name, List<String> examples, String response) {
+        this(name, examples, response, new ArrayList<>());
+    }
+
+    public BotIntent(String name, List<String> examples, String response, List<BotResponseDTO.BotButton> buttons) {
         this.name = name;
         this.examples = examples;
         this.response = response;
-        this.followUp = followUp;
+        this.buttons = buttons;
     }
+
 
 }

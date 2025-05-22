@@ -13,6 +13,14 @@
   <div class="chat-box">
     <div *ngFor="let msg of messages" class="message-wrapper" [ngClass]="msg.sender">
       <div class="message">
+
+        <!-- Bottoni suggeriti -->
+        <div class="suggested-buttons" *ngIf="msg.buttons?.length">
+          <a *ngFor="let b of msg.buttons" [routerLink]="b.link" class="suggestion-btn">
+            {{ b.label }}
+          </a>
+        </div>
+
         <ng-container *ngIf="msg.sender === 'bot'; else userBlock">
           <ng-container *ngIf="splitResponse(msg.text).intent; else simpleBot">
             <p><strong>🤖 LLaMA:</strong><br>{{ splitResponse(msg.text).llama }}</p>
@@ -33,8 +41,10 @@
   <div *ngIf="isLoading" class="loading">⏳ Sto pensando...</div>
 
   <!-- ✅ INPUT CHAT SEMPRE VISIBILE -->
-  <div class="chat-input">
+  <div class="chat-bottom">
+    <button (click)="clearChat()" class="clear-btn">🗑️</button>
     <input [(ngModel)]="userMessage" placeholder="Scrivi un messaggio..." (keyup.enter)="sendMessage()" />
     <button (click)="sendMessage()">Invia</button>
   </div>
+
 </div>
