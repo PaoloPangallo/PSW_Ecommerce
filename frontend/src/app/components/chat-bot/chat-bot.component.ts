@@ -3,19 +3,18 @@ import {
   ViewChild,
   ElementRef,
   AfterViewChecked,
-  OnInit, ChangeDetectorRef
+  OnInit
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, NgClass } from '@angular/common';
 import { AuthService } from '../../services/auth.services';
-import {RouterLink} from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-chat-bot',
   templateUrl: './chat-bot.component.html',
   styleUrls: ['./chat-bot.component.css'],
-
   standalone: true,
   imports: [FormsModule, NgClass, CommonModule, RouterLink],
 })
@@ -35,16 +34,7 @@ export class ChatBotComponent implements OnInit, AfterViewChecked {
 
   messages: { sender: 'user' | 'bot', text: string, buttons?: { label: string, link: string }[] }[] = [];
 
-  @ViewChild('chatEnd', { static: false }) chatEnd!: ElementRef;
-
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService,
-    private cdRef: ChangeDetectorRef
-  ) {
-    this.userId = this.authService.getCurrentUserId();
-  }
-
+  @ViewChild('chatEnd') chatEnd!: ElementRef;
 
   ngOnInit(): void {
     const stored = localStorage.getItem('chat_messages');
@@ -52,75 +42,82 @@ export class ChatBotComponent implements OnInit, AfterViewChecked {
       this.messages = JSON.parse(stored);
     }
   }
+
   ngAfterViewChecked(): void {
-    if (this.shouldScroll) {
-      setTimeout(() => this.scrollToBottom(), 50);
-      this.shouldScroll = false;
-    }
+    this.scrollToBottom(); // Scroll sempre dopo ogni aggiornamento
   }
 
+  constructor(private http: HttpClient, private authService: AuthService) {
+    this.userId = this.authService.getCurrentUserId();
+  }
 
+  lastBotButtons: { label: string; link: string }[] = [];
 
   sendMessage() {
     if (!this.userMessage.trim()) return;
 
     const msg = this.userMessage;
-    this.messages.push({sender: 'user', text: msg});
+    this.messages.push({ sender: 'user' as const, text: msg }); // ✅ cast 'user' come literal
     this.saveMessages();
 
     this.userMessage = '';
     this.isLoading = true;
-    this.shouldScroll = true;
 
     this.http.post<any>(`http://localhost:8080/api/chatbot/message?userId=${this.userId}`, msg)
       .subscribe({
         next: (botReply) => {
-          this.messages.push({
-            sender: 'bot',
+          const message = {
+            sender: 'bot' as const, // ✅ cast 'bot' come literal
             text: botReply.text,
             buttons: botReply.buttons || []
-          });
+          };
 
+          this.messages.push(message);
+          this.lastBotButtons = message.buttons || [];
           this.isLoading = false;
           this.saveMessages();
-
-          // 👉 Forza il rilevamento dei cambi DOM e scrolla solo dopo
-          this.cdRef.detectChanges();
-          setTimeout(() => this.scrollToBottom(), 0);
         },
         error: () => {
-          this.messages.push({sender: 'bot', text: '❌ Errore nel contattare il bot.'});
+          const errMsg = {
+            sender: 'bot' as const, // ✅ anche qui
+            text: '❌ Errore nel contattare il bot.'
+          };
+
+          this.messages.push(errMsg);
+          this.lastBotButtons = [];
           this.isLoading = false;
           this.saveMessages();
-
-          this.cdRef.detectChanges();
-          setTimeout(() => this.scrollToBottom(), 0);
         }
       });
   }
 
-    sendFAQ(question: string) {
-    this.userMessage = question;
-    this.sendMessage();
-  }
+
+
+
+
   scrollToBottom() {
     try {
-
-      this.chatEnd?.nativeElement?.scrollIntoView({ behavior: 'smooth' });
-    } catch (e) {
-      // può capitare alla prima apertura
-      console.warn('chatEnd non disponibile ancora', e);
+      this.chatEnd.nativeElement.scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      console.warn('Errore nel fare scroll:', err);
     }
+  }
+
+  sendFAQ(question: string) {
+    this.userMessage = question;
+    this.sendMessage();
   }
 
   saveMessages() {
     localStorage.setItem('chat_messages', JSON.stringify(this.messages));
   }
 
+  clearChat() {
+    this.messages = [];
+    localStorage.removeItem('chat_messages');
+    this.shouldScroll = true;
+  }
 
-
-
-  // Optional: parsing LLaMA + intento
   splitResponse(text: string): { llama: string, intent: string | null } {
     if (text.includes("**Suggerimento mirato")) {
       const [llama, intent] = text.split("**Suggerimento mirato");
@@ -131,11 +128,4 @@ export class ChatBotComponent implements OnInit, AfterViewChecked {
     }
     return { llama: text, intent: null };
   }
-
-  clearChat() {
-    this.messages = [];
-    localStorage.removeItem('chat_messages');
-    this.shouldScroll = true;
-  }
-
 }

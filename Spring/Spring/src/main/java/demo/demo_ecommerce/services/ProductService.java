@@ -22,38 +22,14 @@ public class ProductService {
 
     private static final Logger logger = LoggerFactory.getLogger(ProductService.class);
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository; //
+
 
     public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
     }
 
-    /**
-     * Crea un nuovo prodotto, assegnando un'immagine predefinita se non presente.
-     */
-    @Transactional // scrittura
-    public Product createProduct(Product product) {
-        if (productRepository.existsByName(product.getName())) {
-            throw new IllegalArgumentException("Product with this name already exists");
-        }
-
-        // Se il prodotto contiene una Category con un ID, recuperala dal DB
-        if (product.getCategory() != null && product.getCategory().getId() != null) {
-            Category managedCategory = categoryRepository.findById(product.getCategory().getId())
-                    .orElseThrow(() -> new RuntimeException("Categoria non trovata con ID: " + product.getCategory().getId()));
-            product.setCategory(managedCategory);
-        }
-
-        // Se il prodotto non ha un'immagine, assegna una di default
-        if (product.getImageUrl() == null || product.getImageUrl().isEmpty()) {
-            product.setImageUrl("https://example.com/default-image.jpg");
-        }
-
-        return productRepository.save(product);
-    }
-
-
-    private final CategoryRepository categoryRepository; // 🔹 Aggiungi il repository delle categorie
 
 
     /**
@@ -97,7 +73,7 @@ public class ProductService {
         existingProduct.setDescription(productDetails.getDescription());
         existingProduct.setPrice(productDetails.getPrice());
         existingProduct.setStock(productDetails.getStock());
-        existingProduct.setDiscountPercentage(productDetails.getDiscountPercentage()); // ✅ ECCOLO
+        existingProduct.setDiscountPercentage(productDetails.getDiscountPercentage());
 
         if (productDetails.getImageUrl() != null && !productDetails.getImageUrl().isEmpty()) {
             existingProduct.setImageUrl(productDetails.getImageUrl());
@@ -169,11 +145,7 @@ public class ProductService {
         product.setPrice(dto.getPrice());
         product.setFeatured(dto.isFeatured());
 
-        // Se desideri assegnare una categoria predefinita, puoi farlo qui
-        // oppure lasciare null per ora
 
-        // Immagine predefinita
-        product.setImageUrl("https://example.com/default-image.jpg");
 
         return productRepository.save(product);
     }
@@ -192,9 +164,7 @@ public class ProductService {
     public Page<Product> getAllProductsPaged(Pageable pageable) {
         Page<Product> products = productRepository.findAll(pageable);
         products.forEach(product -> {
-            if (product.getImageUrl() == null || product.getImageUrl().isEmpty()) {
-                product.setImageUrl("https://source.unsplash.com/300x300/?electronics");
-            }
+
         });
         return products;
     }

@@ -12,6 +12,8 @@ import {LirePipe} from '../../services/lire.pipe';
   styleUrls: ['./wishlist.component.css'],
   // Aggiungi la pipe all'array imports
   imports: [CommonModule, NgIf, NgFor, LirePipe],})
+
+
 export class WishlistComponent implements OnInit {
   wishlist: Wishlist | null = null;
   isLoading = false;

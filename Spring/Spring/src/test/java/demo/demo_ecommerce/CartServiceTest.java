@@ -132,8 +132,12 @@ class CartServiceTest {
     @Test
     void testRemoveItemFromCart_RemovesItemSuccessfully() {
         Long userId = 1L, productId = 2L;
+
+        Product product = new Product();
+        product.setId(productId);
+
         ShoppingCartItem item = new ShoppingCartItem();
-        Product product = new Product(); product.setId(productId);
+        item.setId(123L); // ✅ Imposta ID valido
         item.setProduct(product);
 
         Cart cart = new Cart();
@@ -144,22 +148,96 @@ class CartServiceTest {
         when(shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId)).thenReturn(Optional.of(item));
 
         Cart updated = cartService.removeItemFromCart(userId, productId);
+
         assertNotNull(updated);
-        verify(shoppingCartItemRepository).delete(item);
+        verify(shoppingCartItemRepository).deleteByIdWithoutVersion(123L); // ✅ Metodo corretto
     }
+
 
     @Test
     void testClearCart_EmptiesAllItems() {
         Long userId = 1L;
+
+        ShoppingCartItem item1 = new ShoppingCartItem();
+        item1.setId(100L);
+
+        ShoppingCartItem item2 = new ShoppingCartItem();
+        item2.setId(101L);
+
+        List<ShoppingCartItem> items = List.of(item1, item2);
+
         Cart cart = new Cart();
         cart.setId(1L);
-        cart.setItems(new ArrayList<>());
+        cart.setItems(new ArrayList<>(items));
 
         when(cartRepository.findByUserIdWithItems(userId)).thenReturn(Optional.of(cart));
 
         Cart cleared = cartService.clearCart(userId);
 
         assertNotNull(cleared);
-        verify(shoppingCartItemRepository).deleteAllByCartId(cart.getId());
+        verify(shoppingCartItemRepository).deleteByIdWithoutVersion(100L);
+        verify(shoppingCartItemRepository).deleteByIdWithoutVersion(101L);
+
+        // ❌ Non più necessario con l’implementazione attuale:
+        // verify(shoppingCartItemRepository).findByCartId(cart.getId());
     }
+
+
+    @Test
+    void testAddItemToCart_ThrowsOnVersionConflict() {
+        Long userId = 1L, productId = 2L;
+        int quantity = 2;
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setStock(5);
+        product.setPrice(BigDecimal.valueOf(50));
+
+        Cart cart = new Cart();
+        cart.setId(1L);
+        cart.setItems(new ArrayList<>());
+
+        when(cartRepository.findByUserIdWithItems(userId)).thenReturn(Optional.of(cart));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId)).thenReturn(Optional.empty());
+
+        doThrow(new org.springframework.orm.ObjectOptimisticLockingFailureException(Product.class, productId))
+                .when(shoppingCartItemRepository).save(any());
+
+        assertThrows(org.springframework.orm.ObjectOptimisticLockingFailureException.class, () ->
+                cartService.addItemToCart(userId, productId, quantity)
+        );
+    }
+
+
+    @Test
+    void testClearCart_OneItemAlreadyDeleted() {
+        Long userId = 1L;
+
+        ShoppingCartItem item1 = new ShoppingCartItem();
+        item1.setId(100L);
+
+        ShoppingCartItem item2 = new ShoppingCartItem();
+        item2.setId(101L);
+
+        Cart cart = new Cart();
+        cart.setId(1L);
+        cart.setItems(new ArrayList<>(List.of(item1, item2)));
+
+        when(cartRepository.findByUserIdWithItems(userId)).thenReturn(Optional.of(cart));
+
+        doNothing().when(shoppingCartItemRepository).deleteByIdWithoutVersion(101L);
+        doThrow(new org.springframework.dao.EmptyResultDataAccessException(1))
+                .when(shoppingCartItemRepository).deleteByIdWithoutVersion(100L);
+
+        Cart cleared = cartService.clearCart(userId);
+
+        assertNotNull(cleared);
+        verify(shoppingCartItemRepository).deleteByIdWithoutVersion(100L);
+        verify(shoppingCartItemRepository).deleteByIdWithoutVersion(101L);
+    }
+
+
+
+
 }

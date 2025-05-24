@@ -8,6 +8,7 @@ import demo.demo_ecommerce.entities.*;
 import demo.demo_ecommerce.entities.Order.ShippingMethod;
 import demo.demo_ecommerce.repositories.CartRepository;
 import demo.demo_ecommerce.repositories.OrderRepository;
+import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
@@ -37,13 +38,15 @@ public class OrderService {
 
     private final UsersRepository userRepository;
     private final CartRepository cartRepository;
+    private final ShoppingCartItemRepository shoppingCartItemRepository;
 
     public OrderService(OrderRepository orderRepository,
                         UsersRepository userRepository,
-                        CartRepository cartRepository) {
+                        CartRepository cartRepository, ShoppingCartItemRepository shoppingCartItemRepository) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
+        this.shoppingCartItemRepository = shoppingCartItemRepository;
     }
 
     @Transactional
@@ -51,14 +54,13 @@ public class OrderService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Utente non trovato con ID: " + userId));
 
-        Cart cart = cartRepository.findByUserId(userId)
+        Cart cart = cartRepository.findByUserIdWithItems(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Carrello non trovato per l'utente con ID: " + userId));
 
         if (cart.getItems().isEmpty()) {
             throw new IllegalArgumentException("Il carrello è vuoto, impossibile creare un ordine");
         }
 
-        // Calcolo totale carrello con eventuali sconti
         BigDecimal totalBD = cart.getItems().stream()
                 .map(cartItem -> {
                     BigDecimal price = cartItem.getProduct().getPrice();
@@ -77,55 +79,55 @@ public class OrderService {
             throw new IllegalArgumentException("Il totale dell'ordine deve essere maggiore di zero");
         }
 
-        // Calcolo del costo di spedizione
         BigDecimal shippingCost = calculateShippingCost(totalBD, shippingMethod);
 
-        // Crea ordine
-        Order unsavedOrder = Order.builder()
+        Order order = Order.builder()
                 .user(user)
                 .total(totalBD)
                 .shippingMethod(shippingMethod)
                 .shippingCost(shippingCost)
                 .build();
 
-        // Crea OrderItem
         List<OrderItem> orderItems = cart.getItems().stream()
                 .map(cartItem -> {
-                    BigDecimal productPrice = cartItem.getProduct().getPrice();
+                    Product product = cartItem.getProduct();
+                    int quantity = cartItem.getQuantity();
+                    BigDecimal price = cartItem.getProduct().getPrice();
+
                     if (cartItem.getAppliedCoupon() != null) {
                         BigDecimal discount = cartItem.getAppliedCoupon().getDiscountPercentage();
                         BigDecimal discountRate = BigDecimal.valueOf(100)
                                 .subtract(discount)
                                 .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
-                        productPrice = productPrice.multiply(discountRate).setScale(2, RoundingMode.HALF_UP);
+                        price = price.multiply(discountRate).setScale(2, RoundingMode.HALF_UP);
                     }
 
-                    Product product = cartItem.getProduct();
-                    int quantity = cartItem.getQuantity();
                     if (product.getStock() < quantity) {
                         throw new IllegalArgumentException("Stock insufficiente per il prodotto: " + product.getName());
                     }
+
                     product.setStock(product.getStock() - quantity);
 
                     return OrderItem.builder()
-                            .order(unsavedOrder)
+                            .order(order)
                             .product(product)
                             .quantity(quantity)
-                            .price(productPrice)
+                            .price(price)
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
 
-        unsavedOrder.setOrderItems(orderItems);
+        order.setOrderItems(orderItems);
+        Order savedOrder = orderRepository.save(order);
 
-        Order savedOrder = orderRepository.save(unsavedOrder);
-
-        // Svuota carrello
+        // Rimuove tutti gli item del carrello senza toccare il versionamento
+        shoppingCartItemRepository.deleteAllByCartId(cart.getId());
         cart.getItems().clear();
-        cartRepository.save(cart);
 
-        return OrderDTO.fromEntity(savedOrder, true); // o false se vuoi evitare il caricamento degli items
+        // ❌ Nessun cartRepository.save(cart);
+        return OrderDTO.fromEntity(savedOrder, true);
     }
+
 
     private BigDecimal calculateShippingCost(BigDecimal total, ShippingMethod method) {
         if (total.compareTo(new BigDecimal("100.00")) >= 0) {

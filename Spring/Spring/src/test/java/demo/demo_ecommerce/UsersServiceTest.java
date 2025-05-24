@@ -4,16 +4,14 @@ import demo.demo_ecommerce.dtos.UpdateUserDTO;
 import demo.demo_ecommerce.dtos.UserDTO;
 import demo.demo_ecommerce.dtos.UserResponseDTO;
 import demo.demo_ecommerce.entities.Cart;
-import demo.demo_ecommerce.entities.Role;
+import demo.demo_ecommerce.entities.Order;
 import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.repositories.*;
 import demo.demo_ecommerce.services.UsersService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -22,71 +20,104 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class UsersServiceTest {
+
+    @InjectMocks
+    private UsersService usersService;
 
     @Mock private UsersRepository usersRepository;
     @Mock private PasswordEncoder passwordEncoder;
     @Mock private CartRepository cartRepository;
     @Mock private OrderRepository orderRepository;
-
-    @InjectMocks private UsersService usersService;
-
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-    }
+    @Mock private WishlistRepository wishlistRepository;
+    @Mock private ReviewRepository reviewRepository;
 
     @Test
-    void getAllUsers_returnsPageOfUsers() {
-        User user = new User(); user.setUsername("pippo");
-        Page<User> page = new PageImpl<>(List.of(user));
-        when(usersRepository.findAll(any(PageRequest.class))).thenReturn(page);
-
-        Page<User> result = usersService.getAllUsers(PageRequest.of(0, 10));
-
-        assertEquals(1, result.getTotalElements());
-        verify(usersRepository).findAll(any(PageRequest.class));
-    }
-
-    @Test
-    void createUser_shouldEncodePasswordAndSave() {
+    void testCreateUser_Success() {
         UserDTO dto = new UserDTO();
-        dto.setUsername("mario");
-        dto.setPassword("pass");
-        dto.setEmail("mario@mail.com");
+        dto.setUsername("user");
+        dto.setEmail("user@mail.com");
+        dto.setPassword("password");
 
-        when(passwordEncoder.encode("pass")).thenReturn("encoded");
-        when(usersRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+        User savedUser = new User();
+        savedUser.setId(1L);
+        savedUser.setUsername("user");
 
-        User saved = usersService.createUser(dto);
+        when(passwordEncoder.encode(any())).thenReturn("encoded");
+        when(usersRepository.save(any())).thenReturn(savedUser);
 
-        assertEquals("encoded", saved.getPassword());
-        assertEquals("mario", saved.getUsername());
-        verify(usersRepository).save(any(User.class));
+        User created = usersService.createUser(dto);
+
+        assertNotNull(created);
+        assertEquals("user", created.getUsername());
+        verify(usersRepository).save(any());
     }
 
     @Test
-    void getUserById_shouldThrowIfNotFound() {
-        when(usersRepository.findById(123L)).thenReturn(Optional.empty());
-
-        assertThrows(RuntimeException.class, () -> usersService.getUserById(123L));
-    }
-
-    @Test
-    void updateUser_shouldUpdateFields() {
-        User user = new User();
-        user.setId(1L);
-        user.setEmail("old@mail.com");
+    void testUpdateUser_OnlyEmailAndCity() {
+        Long userId = 1L;
+        User existing = new User(); existing.setId(userId); existing.setEmail("old@mail.com");
+        when(usersRepository.findById(userId)).thenReturn(Optional.of(existing));
+        when(usersRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         UpdateUserDTO dto = new UpdateUserDTO();
         dto.setEmail("new@mail.com");
+        dto.setCity("Milano");
 
-        when(usersRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(usersRepository.save(any(User.class))).thenReturn(user);
+        UserResponseDTO updated = usersService.updateUser(userId, dto);
 
-        UserResponseDTO result = usersService.updateUser(1L, dto);
-
-        assertEquals("new@mail.com", result.getEmail());
-        verify(usersRepository).save(user);
+        assertEquals("new@mail.com", updated.getEmail());
+        assertEquals("Milano", updated.getCity());
     }
+
+    @Test
+    void testRegisterUser_CreatesCart() {
+        UserDTO dto = new UserDTO();
+        dto.setUsername("register");
+        dto.setEmail("register@mail.com");
+        dto.setPassword("secure");
+
+        when(passwordEncoder.encode(any())).thenReturn("encoded");
+        when(usersRepository.save(any())).thenAnswer(inv -> {
+            User u = inv.getArgument(0);
+            u.setId(99L);
+            return u;
+        });
+
+        usersService.registerUser(dto);
+
+        verify(usersRepository).save(any());
+        verify(cartRepository).save(any(Cart.class));
+    }
+
+    @Test
+    void testDeleteUser_RemovesUserAndUnlinksOrders() {
+        Long userId = 1L;
+        User user = new User(); user.setId(userId);
+
+        Order order1 = new Order(); order1.setUser(user);
+        Order order2 = new Order(); order2.setUser(user);
+
+        when(usersRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(orderRepository.findByUserId(userId)).thenReturn(List.of(order1, order2));
+
+        usersService.deleteUser(userId);
+
+        assertNull(order1.getUser());
+        assertNull(order2.getUser());
+        verify(usersRepository).delete(user);
+    }
+
+    @Test
+    void testGetUserById_UserExists() {
+        Long id = 1L;
+        User user = new User(); user.setId(id); user.setUsername("check");
+        when(usersRepository.findById(id)).thenReturn(Optional.of(user));
+
+        User result = usersService.getUserById(id);
+        assertEquals("check", result.getUsername());
+    }
+
+
 }

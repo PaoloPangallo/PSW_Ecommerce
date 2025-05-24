@@ -23,6 +23,10 @@ public class ShoppingCartItem {
     @JsonIgnore
     private Cart cart;
 
+    @Version
+    private Long version;
+
+
     @ManyToOne
     private Product product;
 

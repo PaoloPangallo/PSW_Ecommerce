@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -114,23 +115,23 @@ public class CartService {
     }
 
 
-        public static class CartSummary {
-            private final int itemCount;
-            private final BigDecimal total;
+    public static class CartSummary {
+        private final int itemCount;
+        private final BigDecimal total;
 
-            public CartSummary(int itemCount, BigDecimal total) {
-                this.itemCount = itemCount;
-                this.total = total;
-            }
-
-            public int getItemCount() {
-                return itemCount;
-            }
-
-            public BigDecimal getTotal() {
-                return total;
-            }
+        public CartSummary(int itemCount, BigDecimal total) {
+            this.itemCount = itemCount;
+            this.total = total;
         }
+
+        public int getItemCount() {
+            return itemCount;
+        }
+
+        public BigDecimal getTotal() {
+            return total;
+        }
+    }
 
     @Transactional
     public CartSummary getCartSummary(Long userId) {
@@ -150,155 +151,162 @@ public class CartService {
 
 
     /**
-         * Aggiunge un item al carrello, controllando lo stock e inizializzando i prezzi.
-         */
-        @Transactional
-        public Cart addItemToCart(Long userId, Long productId, int quantity) {
-            if (userId == null) {
-                throw new IllegalStateException("Devi essere loggato per aggiungere prodotti al carrello.");
+     * Aggiunge un item al carrello, controllando lo stock e inizializzando i prezzi.
+     */
+    @Transactional
+    public Cart addItemToCart(Long userId, Long productId, int quantity) {
+        if (userId == null) {
+            throw new IllegalStateException("Devi essere loggato per aggiungere prodotti al carrello.");
+        }
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("La quantità deve essere maggiore di zero.");
+        }
+
+        Cart cart = getCartByUserId(userId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Prodotto non trovato con ID: " + productId));
+        int availableStock = product.getStock();
+
+        Optional<ShoppingCartItem> existingItemOpt = shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
+        if (existingItemOpt.isPresent()) {
+            ShoppingCartItem existingItem = existingItemOpt.get();
+            int newQuantity = existingItem.getQuantity() + quantity;
+
+            if (newQuantity > availableStock) {
+                throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
             }
 
-            if (quantity <= 0) {
-                throw new IllegalArgumentException("La quantità deve essere maggiore di zero.");
+            existingItem.setQuantity(newQuantity);
+            shoppingCartItemRepository.save(existingItem); // trigger @Version
+        } else {
+            if (quantity > availableStock) {
+                throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
             }
 
-            Cart cart = getCartByUserId(userId);
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new IllegalArgumentException("Prodotto non trovato con ID: " + productId));
+            ShoppingCartItem newItem = new ShoppingCartItem();
+            newItem.setCart(cart);
+            newItem.setProduct(product);
+            newItem.setQuantity(quantity);
 
-            int availableStock = product.getStock();
+            BigDecimal basePrice = product.getPrice();
+            Integer discountPercentage = product.getDiscountPercentage();
 
-            Optional<ShoppingCartItem> existingItemOpt = shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
-            if (existingItemOpt.isPresent()) {
-                ShoppingCartItem existingItem = existingItemOpt.get();
-                int newQuantity = existingItem.getQuantity() + quantity;
-                if (newQuantity > availableStock) {
-                    throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
-                }
-                existingItem.setQuantity(newQuantity);
-                shoppingCartItemRepository.save(existingItem);
+            if (discountPercentage != null && discountPercentage > 0) {
+                BigDecimal discountAmount = basePrice
+                        .multiply(BigDecimal.valueOf(discountPercentage))
+                        .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+                BigDecimal discountedPrice = basePrice.subtract(discountAmount);
+                newItem.setPrice(discountedPrice);
+                newItem.setOldPrice(basePrice);
             } else {
-                if (quantity > availableStock) {
-                    throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
+                newItem.setPrice(basePrice);
+                newItem.setOldPrice(null);
+            }
+
+            shoppingCartItemRepository.save(newItem); // trigger @Version
+            cart.getItems().add(newItem);
+        }
+
+        cartRepository.save(cart); // trigger @Version su Cart
+        return getCartByUserId(userId); // ricarica sicura e aggiornata
+    }
+
+
+
+    /**
+     * Aggiorna la quantità di un item nel carrello.
+     */
+    @Transactional
+    public Cart updateItemQuantity(Long userId, Long productId, int newQuantity) {
+        Cart cart = getCartByUserId(userId);
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
+
+        int availableStock = product.getStock();
+
+        Optional<ShoppingCartItem> itemOpt = shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
+        if (itemOpt.isPresent()) {
+            ShoppingCartItem item = itemOpt.get();
+
+            if (newQuantity <= 0) {
+                shoppingCartItemRepository.delete(item);
+                cart.getItems().removeIf(i -> i.getProduct().getId().equals(productId));
+            } else {
+                if (newQuantity > availableStock) {
+                    throw new IllegalArgumentException("Quantità superiore allo stock disponibile: " + availableStock);
+                }
+                item.setQuantity(newQuantity);
+                shoppingCartItemRepository.save(item);  // trigger su @Version
+            }
+        } else {
+            if (newQuantity > 0) {
+                if (newQuantity > availableStock) {
+                    throw new IllegalArgumentException("Quantità superiore allo stock disponibile: " + availableStock);
                 }
 
-                ShoppingCartItem newItem = new ShoppingCartItem();
-                newItem.setCart(cart);
-                newItem.setProduct(product);
-                newItem.setQuantity(quantity);
-
-                BigDecimal basePrice = product.getPrice();
-                Integer discountPercentage = product.getDiscountPercentage();
-
-                if (discountPercentage != null && discountPercentage > 0) {
-                    BigDecimal discountAmount = basePrice
-                            .multiply(BigDecimal.valueOf(discountPercentage))
-                            .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-                    BigDecimal discountedPrice = basePrice.subtract(discountAmount);
-
-                    newItem.setPrice(discountedPrice);
-                    newItem.setOldPrice(basePrice);
-                } else {
-                    newItem.setPrice(basePrice);
-                    newItem.setOldPrice(null);
-                }
+                ShoppingCartItem newItem = ShoppingCartItem.builder()
+                        .cart(cart)
+                        .product(product)
+                        .quantity(newQuantity)
+                        .price(product.getPrice())
+                        .oldPrice(product.getPrice())
+                        .build();
 
                 shoppingCartItemRepository.save(newItem);
-            }
-
-            cartRepository.save(cart);
-            return getCartByUserId(userId);
-        }
-
-
-        /**
-         * Aggiorna la quantità di un item nel carrello.
-         */
-        @Transactional
-        public Cart updateItemQuantity(Long userId, Long productId, int newQuantity) {
-            Cart cart = getCartByUserId(userId);
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + productId));
-            int availableStock = product.getStock();
-
-            logger.info(">> Carrello prima dell'update: {} con {} item.", cart.getId(), cart.getItems().size());
-
-            Optional<ShoppingCartItem> itemOpt = shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
-            if (itemOpt.isPresent()) {
-                ShoppingCartItem item = itemOpt.get();
-                logger.info(">> Item trovato per productId {}. Quantità attuale: {}", productId, item.getQuantity());
-
-                if (newQuantity <= 0) {
-                    shoppingCartItemRepository.delete(item);
-                    cart.getItems().removeIf(i -> i.getProduct().getId().equals(productId));
-                    logger.info(">> Item rimosso per productId {}", productId);
-                } else {
-                    if (newQuantity > availableStock) {
-                        throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
-                    }
-                    item.setQuantity(newQuantity);
-                    shoppingCartItemRepository.save(item);
-                    logger.info(">> Quantità aggiornata per productId {} a {}", productId, newQuantity);
-                }
+                cart.getItems().add(newItem);
             } else {
-                if (newQuantity > 0) {
-                    if (newQuantity > availableStock) {
-                        throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
-                    }
-                    ShoppingCartItem newItem = new ShoppingCartItem();
-                    newItem.setCart(cart);
-                    newItem.setProduct(product);
-                    newItem.setQuantity(newQuantity);
-                    // Inizializza i prezzi al valore di listino del prodotto
-                    newItem.setPrice(product.getPrice());
-                    newItem.setOldPrice(product.getPrice());
-                    shoppingCartItemRepository.save(newItem);
-                    cart.getItems().add(newItem);
-                    logger.info(">> Nuovo item aggiunto per productId {} con quantità {}", productId, newQuantity);
-                } else {
-                    throw new IllegalArgumentException("Impossibile aggiornare un item con quantità non positiva.");
-                }
+                throw new IllegalArgumentException("Quantità non valida.");
             }
-
-            cartRepository.save(cart);
-            Cart updatedCart = getCartByUserId(userId);
-            logger.info(">> Carrello aggiornato finale: {} item.", updatedCart.getItems().size());
-            updatedCart.getItems().forEach(i ->
-                    logger.info("   - productId: {}, quantity: {}", i.getProduct().getId(), i.getQuantity())
-            );
-            return updatedCart;
         }
 
-        /**
-         * Rimuove un item dal carrello.
-         */
-        @Transactional
-        public Cart removeItemFromCart(Long userId, Long productId) {
-            Cart cart = getCartByUserId(userId);
-            ShoppingCartItem itemToRemove = shoppingCartItemRepository
-                    .findByCartIdAndProductId(cart.getId(), productId)
-                    .orElseThrow(() -> new IllegalArgumentException("Prodotto non trovato nel carrello."));
-
-            shoppingCartItemRepository.delete(itemToRemove);
-            cart.getItems().removeIf(i -> i.getProduct().getId().equals(productId));
-
-            cartRepository.save(cart);
-            logger.info("Dopo removeItem, nel DB il carrello ha {} item:", cart.getItems().size());
-            cart.getItems().forEach(i ->
-                    logger.info("  - productId: {}, quantity={}", i.getProduct().getId(), i.getQuantity())
-            );
-            return getCartByUserId(userId);
-        }
-
-        /**
-         * Svuota il carrello dell'utente.
-         */
-        @Transactional
-        public Cart clearCart(Long userId) {
-            Cart cart = getCartByUserId(userId);
-            shoppingCartItemRepository.deleteAllByCartId(cart.getId());
-            cart.getItems().clear();
-            cartRepository.save(cart);
-            return getCartByUserId(userId);
-        }
+        cartRepository.save(cart); // trigger su @Version Cart
+        return getCartByUserId(userId);
     }
+
+    /**
+     * Rimuove un item dal carrello.
+     */
+    @Transactional
+    public Cart removeItemFromCart(Long userId, Long productId) {
+        Cart cart = getCartByUserId(userId);
+
+        shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId)
+                .ifPresent(item -> {
+                    shoppingCartItemRepository.deleteByIdWithoutVersion(item.getId());
+                    // Hibernate tiene la collezione sincronizzata in memoria
+                    cart.getItems().removeIf(i -> i.getProduct().getId().equals(productId));
+                });
+
+        // ❌ NIENTE cartRepository.save(cart);
+        return cart;
+    }
+
+
+
+
+    /**
+     * Svuota il carrello dell'utente.
+     */
+    @Transactional
+    public Cart clearCart(Long userId) {
+        Cart cart = getCartByUserId(userId);
+
+        for (ShoppingCartItem item : List.copyOf(cart.getItems())) {
+            try {
+                shoppingCartItemRepository.deleteByIdWithoutVersion(item.getId());
+            } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
+                // Logga o ignora: item già rimosso
+                logger.warn("Elemento già cancellato dal carrello: ID={}", item.getId());
+            }
+            cart.getItems().remove(item); // mantiene Hibernate sincronizzato
+        }
+
+        return cart;
+    }
+
+
+
+
+
+
+}
