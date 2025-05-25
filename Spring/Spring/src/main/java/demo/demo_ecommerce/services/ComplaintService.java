@@ -1,6 +1,5 @@
 package demo.demo_ecommerce.services;
 
-
 import demo.demo_ecommerce.entities.Complaint;
 import demo.demo_ecommerce.entities.ComplaintCategory;
 import demo.demo_ecommerce.entities.ComplaintMessage;
@@ -8,7 +7,6 @@ import demo.demo_ecommerce.entities.ComplaintStatus;
 import demo.demo_ecommerce.repositories.ComplaintMessageRepository;
 import demo.demo_ecommerce.repositories.ComplaintRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,83 +17,80 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ComplaintService {
 
-
-    @Autowired
-    private ComplaintRepository complaintRepository;
-
-    @Autowired
-    private ComplaintMessageRepository messageRepository;
-
     private final ComplaintRepository complaintRepo;
     private final ComplaintMessageRepository msgRepo;
 
+    // ✅ Crea reclamo e primo messaggio
     @Transactional
     public void createComplaintWithFirstMessage(String email,
                                                 ComplaintCategory category,
                                                 String description) {
-
-        // 1. Crea reclamo
         Complaint complaint = new Complaint();
         complaint.setEmail(email);
         complaint.setCategory(category);
-        complaint.setDescription(description);      // campo riassuntivo
+        complaint.setDescription(description);
+
         Complaint saved = complaintRepo.save(complaint);
 
-        // 2. Crea PRIMO messaggio con stesso testo
         ComplaintMessage first = new ComplaintMessage();
         first.setComplaint(saved);
         first.setSender("USER");
         first.setContent(description);
         first.setTimestamp(LocalDateTime.now());
+
         msgRepo.save(first);
     }
 
-
+    // ✅ Reclami per utente
     public List<Complaint> getComplaintsByEmail(String email) {
-        return complaintRepository.findByEmail(email);
+        return complaintRepo.findByEmail(email);
     }
 
+    // ✅ Tutti i reclami (admin)
     public List<Complaint> getAllComplaints() {
-        return complaintRepository.findAll();
+        return complaintRepo.findAll();
     }
 
+    // ✅ Aggiunta messaggio
     public ComplaintMessage addMessage(Long complaintId, ComplaintMessage message) {
-        Complaint complaint = complaintRepository.findById(complaintId)
-                .orElseThrow(() -> new RuntimeException("Complaint not found"));
+        Complaint complaint = complaintRepo.findById(complaintId)
+                .orElseThrow(() -> new RuntimeException("Reclamo non trovato"));
         message.setComplaint(complaint);
-        return messageRepository.save(message);
+        return msgRepo.save(message);
     }
 
+    // ✅ Recupera messaggi
     public List<ComplaintMessage> getMessages(Long complaintId) {
-        return messageRepository.findByComplaintIdOrderByTimestampAsc(complaintId);
+        return msgRepo.findByComplaintIdOrderByTimestampAsc(complaintId);
     }
 
+    // ✅ Cambia stato (solo admin)
     public Complaint updateStatus(Long id, ComplaintStatus newStatus) {
-        Complaint complaint = complaintRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Complaint not found"));
+        Complaint complaint = complaintRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reclamo non trovato"));
 
         ComplaintStatus currentStatus = complaint.getStatus();
-
-        // Regole di transizione valide
         if (!isValidTransition(currentStatus, newStatus)) {
             throw new IllegalStateException(
                     "Transizione da " + currentStatus + " a " + newStatus + " non consentita");
         }
 
         complaint.setStatus(newStatus);
-        return complaintRepository.save(complaint);
+        return complaintRepo.save(complaint);
     }
 
+    // ✅ Recupera complaint (per controllo ownership nel controller)
+    public Complaint getComplaintById(Long id) {
+        return complaintRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reclamo non trovato"));
+    }
+
+    // ⚙️ Regole di transizione
     private boolean isValidTransition(ComplaintStatus current, ComplaintStatus next) {
         return switch (current) {
             case PENDING -> next == ComplaintStatus.ACCEPTED || next == ComplaintStatus.REJECTED;
             case ACCEPTED -> next == ComplaintStatus.CLOSED;
-            case REJECTED -> false;
-            case CLOSED -> false;
+            case REJECTED, CLOSED -> false;
         };
     }
-
-
-
-
 }

@@ -4,11 +4,11 @@ import demo.demo_ecommerce.entities.NewsletterSubscriber;
 import demo.demo_ecommerce.entities.Product;
 import demo.demo_ecommerce.repositories.NewsletterSubscriberRepository;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;

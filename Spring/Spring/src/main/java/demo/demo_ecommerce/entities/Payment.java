@@ -36,7 +36,7 @@ public class Payment {
     @Column(nullable = false)
     private Double amount;
 
-    @Enumerated(EnumType.STRING)  // Usato per lo stato del pagamento come Enum
+    @Enumerated(EnumType.STRING)
     @NotNull(message = "Payment status cannot be null")
     @Column(nullable = false)
     private PaymentStatus status;
@@ -45,6 +45,14 @@ public class Payment {
     @PastOrPresent(message = "Timestamp cannot be in the future")
     @Column(nullable = false)
     private LocalDateTime timestamp;
+
+    @Version
+    private Long version = 0L;
+
+    @PrePersist
+    public void prePersist() {
+        if (version == null) version = 0L;
+    }
 
     public enum PaymentStatus {
         PENDING, COMPLETED, FAILED

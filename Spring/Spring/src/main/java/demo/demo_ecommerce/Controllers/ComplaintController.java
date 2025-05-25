@@ -5,7 +5,6 @@ import demo.demo_ecommerce.dtos.MessageResponse;
 import demo.demo_ecommerce.entities.Complaint;
 import demo.demo_ecommerce.entities.ComplaintCategory;
 import demo.demo_ecommerce.entities.ComplaintMessage;
-
 import demo.demo_ecommerce.entities.ComplaintStatus;
 import demo.demo_ecommerce.services.ComplaintService;
 import lombok.RequiredArgsConstructor;
@@ -29,18 +28,14 @@ public class ComplaintController {
     // ✅ Crea un nuovo reclamo
     @PostMapping
     public ResponseEntity<MessageResponse> submitComplaint(@RequestBody ComplaintRequest req) {
-
-        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-
+        String userEmail = getCurrentUserEmail();
         complaintService.createComplaintWithFirstMessage(
                 userEmail,
                 ComplaintCategory.valueOf(req.getCategory()),
                 req.getMessage()
         );
-
         return ResponseEntity.ok(new MessageResponse("Reclamo ricevuto correttamente."));
     }
-
 
     // ✅ Visualizza tutti i reclami (ADMIN)
     @PreAuthorize("hasRole('ADMIN')")
@@ -49,15 +44,15 @@ public class ComplaintController {
         return ResponseEntity.ok(complaintService.getAllComplaints());
     }
 
-    // ✅ Visualizza reclami per email (USER)
+    // ✅ Visualizza reclami per utente autenticato
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/user")
     public ResponseEntity<List<Complaint>> getUserComplaints() {
-        String authenticatedEmail = SecurityContextHolder.getContext().getAuthentication().getName();
-        return ResponseEntity.ok(complaintService.getComplaintsByEmail(authenticatedEmail));
+        String email = getCurrentUserEmail();
+        return ResponseEntity.ok(complaintService.getComplaintsByEmail(email));
     }
 
-
-    // ✅ Cambia stato del reclamo (ADMIN)
+    // ✅ Cambia stato (solo ADMIN)
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<MessageResponse> updateComplaintStatus(@PathVariable Long id, @RequestBody Map<String, String> body) {
@@ -72,13 +67,18 @@ public class ComplaintController {
         }
     }
 
-
-
-    // ✅ Aggiunge messaggio a un reclamo
+    // ✅ Aggiunge messaggio al reclamo (owner o admin)
     @PostMapping("/{id}/messages")
-    public ResponseEntity<ComplaintMessage> addMessage(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public ResponseEntity<?> addMessage(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        String email = getCurrentUserEmail();
+        Complaint complaint = complaintService.getComplaintById(id);
+
+        if (!isOwner(complaint, email) && !isAdmin()) {
+            return ResponseEntity.status(403).body(new MessageResponse("Accesso negato."));
+        }
+
         ComplaintMessage message = new ComplaintMessage();
-        message.setSender(body.get("sender")); // "USER" o "ADMIN"
+        message.setSender(body.get("sender")); // USER o ADMIN
         message.setContent(body.get("content"));
         message.setTimestamp(LocalDateTime.now());
 
@@ -86,14 +86,32 @@ public class ComplaintController {
         return ResponseEntity.ok(saved);
     }
 
-    // ✅ Restituisce la conversazione di un reclamo
+    // ✅ Visualizza messaggi (solo owner o admin)
     @GetMapping("/{id}/messages")
-    public ResponseEntity<List<ComplaintMessage>> getMessages(@PathVariable Long id) {
+    public ResponseEntity<?> getMessages(@PathVariable Long id) {
+        String email = getCurrentUserEmail();
+        Complaint complaint = complaintService.getComplaintById(id);
+
+        if (!isOwner(complaint, email) && !isAdmin()) {
+            return ResponseEntity.status(403).body(new MessageResponse("Accesso negato."));
+        }
+
         return ResponseEntity.ok(complaintService.getMessages(id));
     }
 
+    // === Utility methods ===
 
+    private String getCurrentUserEmail() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
 
+    private boolean isOwner(Complaint complaint, String email) {
+        return complaint.getEmail().equalsIgnoreCase(email);
+    }
 
-
+    private boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
 }

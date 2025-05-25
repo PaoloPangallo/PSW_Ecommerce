@@ -93,33 +93,41 @@ table {
 // Prezzi e sconti
 // ===============================
 .old-price {
-  color: darken($col-secondary, 30%);
   text-decoration: line-through;
-  margin-right: $space-xs;
-  font-weight: 600;
-  font-size: 1rem;
-  font-family: $font-body;
+  margin-right: 0.5rem;
+  color: #999;
 }
 
 .new-price {
-  color: $col-accent;
-  font-weight: 700;
-  font-size: 1.2rem;
-  font-family: $font-body;
+  font-weight: bold;
+  color: #2e7d32;
 }
 
 .discount-badge {
-  background: linear-gradient(135deg, $col-accent 0%, darken($col-accent, 10%) 100%);
-  color: white;
-  font-weight: 700;
-  font-size: 0.85rem;
-  padding: 4px 12px;
-  border-radius: 30px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-  user-select: none;
-  margin-left: $space-sm;
-  vertical-align: middle;
+  background-color: #ffecb3;
+  color: #ef6c00;
+  padding: 0.1rem 0.4rem;
+  margin-left: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
 }
+
+.coupon-label {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  color: $col-primary;
+  background-color: lighten($col-secondary, 40%);
+  border: 1px dashed $col-accent;
+  border-radius: 8px;
+  font-weight: 600;
+  font-family: $font-body;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+
+
 
 // ===============================
 // Input coupon

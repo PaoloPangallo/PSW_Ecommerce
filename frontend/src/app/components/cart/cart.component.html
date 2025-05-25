@@ -32,14 +32,19 @@
           <ng-container *ngIf="item.oldPrice && item.oldPrice > item.price; else noDiscount">
             <del class="old-price">{{ item.oldPrice | lire:false }}</del>
             <span class="new-price">{{ item.price | lire:false }}</span>
-            <span class="discount-badge">
-              -{{ ((1 - (item.price / item.oldPrice)) * 100) | number: '1.0-0' }}%
-            </span>
+            <span class="discount-badge">-{{ item.discountPercentage }}%</span>
           </ng-container>
+
           <ng-template #noDiscount>
-            {{ item.price | lire:false }}
+            <span class="new-price">{{ item.price | lire:false }}</span>
           </ng-template>
+
+          <!-- Etichetta Coupon -->
+          <ng-container *ngIf="item.couponCode">
+            <div class="coupon-label">🎟 Coupon <strong>{{ item.couponCode }}</strong> applicato</div>
+          </ng-container>
         </td>
+
       </ng-container>
 
       <!-- Colonna Totale per Prodotto -->

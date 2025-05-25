@@ -46,7 +46,7 @@ public class Product {
 
 
     @Version
-    private Long version;
+    private Long version = 0L;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
@@ -82,6 +82,12 @@ public class Product {
         this.imageUrl = imageUrl;
         this.featured = featured;
     }
+
+    @PrePersist
+    public void prePersist() {
+        if (version == null) version = 0L;
+    }
+
 
     @Override
     public boolean equals(Object o) {

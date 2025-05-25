@@ -7,6 +7,7 @@ import demo.demo_ecommerce.services.DeliveryEstimationService;
 import demo.demo_ecommerce.entities.Order;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -23,7 +24,8 @@ public class CheckoutController {
         this.deliveryEstimationService = deliveryEstimationService;
     }
 
-    // POST /checkout/{userId}
+    // 🔐 Solo ADMIN o l'utente stesso possono fare checkout
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @PostMapping("/{userId}")
     public ResponseEntity<CheckoutResponse> processCheckout(
             @PathVariable Long userId,
@@ -43,7 +45,7 @@ public class CheckoutController {
         return ResponseEntity.ok(response);
     }
 
-    // GET /checkout/estimate?cap=80100
+    // Pubblico: chiunque può stimare una consegna
     @GetMapping("/estimate")
     public ResponseEntity<LocalDate> getEstimate(@RequestParam String cap) {
         LocalDate estimate = deliveryEstimationService.estimateDeliveryDate(cap);

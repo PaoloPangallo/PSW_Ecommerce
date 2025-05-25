@@ -21,7 +21,7 @@ public class Order {
     private Long id;
 
     @Version
-    private Long version;
+    private Long version = 0L;
 
     @DecimalMin(value = "0.0", inclusive = true, message = "Total must be a positive value")
     private BigDecimal total = BigDecimal.ZERO;
@@ -54,7 +54,13 @@ public class Order {
         if (status == null) {
             status = OrderStatus.CREATED;
         }
+        if (version == null) {
+            version = 0L;
+        }
     }
+
+
+
 
     @Enumerated(EnumType.STRING)
     @Column(name = "shipping_method", nullable = false)

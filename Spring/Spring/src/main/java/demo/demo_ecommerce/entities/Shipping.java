@@ -21,7 +21,6 @@ public class Shipping {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Mantieni il vincolo a livello DB, ma togli @NotNull a livello di Bean Validation
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
@@ -45,18 +44,16 @@ public class Shipping {
     @Column(nullable = false)
     private ShippingStatus status;
 
+    @Version
+    private Long version = 0L;
+
     @PrePersist
     public void prePersist() {
-        // Se shippingDate non è settata dal service, la imposto di default a "adesso + 2 giorni"
-        if (shippingDate == null) {
-            shippingDate = LocalDateTime.now().plusDays(2);
-        }
+        if (shippingDate == null) shippingDate = LocalDateTime.now().plusDays(2);
+        if (version == null) version = 0L;
     }
-
 
     public enum ShippingStatus {
         PENDING, SHIPPED, DELIVERED
     }
-
-    // equals, hashCode ...
 }

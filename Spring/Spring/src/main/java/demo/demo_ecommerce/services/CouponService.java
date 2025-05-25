@@ -6,6 +6,7 @@ import demo.demo_ecommerce.entities.Coupon;
 import demo.demo_ecommerce.entities.Product;
 import demo.demo_ecommerce.repositories.CouponRepository;
 import demo.demo_ecommerce.repositories.ProductRepository;
+import demo.demo_ecommerce.repositories.UsersRepository;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ public class CouponService {
     @Autowired
     private final CouponRepository couponRepository;
     private final ProductRepository productRepository;
+    @Autowired
+    private UsersRepository usersRepository;
 
     public CouponService(CouponRepository couponRepository, ProductRepository productRepository) {
         this.couponRepository = couponRepository;
@@ -88,6 +91,12 @@ public class CouponService {
         return coupons.stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
+    }
+
+    public boolean isUserRequestingOwnData(Long userId, String email) {
+        return usersRepository.findById(userId)
+                .map(u -> u.getEmail().equalsIgnoreCase(email))
+                .orElse(false);
     }
 
     // Esempio di mappatura

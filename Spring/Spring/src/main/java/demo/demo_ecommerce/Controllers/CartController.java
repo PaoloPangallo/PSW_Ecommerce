@@ -4,11 +4,13 @@ import demo.demo_ecommerce.dtos.CartDTO;
 import demo.demo_ecommerce.dtos.QuantityUpdateRequest;
 import demo.demo_ecommerce.entities.Cart;
 import demo.demo_ecommerce.entities.ShoppingCartItem;
+import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
 import demo.demo_ecommerce.services.CartService;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -36,20 +38,32 @@ public class CartController {
     }
 
     // Idem come sopra
-    @PreAuthorize("hasRole('ADMIN') or #cartItemId == principal.id")
     @PostMapping("/apply-coupon-to-item/{cartItemId}/{couponCode}")
-    public ResponseEntity<CartDTO> applyCouponToItem(@PathVariable Long cartItemId,
-                                                     @PathVariable String couponCode) {
+    public ResponseEntity<CartDTO> applyCouponToItem(
+            @PathVariable Long cartItemId,
+            @PathVariable String couponCode,
+            @AuthenticationPrincipal User user) {
+
+        ShoppingCartItem item = shoppingCartItemRepository.findById(cartItemId)
+                .orElseThrow(() -> new IllegalArgumentException("Cart item non trovato"));
+
+        Long ownerId = item.getCart().getUser().getId();
+
+        boolean isAdmin = user.getRole().name().equals("ADMIN");
+
+        if (!isAdmin && !ownerId.equals(user.getId())) {
+            return ResponseEntity.status(403).body(null); // ❌ Non autorizzato
+        }
+
         boolean success = cartService.applyCouponToCartItem(cartItemId, couponCode);
         if (!success) {
             return ResponseEntity.badRequest().build();
         }
-        ShoppingCartItem updatedItem = shoppingCartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
-        Long userId = updatedItem.getCart().getUser().getId();
-        Cart updatedCart = cartService.getCartByUserId(userId);
+
+        Cart updatedCart = cartService.getCartByUserId(ownerId);
         return ResponseEntity.ok(CartDTO.fromEntity(updatedCart));
     }
+
 
     // Get cart: ADMIN può vedere qualsiasi carrello, l’utente può vedere solo il proprio
     @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")

@@ -18,6 +18,10 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version = 0L;
+
+
     // Relazione ManyToOne con Order
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
@@ -36,6 +40,13 @@ public class OrderItem {
     @NotNull(message = "The price must not be null")
     @DecimalMin(value = "0.0", message = "The price must be 0 or greater")
     private BigDecimal price;
+
+    @PrePersist
+    public void prePersist() {
+        if (version == null) version = 0L;
+    }
+
+
 
     @Override
     public boolean equals(Object o) {

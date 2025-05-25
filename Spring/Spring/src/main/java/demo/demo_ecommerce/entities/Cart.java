@@ -17,8 +17,9 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @OneToOne
-    @JoinColumn(name = "user_id", unique = true, nullable = false) // Assicura un solo carrello per utente
+    @JoinColumn(name = "user_id", unique = true, nullable = false)
     private User user;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -28,19 +29,19 @@ public class Cart {
     private Map<Long, String> selectedCoupons = new HashMap<>();
 
     @Version
-    private Long version;
-
-
-
+    private Long version = 0L;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShoppingCartItem> items = new ArrayList<>();
 
-    public Cart() {
-    }
+    public Cart() {}
 
     public Cart(User user) {
         this.user = user;
     }
 
+    @PrePersist
+    public void prePersist() {
+        if (version == null) version = 0L;
+    }
 }

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -143,7 +144,7 @@ public class ReviewService {
 
         // Se non ci sono recensioni, restituiamo una lista vuota
         if (reviews.isEmpty()) {
-            return List.of();
+            return new ArrayList<>(); // ✅ mutabile
         }
         // Forza l'inizializzazione della collection upvotes per ogni review
         reviews.forEach(review -> review.getUpvotes().size());

@@ -1,6 +1,8 @@
 package demo.demo_ecommerce.services;
 
 import com.itextpdf.text.*;
+import java.util.ArrayList;
+
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import demo.demo_ecommerce.dtos.OrderDTO;
@@ -10,7 +12,6 @@ import demo.demo_ecommerce.repositories.CartRepository;
 import demo.demo_ecommerce.repositories.OrderRepository;
 import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
-import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,11 +21,14 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -92,7 +96,7 @@ public class OrderService {
                 .map(cartItem -> {
                     Product product = cartItem.getProduct();
                     int quantity = cartItem.getQuantity();
-                    BigDecimal price = cartItem.getProduct().getPrice();
+                    BigDecimal price = product.getPrice();
 
                     if (cartItem.getAppliedCoupon() != null) {
                         BigDecimal discount = cartItem.getAppliedCoupon().getDiscountPercentage();
@@ -108,6 +112,13 @@ public class OrderService {
 
                     product.setStock(product.getStock() - quantity);
 
+                    if (product.getVersion() == null) {
+                        System.out.println("⚠️ WARNING: product.version è null per: " + product.getName() + " → forzatura a 0L");
+                        product.setVersion(0L);
+                    } else {
+                        System.out.println("✅ product.version OK per: " + product.getName() + " = " + product.getVersion());
+                    }
+
                     return OrderItem.builder()
                             .order(order)
                             .product(product)
@@ -115,18 +126,30 @@ public class OrderService {
                             .price(price)
                             .build();
                 })
-                .toList();
+                .collect(Collectors.toCollection(ArrayList::new)); // ✅ FIX: lista mutabile
 
         order.setOrderItems(orderItems);
+
+        for (OrderItem item : orderItems) {
+            Product product = item.getProduct();
+            System.out.println("💾 Salvataggio prodotto: " + product.getName() + " (version: " + product.getVersion() + ")");
+            // productRepository.save(product); // decommenta se usi ProductRepository
+        }
+
         Order savedOrder = orderRepository.save(order);
 
-        // Rimuove tutti gli item del carrello senza toccare il versionamento
-        shoppingCartItemRepository.deleteAllByCartId(cart.getId());
-        cart.getItems().clear();
+        Iterator<ShoppingCartItem> iterator = cart.getItems().iterator();
+        while (iterator.hasNext()) {
+            ShoppingCartItem item = iterator.next();
+            shoppingCartItemRepository.delete(item);
+            iterator.remove();
+        }
 
-        // ❌ Nessun cartRepository.save(cart);
         return OrderDTO.fromEntity(savedOrder, true);
     }
+
+
+
 
 
     private BigDecimal calculateShippingCost(BigDecimal total, ShippingMethod method) {
@@ -151,6 +174,12 @@ public class OrderService {
         });
         return ordersPage.map(order -> OrderDTO.fromEntity(order, true));
     }
+
+    public Order getOrderEntityById(Long orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Ordine non trovato: " + orderId));
+    }
+
 
     @Transactional
     public OrderDTO getOrderById(Long userId, Long orderId) {

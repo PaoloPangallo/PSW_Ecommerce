@@ -2,10 +2,8 @@ package demo.demo_ecommerce.Controllers;
 
 import demo.demo_ecommerce.entities.Faq;
 import demo.demo_ecommerce.services.FaqService;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,9 +18,23 @@ public class FaqController {
         this.faqService = faqService;
     }
 
+    // Pubblico
     @GetMapping
     public List<Faq> getAllFaqs() {
         return faqService.getAllFaqs();
     }
-}
 
+    // Solo ADMIN può aggiungere nuove FAQ
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public Faq createFaq(@RequestBody Faq faq) {
+        return faqService.saveFaq(faq);
+    }
+
+    // Solo ADMIN può cancellare una FAQ
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public void deleteFaq(@PathVariable Long id) {
+        faqService.deleteFaqById(id);
+    }
+}

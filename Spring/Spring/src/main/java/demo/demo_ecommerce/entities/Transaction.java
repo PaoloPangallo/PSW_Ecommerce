@@ -23,12 +23,10 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Riferimento a Payment, obbligatorio a livello DB
     @ManyToOne
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
 
-    // Riferimento all'Order
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
@@ -46,14 +44,14 @@ public class Transaction {
     @Column(nullable = false)
     private LocalDateTime transactionDate;
 
+    @Version
+    private Long version = 0L;
+
     @PrePersist
     public void prePersist() {
-        if (transactionDate == null) {
-            transactionDate = LocalDateTime.now();
-        }
-        if (transactionId == null || transactionId.isBlank()) {
-            transactionId = "TEMP";
-        }
+        if (transactionDate == null) transactionDate = LocalDateTime.now();
+        if (transactionId == null || transactionId.isBlank()) transactionId = "TEMP";
+        if (version == null) version = 0L;
     }
 
     public enum TransactionStatus {

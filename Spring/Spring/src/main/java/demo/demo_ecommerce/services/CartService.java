@@ -10,10 +10,10 @@ import demo.demo_ecommerce.repositories.CouponRepository;
 import demo.demo_ecommerce.repositories.ProductRepository;
 import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -293,12 +293,11 @@ public class CartService {
 
         for (ShoppingCartItem item : List.copyOf(cart.getItems())) {
             try {
-                shoppingCartItemRepository.deleteByIdWithoutVersion(item.getId());
-            } catch (org.springframework.dao.EmptyResultDataAccessException ex) {
-                // Logga o ignora: item già rimosso
-                logger.warn("Elemento già cancellato dal carrello: ID={}", item.getId());
+                shoppingCartItemRepository.delete(item); // usa delete(entity) per rispettare il @Version
+            } catch (Exception ex) {
+                logger.warn("Errore durante la cancellazione: ID={}", item.getId());
             }
-            cart.getItems().remove(item); // mantiene Hibernate sincronizzato
+            cart.getItems().remove(item);
         }
 
         return cart;

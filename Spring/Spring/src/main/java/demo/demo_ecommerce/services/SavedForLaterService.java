@@ -6,8 +6,8 @@ import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.repositories.ProductRepository;
 import demo.demo_ecommerce.repositories.SavedForLaterRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

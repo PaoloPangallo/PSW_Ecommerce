@@ -5,6 +5,7 @@ import demo.demo_ecommerce.services.NewsletterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +18,7 @@ public class NewsletterController {
 
     private final NewsletterService newsletterService;
 
+    // ✅ Iscrizione pubblica
     @PostMapping("/subscribe")
     public ResponseEntity<?> subscribe(@RequestBody Map<String, String> body) {
         String email = body.get("email");
@@ -42,6 +44,7 @@ public class NewsletterController {
         }
     }
 
+    // ✅ Conferma pubblica
     @GetMapping("/confirm")
     public ResponseEntity<?> confirm(@RequestParam("token") String token) {
         if (token == null || token.isBlank()) {
@@ -56,19 +59,22 @@ public class NewsletterController {
         }
     }
 
+    // 🔐 Solo admin può vedere la lista completa
     @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<NewsletterSubscriber>> getAllSubscribers() {
         return ResponseEntity.ok(newsletterService.getAllSubscribers());
     }
 
+    // 🔐 Solo admin può inviare manualmente la newsletter
     @PostMapping("/send-now")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> sendNow() {
         try {
-            newsletterService.sendWeeklyNewsletter(); // invio immediato
+            newsletterService.sendWeeklyNewsletter();
             return ResponseEntity.ok(Map.of("message", "Newsletter inviata manualmente con successo."));
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body(Map.of("error", "Errore durante l’invio manuale."));
         }
     }
-
 }

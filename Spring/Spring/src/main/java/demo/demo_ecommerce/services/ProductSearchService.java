@@ -30,7 +30,8 @@ public class ProductSearchService {
                 .filter(token -> !STOPWORDS.contains(token))
                 .collect(Collectors.toList());
 
-        if (keywords.isEmpty()) return List.of();
+        if (keywords.isEmpty()) return new ArrayList<>(); // ✅ mutabile
+
 
         List<Product> allProducts = productRepository.findAll();
 

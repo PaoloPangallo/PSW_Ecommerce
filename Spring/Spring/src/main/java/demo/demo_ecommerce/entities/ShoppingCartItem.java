@@ -24,8 +24,7 @@ public class ShoppingCartItem {
     private Cart cart;
 
     @Version
-    private Long version;
-
+    private Long version = 0L;
 
     @ManyToOne
     private Product product;
@@ -35,17 +34,12 @@ public class ShoppingCartItem {
     @ManyToOne
     private Coupon appliedCoupon;
 
-    /**
-     * Prezzo originale del prodotto prima di qualsiasi sconto o coupon.
-     * Viene impostato al momento dell’aggiunta del prodotto al carrello,
-     * oppure quando aggiorniamo la quantità se non esiste già.
-     */
     private BigDecimal oldPrice;
 
-    /**
-     * Prezzo finale che l’utente paga (potenzialmente scontato).
-     * Se non è mai stato applicato un coupon, coincide con oldPrice.
-     * Se applichi un coupon, aggiorni questo campo con il prezzo scontato.
-     */
     private BigDecimal price;
+
+    @PrePersist
+    public void prePersist() {
+        if (version == null) version = 0L;
+    }
 }

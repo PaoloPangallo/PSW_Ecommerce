@@ -7,7 +7,6 @@ import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.repositories.OrderRepository;
 import demo.demo_ecommerce.repositories.ProductRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -31,7 +30,8 @@ public class RecommendationService {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             System.out.println("Nessun utente trovato con ID: " + userId);
-            return List.of();
+            return new ArrayList<>(); // ✅ mutabile
+
         }
 
         User user = userOpt.get();
@@ -51,7 +51,7 @@ public class RecommendationService {
 
         if (categoryCount.isEmpty()) {
             System.out.println("Nessuna categoria trovata per i prodotti acquistati da " + userId);
-            return List.of();
+            return new ArrayList<>(); // ✅ mutabile
         }
 
         Long topCategoryId = Collections.max(categoryCount.entrySet(), Map.Entry.comparingByValue()).getKey();
@@ -81,7 +81,8 @@ public class RecommendationService {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
             System.out.println("❌ Nessun utente trovato con email: " + email);
-            return List.of();
+            return new ArrayList<>(); // ✅ mutabile
+
         }
 
         User user = userOpt.get();

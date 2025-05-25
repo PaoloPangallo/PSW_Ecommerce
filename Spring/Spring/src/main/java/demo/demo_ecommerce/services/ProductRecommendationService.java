@@ -52,7 +52,8 @@ public class ProductRecommendationService {
                 .limit(5)
                 .collect(Collectors.toList());
 
-        if (recommendedIds.isEmpty()) return List.of();
+        if (recommendedIds.isEmpty()) return new ArrayList<>(); // ✅ mutabile
+
 
         return productRepository.findAllById(recommendedIds).stream()
                 .filter(p -> p.getStock() > 0)

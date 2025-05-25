@@ -41,11 +41,13 @@ public class ShoppingCartItemDTO {
         BigDecimal productPrice = item.getProduct().getPrice();
 
 // Se item.getPrice() è inferiore al prezzo del prodotto, allora c'è sconto
-        if (productPrice != null && productPrice.compareTo(this.price) > 0) {
+        if (item.getAppliedCoupon() == null && productPrice != null && productPrice.compareTo(this.price) > 0) {
+            // Solo se NON c'è coupon applicato e il prezzo è più basso → sconto di prodotto
             this.oldPrice = productPrice;
         } else {
-            this.oldPrice = null; // nessuno sconto → nessun prezzo barrato
+            this.oldPrice = null;
         }
+
 
 
         this.quantity = item.getQuantity();
@@ -55,13 +57,15 @@ public class ShoppingCartItemDTO {
                 : null;
 
         // Calcolo percentuale sconto se oldPrice è valido
-        if (this.oldPrice != null && this.oldPrice.compareTo(this.price) > 0) {
-            BigDecimal discount = this.oldPrice.subtract(this.price).divide(this.oldPrice, 2, BigDecimal.ROUND_HALF_UP)
+        if (this.oldPrice != null) {
+            BigDecimal discount = this.oldPrice.subtract(this.price)
+                    .divide(this.oldPrice, 2, BigDecimal.ROUND_HALF_UP)
                     .multiply(BigDecimal.valueOf(100));
             this.discountPercentage = discount.intValue();
         } else {
             this.discountPercentage = 0;
         }
+
 
         // Debug utile in console backend
         System.out.println("CartDTO -> " + productName + " | prezzo: " + this.price + " | old: " + this.oldPrice + " | sconto: " + this.discountPercentage + "%");

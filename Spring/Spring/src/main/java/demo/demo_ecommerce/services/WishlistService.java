@@ -8,10 +8,10 @@ import demo.demo_ecommerce.repositories.ProductRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
 import demo.demo_ecommerce.repositories.WishlistRepository;
 import demo.demo_ecommerce.Utility.WishlistNotFoundException;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
