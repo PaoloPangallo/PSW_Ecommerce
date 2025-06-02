@@ -1,7 +1,12 @@
 package demo.demo_ecommerce.dtos;
 
-import java.time.LocalDateTime;
+import demo.demo_ecommerce.entities.Payment;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+@Setter
+@Getter
 public class PaymentResponseDTO {
 
     private Long id;
@@ -12,47 +17,17 @@ public class PaymentResponseDTO {
     private String status;
     private LocalDateTime timestamp;
 
-    // Getters and Setters
-    public Long getId() {
-        return id;
+    public static PaymentResponseDTO fromEntity(Payment payment) {
+        PaymentResponseDTO dto = new PaymentResponseDTO();
+        dto.setId(payment.getId());
+        dto.setUserId(payment.getUser().getId());
+        dto.setOrderId(payment.getOrder().getId());
+        dto.setPaymentMethod(payment.getPaymentMethod());
+        dto.setAmount(payment.getAmount());
+        dto.setStatus(payment.getStatus().toString());
+        dto.setTimestamp(payment.getTimestamp());
+        return dto;
     }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public Long getUserId() {
-        return userId;
-    }
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-    public Long getOrderId() {
-        return orderId;
-    }
-    public void setOrderId(Long orderId) {
-        this.orderId = orderId;
-    }
-    public String getPaymentMethod() {
-        return paymentMethod;
-    }
-    public void setPaymentMethod(String paymentMethod) {
-        this.paymentMethod = paymentMethod;
-    }
-    public Double getAmount() {
-        return amount;
-    }
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-    public String getStatus() {
-        return status;
-    }
-    public void setStatus(String status) {
-        this.status = status;
-    }
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
+
+
 }

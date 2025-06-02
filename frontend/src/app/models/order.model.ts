@@ -7,6 +7,7 @@ export interface OrderItem {
 }
 
 export interface Order {
+  shippingCost: number;
   id: number;
   total: number;
   createdAt: string;    // o Date, se preferisci convertirlo

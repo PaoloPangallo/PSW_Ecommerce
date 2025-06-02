@@ -12,6 +12,8 @@ import demo.demo_ecommerce.repositories.CartRepository;
 import demo.demo_ecommerce.repositories.OrderRepository;
 import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +39,12 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
 
+    private final EntityManager entityManager;
+
+
+
+
+
     private final OrderRepository orderRepository;
 
 
@@ -44,9 +52,10 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
 
-    public OrderService(OrderRepository orderRepository,
+    public OrderService(EntityManager entityManager, OrderRepository orderRepository,
                         UsersRepository userRepository,
                         CartRepository cartRepository, ShoppingCartItemRepository shoppingCartItemRepository) {
+        this.entityManager = entityManager;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
@@ -59,7 +68,12 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Utente non trovato con ID: " + userId));
 
         Cart cart = cartRepository.findByUserIdWithItems(userId)
+
+
+
                 .orElseThrow(() -> new IllegalArgumentException("Carrello non trovato per l'utente con ID: " + userId));
+        entityManager.lock(cart, LockModeType.OPTIMISTIC);
+
 
         if (cart.getItems().isEmpty()) {
             throw new IllegalArgumentException("Il carrello è vuoto, impossibile creare un ordine");

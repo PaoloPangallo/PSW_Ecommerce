@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {AuthService} from './auth.services';
 import {Observable} from 'rxjs';
+import {CartDTO} from '../models/cart.model';
 
 @Injectable({ providedIn: 'root' })
 export class SavedService {
@@ -40,6 +41,15 @@ export class SavedService {
       responseType: 'text' as 'json'  // ✅ QUI pure
     });
   }
+
+  restoreToCart(userId: number, productId: number) {
+    return this.http.post<CartDTO>(`http://localhost:8080/api/saved/restore`, null, {
+      params: { userId, productId }
+    });
+  }
+
+
+
 
 
 

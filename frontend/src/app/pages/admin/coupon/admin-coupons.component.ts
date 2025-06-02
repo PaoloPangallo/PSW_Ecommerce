@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AdminCouponService } from '../../../service-admin/admin-coupon.service';
-import {Coupon, CouponCreationDTO} from '../../../models/coupon.model';
+import { Coupon, CouponCreationDTO } from '../../../models/coupon.model';
+import { Page } from '../../../models/page.model';
 
 @Component({
   selector: 'app-admin-coupons',
@@ -13,9 +15,12 @@ import {Coupon, CouponCreationDTO} from '../../../models/coupon.model';
 })
 export class AdminCouponsComponent implements OnInit {
   coupons: Coupon[] = [];
-  createMode: boolean = false;
+  createMode = false;
 
-  // newCoupon viene definito come Partial<CouponCreationDTO> per consentire l'omissione dell'ID (generato dal backend)
+  currentPage = 0;
+  pageSize = 5;
+  totalPages = 0;
+
   newCoupon: Partial<CouponCreationDTO> = {
     code: '',
     discountPercentage: 0,
@@ -24,26 +29,53 @@ export class AdminCouponsComponent implements OnInit {
     minOrderValue: 0,
     productIds: []
   };
-
-  // Variabile per gestire l'input di una stringa di ID prodotto separati da virgola
   productIdsString: string = '';
 
-  constructor(private adminCouponService: AdminCouponService) { }
+  constructor(
+    private adminCouponService: AdminCouponService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadCoupons();
+    setTimeout(() => this.loadCoupons(), 200); // ⚠️ simula seconda chiamata (da cache)
   }
 
   loadCoupons(): void {
-    this.adminCouponService.getCoupons().subscribe(
-      data => {
-        console.log('Coupon ricevuti dal backend:', data);
-        this.coupons = data;
+    this.adminCouponService.getCoupons(this.currentPage, this.pageSize).subscribe(
+      (data: Page<Coupon>) => {
+        console.log("📦 Risposta ricevuta:", data); // 👈
+        this.coupons = data.content;
+        this.totalPages = data.totalPages;
       },
-      error => console.error('Errore nel recupero dei coupon', error)
+      error => console.error('❌ Errore nel recupero dei coupon', error)
     );
   }
 
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages - 1) {
+      this.currentPage++;
+      this.loadCoupons();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 0) {
+      this.currentPage--;
+      this.loadCoupons();
+    }
+  }
+
+  onChangePageSize(size: number): void {
+    this.pageSize = size;
+    this.currentPage = 0;
+    this.loadCoupons();
+  }
+
+  goBack(): void {
+    this.router.navigate(['/admin/dashboard']);
+  }
 
   onCreate(): void {
     this.createMode = true;
@@ -63,7 +95,6 @@ export class AdminCouponsComponent implements OnInit {
   }
 
   onSubmitCreate(): void {
-    // Converte la stringa di input in un array di numeri
     if (this.productIdsString.trim() !== '') {
       this.newCoupon.productIds = this.productIdsString.split(',')
         .map(id => parseInt(id.trim()))
@@ -71,11 +102,11 @@ export class AdminCouponsComponent implements OnInit {
     } else {
       this.newCoupon.productIds = [];
     }
-    // Invia il nuovo coupon al backend; il cast garantisce che il DTO abbia il tipo corretto
+
     this.adminCouponService.createCoupon(this.newCoupon as CouponCreationDTO).subscribe(
-      createdCoupon => {
-        this.coupons.push(createdCoupon);
+      () => {
         this.createMode = false;
+        this.loadCoupons(); // ricarica lista
       },
       error => console.error('Errore nella creazione del coupon', error)
     );

@@ -225,18 +225,20 @@ export class CartComponent implements OnInit {
     const userId = this.authService.getCurrentUserId();
     if (!userId) return;
 
-    this.cartService.addToCart(userId, item.product.id, item.quantity).subscribe({
-      next: () => {
-        this.savedService.removeSavedItem(item.product.id).subscribe({
-          next: () => {
-            this.loadCart(userId);
-            this.loadSaved();
-            this.showSnack('✅ Prodotto spostato nel carrello', 2000);
-          }
-        });
+    this.savedService.restoreToCart(userId, item.product.id).subscribe({
+      next: (updatedCart) => {
+        this.cart = updatedCart;
+        this.cartService.setCart(updatedCart); // 🔥 aggiorna lo stato globale
+        this.loadSaved(); // aggiorna la lista dei salvati
+        this.showSnack('✅ Prodotto spostato nel carrello', 2000);
+      },
+      error: (err) => {
+        console.error('Errore durante il ripristino nel carrello:', err);
+        this.showSnack('❌ Impossibile spostare nel carrello.', 3000);
       }
     });
   }
+
 
   removeFromSaved(item: any): void {
     this.savedService.removeSavedItem(item.product.id).subscribe(() => {

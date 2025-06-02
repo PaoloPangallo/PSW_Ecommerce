@@ -10,6 +10,8 @@ import demo.demo_ecommerce.repositories.CouponRepository;
 import demo.demo_ecommerce.repositories.ProductRepository;
 import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -31,19 +33,21 @@ public class CartService {
     private final ShoppingCartItemRepository shoppingCartItemRepository;
     private final CouponRepository couponRepository;
     private final CouponService couponService;
+    private final EntityManager entityManager;
 
     public CartService(CartRepository cartRepository,
                        UsersRepository usersRepository,
                        ProductRepository productRepository,
                        ShoppingCartItemRepository shoppingCartItemRepository,
                        CouponRepository couponRepository,
-                       CouponService couponService) {
+                       CouponService couponService, EntityManager entityManager) {
         this.cartRepository = cartRepository;
         this.usersRepository = usersRepository;
         this.productRepository = productRepository;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
         this.couponRepository = couponRepository;
         this.couponService = couponService;
+        this.entityManager = entityManager;
     }
 
     /**
@@ -162,16 +166,22 @@ public class CartService {
             throw new IllegalArgumentException("La quantità deve essere maggiore di zero.");
         }
 
-        Cart cart = getCartByUserId(userId);
+        // Caricamento con lock ottimistico
+        Cart cart = cartRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Carrello non trovato per l'utente: " + userId));
+        entityManager.lock(cart, LockModeType.OPTIMISTIC); // Forza lock sulla versione
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Prodotto non trovato con ID: " + productId));
+
         int availableStock = product.getStock();
 
         Optional<ShoppingCartItem> existingItemOpt = shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
         if (existingItemOpt.isPresent()) {
             ShoppingCartItem existingItem = existingItemOpt.get();
-            int newQuantity = existingItem.getQuantity() + quantity;
+            entityManager.lock(existingItem, LockModeType.OPTIMISTIC); // Lock anche sull’item esistente
 
+            int newQuantity = existingItem.getQuantity() + quantity;
             if (newQuantity > availableStock) {
                 throw new IllegalArgumentException("La quantità richiesta supera lo stock disponibile. Stock massimo: " + availableStock);
             }
@@ -207,9 +217,15 @@ public class CartService {
             cart.getItems().add(newItem);
         }
 
-        cartRepository.save(cart); // trigger @Version su Cart
-        return getCartByUserId(userId); // ricarica sicura e aggiornata
+        cartRepository.save(cart); // trigger su @Version
+
+        // Per evitare LazyInitializationException/merge inconsistente
+        entityManager.flush();
+        entityManager.clear();
+
+        return getCartByUserId(userId); // Reload aggiornato
     }
+
 
 
 

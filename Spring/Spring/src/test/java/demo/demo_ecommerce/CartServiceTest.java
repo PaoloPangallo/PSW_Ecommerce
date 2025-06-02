@@ -5,6 +5,7 @@ import demo.demo_ecommerce.repositories.*;
 import demo.demo_ecommerce.services.CartService;
 import demo.demo_ecommerce.services.CouponService;
 
+import demo.demo_ecommerce.services.SavedForLaterService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
@@ -21,6 +22,10 @@ class CartServiceTest {
     private CartService cartService;
 
     @Mock
+    SavedForLaterRepository savedRepo;
+
+
+    @Mock
     private CartRepository cartRepository;
     @Mock
     private UsersRepository usersRepository;
@@ -32,6 +37,13 @@ class CartServiceTest {
     private CouponRepository couponRepository;
     @Mock
     private CouponService couponService;
+
+
+    private Long userId;
+    private Long productId;
+
+    CartServiceTest(SavedForLaterService savedForLaterService) {
+    }
 
     @BeforeEach
     void setUp() {
@@ -236,6 +248,67 @@ class CartServiceTest {
         verify(shoppingCartItemRepository).deleteByIdWithoutVersion(100L);
         verify(shoppingCartItemRepository).deleteByIdWithoutVersion(101L);
     }
+
+
+    @Test
+    void testAddSaveAndReAddToCart() {
+        Long userId = 1L;
+        Long productId = 2L;
+
+        User user = new User();
+        user.setId(userId);
+
+        Product product = new Product();
+        product.setId(productId);
+        product.setStock(10);
+        product.setPrice(BigDecimal.valueOf(100));
+
+        Cart cart = new Cart();
+        cart.setId(1L);
+        cart.setUser(user);
+        cart.setItems(new ArrayList<>());
+
+        ShoppingCartItem cartItem = new ShoppingCartItem();
+        cartItem.setId(10L);
+        cartItem.setCart(cart);
+        cartItem.setProduct(product);
+        cartItem.setQuantity(1);
+        cartItem.setPrice(product.getPrice());
+
+        // STEP 1: Aggiunta iniziale al carrello
+        when(cartRepository.findByUserIdWithItems(userId)).thenReturn(Optional.of(cart));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId)).thenReturn(Optional.empty());
+        when(shoppingCartItemRepository.save(any())).thenReturn(cartItem);
+
+        Cart cartAfterAdd = cartService.addItemToCart(userId, productId, 1);
+        assertEquals(1, cartAfterAdd.getItems().size());
+
+        // STEP 2: Simulazione "Salva per dopo"
+        when(shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId)).thenReturn(Optional.of(cartItem));
+        Cart cartAfterRemove = cartService.removeItemFromCart(userId, productId);
+        assertTrue(cartAfterRemove.getItems().isEmpty());
+
+        // Simulazione di item salvato per dopo (eseguito dal frontend/controller)
+        SavedForLaterItem savedItem = new SavedForLaterItem();
+        savedItem.setUser(user);
+        savedItem.setProduct(product);
+        savedItem.setQuantity(1);
+        when(savedRepo.findByUserAndProduct(user, product)).thenReturn(Optional.of(savedItem));
+
+        // STEP 3: Rimessa nel carrello
+        when(shoppingCartItemRepository.findByCartIdAndProductId(cart.getId(), productId)).thenReturn(Optional.empty());
+
+        Cart cartAfterReAdd = cartService.addItemToCart(userId, productId, 2); // aggiunge 2
+
+        assertEquals(1, cartAfterReAdd.getItems().size());
+        ShoppingCartItem resultItem = cartAfterReAdd.getItems().get(0);
+        assertEquals(2, resultItem.getQuantity());
+        assertEquals(productId, resultItem.getProduct().getId());
+
+        verify(savedRepo).deleteByUserAndProduct(user, product); // ✅ rimosso dai salvati
+    }
+
 
 
 

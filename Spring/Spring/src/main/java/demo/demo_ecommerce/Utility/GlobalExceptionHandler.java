@@ -1,7 +1,9 @@
 package demo.demo_ecommerce.Utility;
 
+import jakarta.persistence.OptimisticLockException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.hibernate.StaleObjectStateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -143,7 +145,7 @@ public class GlobalExceptionHandler {
 
         // ex.getRootCause() potrebbe essere null, quindi controlliamo
         Throwable rootCause = ex.getRootCause();
-        String causeMessage = (rootCause != null) ? rootCause.getMessage() : ex.getMessage();
+        String causeMessage = rootCause.getMessage();
         response.put("details", causeMessage);
 
         response.put("path", request.getDescription(false));
@@ -156,6 +158,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleAccessDeniedException() {
         return "Accesso negato: non hai i permessi necessari.";
+    }
+
+    @ExceptionHandler({OptimisticLockException.class, StaleObjectStateException.class})
+    public ResponseEntity<Map<String, String>> handleOptimisticLocking(Exception ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                Map.of("error", "Il tuo carrello è stato modificato in un'altra sessione. Ricaricalo per continuare.")
+        );
     }
 
 }

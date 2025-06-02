@@ -7,9 +7,17 @@ import demo.demo_ecommerce.entities.Product;
 import demo.demo_ecommerce.repositories.CouponRepository;
 import demo.demo_ecommerce.repositories.ProductRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,57 +27,71 @@ import java.util.stream.Collectors;
 @Service
 public class CouponService {
 
-    @Autowired
+    private static final Logger logger = LoggerFactory.getLogger(CouponService.class);
     private final CouponRepository couponRepository;
     private final ProductRepository productRepository;
-    @Autowired
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
 
-    public CouponService(CouponRepository couponRepository, ProductRepository productRepository) {
+    public CouponService(CouponRepository couponRepository, ProductRepository productRepository, UsersRepository usersRepository) {
         this.couponRepository = couponRepository;
         this.productRepository = productRepository;
+        this.usersRepository = usersRepository;
     }
 
+    @Cacheable(value = "couponsPaged", key = "'page-' + #pageable.pageNumber + '-size-' + #pageable.pageSize")
+    public Page<CouponResponseDTO> getAllCouponsPaged(Pageable pageable) {
+        Page<Coupon> page = couponRepository.findAllWithProductsPaged(pageable);
+        List<CouponResponseDTO> dtoList = page.getContent().stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+        return new PageImpl<>(dtoList, pageable, page.getTotalElements());
+    }
 
+    @Cacheable(value = "couponByCode", key = "#code", unless = "#result == null or #result.isEmpty()")
     public Optional<Coupon> findByCode(String code) {
         return couponRepository.findByCode(code);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "coupons", allEntries = true),
+            @CacheEvict(value = "couponsPaged", allEntries = true),
+            @CacheEvict(value = "couponByCode", allEntries = true),
+            @CacheEvict(value = "couponValidation", allEntries = true),
+            @CacheEvict(value = "couponValidationProduct", allEntries = true)
+    })
     public Coupon createCoupon(Coupon coupon) {
         return couponRepository.save(coupon);
     }
 
-    // Validazione per l'intero ordine (o totale) usando un Double
+    @Cacheable(value = "couponValidation", key = "#code + '-' + #orderValue")
     public boolean validateCoupon(String code, Double orderValue) {
         Optional<Coupon> couponOpt = couponRepository.findByCode(code);
-        if (couponOpt.isPresent()) {
-            Coupon coupon = couponOpt.get();
-            return coupon.getIsActive() &&
-                    coupon.getExpirationDate().isAfter(LocalDateTime.now()) &&
-                    orderValue >= coupon.getMinOrderValue().doubleValue();
-        }
-        return false;
+        return couponOpt.map(coupon -> coupon.getIsActive()
+                && coupon.getExpirationDate().isAfter(LocalDateTime.now())
+                && orderValue >= coupon.getMinOrderValue().doubleValue()
+        ).orElse(false);
     }
 
-    // Nuovo metodo per validare il coupon a livello di prodotto,
-    // confrontando il prezzo del prodotto (o il totale dell'item) con il valore minimo richiesto
+    @Cacheable(value = "couponValidationProduct", key = "#code + '-' + #productPrice")
     public boolean validateCouponForProduct(String code, BigDecimal productPrice) {
         Optional<Coupon> couponOpt = couponRepository.findByCode(code);
-        if (couponOpt.isPresent()) {
-            Coupon coupon = couponOpt.get();
-            boolean isActive = coupon.getIsActive();
-            boolean notExpired = coupon.getExpirationDate().isAfter(LocalDateTime.now());
-            boolean meetsMinValue = productPrice.compareTo(coupon.getMinOrderValue()) >= 0;
+        return couponOpt.map(coupon -> {
+            boolean isValid = coupon.getIsActive()
+                    && coupon.getExpirationDate().isAfter(LocalDateTime.now())
+                    && productPrice.compareTo(coupon.getMinOrderValue()) >= 0;
 
-            LoggerFactory.getLogger(getClass()).info("Validating coupon {}: isActive={}, notExpired={}, productPrice={}, minOrderValue={} -> meetsMinValue={}",
-                    code, isActive, notExpired, productPrice, coupon.getMinOrderValue(), meetsMinValue);
-
-            return isActive && notExpired && meetsMinValue;
-        }
-        LoggerFactory.getLogger(getClass()).info("Coupon with code {} not found in validateCouponForProduct", code);
-        return false;
+            logger.info("Validating coupon {}: valid={}", code, isValid);
+            return isValid;
+        }).orElse(false);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "coupons", allEntries = true),
+            @CacheEvict(value = "couponsPaged", allEntries = true),
+            @CacheEvict(value = "couponByCode", key = "#dto.code"),
+            @CacheEvict(value = "couponValidation", allEntries = true),
+            @CacheEvict(value = "couponValidationProduct", allEntries = true)
+    })
     public Coupon createCouponFromDTO(CouponCreationDTO dto) {
         Coupon coupon = new Coupon();
         coupon.setCode(dto.getCode());
@@ -78,16 +100,15 @@ public class CouponService {
         coupon.setIsActive(dto.getIsActive());
         coupon.setMinOrderValue(dto.getMinOrderValue());
 
-        // Carica i prodotti associati
         List<Product> products = productRepository.findAllById(dto.getProductIds());
         coupon.setProducts(products);
 
         return couponRepository.save(coupon);
     }
-    public List<CouponResponseDTO> getAllCoupons() {
-        // Carichiamo i coupon con i prodotti associati
-        List<Coupon> coupons = couponRepository.findAllWithProducts();
 
+    @Cacheable(value = "coupons", unless = "#result == null or #result.isEmpty()")
+    public List<CouponResponseDTO> getAllCoupons() {
+        List<Coupon> coupons = couponRepository.findAllWithProducts();
         return coupons.stream()
                 .map(this::toResponseDTO)
                 .collect(Collectors.toList());
@@ -99,7 +120,6 @@ public class CouponService {
                 .orElse(false);
     }
 
-    // Esempio di mappatura
     private CouponResponseDTO toResponseDTO(Coupon coupon) {
         CouponResponseDTO dto = new CouponResponseDTO();
         dto.setId(coupon.getId());
@@ -109,7 +129,6 @@ public class CouponService {
         dto.setIsActive(coupon.getIsActive());
         dto.setMinOrderValue(coupon.getMinOrderValue());
 
-        // Mappiamo i prodotti associati (in questo esempio, solo i nomi)
         List<String> productNames = coupon.getProducts().stream()
                 .map(Product::getName)
                 .collect(Collectors.toList());
@@ -117,5 +136,4 @@ public class CouponService {
 
         return dto;
     }
-
 }

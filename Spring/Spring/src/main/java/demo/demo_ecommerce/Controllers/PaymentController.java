@@ -1,5 +1,6 @@
 package demo.demo_ecommerce.Controllers;
 
+import demo.demo_ecommerce.Utility.ResourceNotFoundException;
 import demo.demo_ecommerce.dtos.PaymentRequestDTO;
 import demo.demo_ecommerce.dtos.PaymentResponseDTO;
 import demo.demo_ecommerce.entities.Order;
@@ -9,45 +10,43 @@ import demo.demo_ecommerce.repositories.OrderRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
 import demo.demo_ecommerce.services.PaymentService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
 
-    @Autowired
-    private PaymentService paymentService;
+    private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
-    // Aggiungi i repository necessari per recuperare l'utente e l'ordine
-    @Autowired
-    private UsersRepository userRepository;
+    private final PaymentService paymentService;
+    private final UsersRepository userRepository;
+    private final OrderRepository orderRepository;
 
-    @Autowired
-    private OrderRepository orderRepository;
+    public PaymentController(PaymentService paymentService,
+                             UsersRepository userRepository,
+                             OrderRepository orderRepository) {
+        this.paymentService = paymentService;
+        this.userRepository = userRepository;
+        this.orderRepository = orderRepository;
+    }
 
-    // Creazione di un nuovo pagamento
     @PostMapping
-    public ResponseEntity<PaymentResponseDTO> createPayment(@RequestBody @Valid PaymentRequestDTO paymentRequestDTO) {
+    public ResponseEntity<PaymentResponseDTO> createPayment(@Valid @RequestBody PaymentRequestDTO paymentRequestDTO) {
 
-        // 1) Recupera l'utente dal database
         User user = userRepository.findById(paymentRequestDTO.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "User not found with ID: " + paymentRequestDTO.getUserId()
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + paymentRequestDTO.getUserId()));
 
-        // 2) Recupera l'ordine dal database
         Order order = orderRepository.findById(paymentRequestDTO.getOrderId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "Order not found with ID: " + paymentRequestDTO.getOrderId()
-                ));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: " + paymentRequestDTO.getOrderId()));
 
-        // 3) Mappa i campi dal DTO all’entity Payment
         Payment payment = Payment.builder()
                 .user(user)
                 .order(order)
@@ -57,71 +56,52 @@ public class PaymentController {
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        // Salva il pagamento
         Payment createdPayment = paymentService.createPayment(payment);
 
-        // 4) Crea un PaymentResponseDTO per restituirlo al client
-        PaymentResponseDTO responseDTO = new PaymentResponseDTO();
-        responseDTO.setId(createdPayment.getId());
-        responseDTO.setUserId(createdPayment.getUser().getId());
-        responseDTO.setOrderId(createdPayment.getOrder().getId());
-        responseDTO.setPaymentMethod(createdPayment.getPaymentMethod());
-        responseDTO.setAmount(createdPayment.getAmount());
-        responseDTO.setStatus(createdPayment.getStatus().toString());
-        responseDTO.setTimestamp(createdPayment.getTimestamp());
+        PaymentResponseDTO responseDTO = PaymentResponseDTO.fromEntity(createdPayment);
+
+        logger.info("Created payment with ID: {}", createdPayment.getId());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
     }
 
-    // Recupera un pagamento per ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPaymentById(@PathVariable Long id) {
+    public ResponseEntity<PaymentResponseDTO> getPaymentById(@PathVariable Long id) {
         Payment payment = paymentService.getPaymentById(id);
-        if (payment != null) {
-            return ResponseEntity.ok(payment);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Payment not found with ID: " + id);
+        if (payment == null) {
+            throw new ResourceNotFoundException("Payment not found with ID: " + id);
         }
+        return ResponseEntity.ok(PaymentResponseDTO.fromEntity(payment));
     }
 
-    // Recupero di tutti i pagamenti
     @GetMapping
-    public ResponseEntity<List<Payment>> getAllPayments() {
+    public ResponseEntity<List<PaymentResponseDTO>> getAllPayments() {
         List<Payment> payments = paymentService.getAllPayments();
-        return ResponseEntity.ok(payments);
+        List<PaymentResponseDTO> responseList = payments.stream()
+                .map(PaymentResponseDTO::fromEntity)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(responseList);
     }
 
-    // Aggiornamento dello stato di un pagamento
     @PatchMapping("/{id}/status")
-    public ResponseEntity<?> updatePaymentStatus(@PathVariable Long id, @RequestParam String status) {
-        // Validazione dello stato
+    public ResponseEntity<PaymentResponseDTO> updatePaymentStatus(@PathVariable Long id, @RequestParam String status) {
         if (!isValidStatus(status)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid status. Valid values are: 'PENDING', 'COMPLETED', 'FAILED'");
+            return ResponseEntity.badRequest()
+                    .body(null); // oppure potresti restituire un DTO errore più strutturato
         }
-
-        try {
-            Payment updatedPayment = paymentService.updatePaymentStatus(id, status);
-            return ResponseEntity.ok(updatedPayment);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Payment not found with ID: " + id);
+        Payment updatedPayment = paymentService.updatePaymentStatus(id, status);
+        if (updatedPayment == null) {
+            throw new ResourceNotFoundException("Payment not found with ID: " + id);
         }
+        return ResponseEntity.ok(PaymentResponseDTO.fromEntity(updatedPayment));
     }
 
-    // Eliminazione di un pagamento
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePayment(@PathVariable Long id) {
-        try {
-            paymentService.deletePayment(id);
-            return ResponseEntity.noContent().build(); // HTTP 204 No Content
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        paymentService.deletePayment(id);
+        return ResponseEntity.noContent().build();
     }
 
-    // Metodo per validare lo stato del pagamento
     private boolean isValidStatus(String status) {
         try {
             Payment.PaymentStatus.valueOf(status.toUpperCase());

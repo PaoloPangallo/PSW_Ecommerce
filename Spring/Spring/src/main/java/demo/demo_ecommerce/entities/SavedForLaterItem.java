@@ -12,6 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
 public class SavedForLaterItem {
 
     @Id
@@ -19,11 +20,9 @@ public class SavedForLaterItem {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "product_id")
     private Product product;
 
     private int quantity;

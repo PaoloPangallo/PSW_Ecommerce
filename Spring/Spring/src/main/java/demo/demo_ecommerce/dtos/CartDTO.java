@@ -27,10 +27,12 @@ public class CartDTO {
     }
     public static CartDTO fromEntity(Cart cart) {
         List<ShoppingCartItemDTO> itemsList = cart.getItems().stream()
-                .filter(item -> item.getProduct() != null)
+                .filter(item -> item.getProduct() != null && !item.isSavedForLater()) // 👈 filtro aggiunto
                 .map(ShoppingCartItemDTO::new)
                 .collect(Collectors.toList());
+
         return new CartDTO(cart.getId(), itemsList, cart.getSelectedCoupons());
     }
+
 
 }

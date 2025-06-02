@@ -20,11 +20,7 @@ export class AdminProductService {
   }
 
   // Recupera un singolo prodotto tramite ID
-  getProductById(id: number): Observable<Product> {
-    return this.http.get<Product>(`${this.baseUrl}/${id}`);
-  }
-
-  // Operazione Admin: Crea un nuovo prodotto
+// Operazione Admin: Crea un nuovo prodotto
   createProduct(product: Product): Observable<Product> {
     return this.http.post<Product>(this.baseUrl, product);
   }
@@ -39,15 +35,5 @@ export class AdminProductService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  // Operazione Admin: Carica (upload) l'immagine di un prodotto
-  uploadProductImage(id: number, file: File): Observable<Product> {
-    const formData = new FormData();
-    formData.append('file', file);
-    return this.http.post<Product>(`${this.baseUrl}/${id}/uploadImage`, formData);
-  }
 
-  // (Opzionale) Recupera i prodotti in evidenza
-  getFeaturedProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(`${this.baseUrl}/featured`);
-  }
 }

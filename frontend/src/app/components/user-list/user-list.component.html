@@ -1,4 +1,5 @@
 <h2>Lista Utenti</h2>
+
 <table border="1">
   <thead>
   <tr>
@@ -17,3 +18,9 @@
   </tr>
   </tbody>
 </table>
+
+<div class="pagination-controls">
+  <button (click)="previousPage()" [disabled]="currentPage === 0">⬅️ Indietro</button>
+  <span>Pagina {{ currentPage + 1 }} / {{ totalPages }}</span>
+  <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">➡️ Avanti</button>
+</div>

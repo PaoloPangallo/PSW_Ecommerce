@@ -10,6 +10,8 @@ import demo.demo_ecommerce.repositories.*;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,6 +59,8 @@ public class UsersService {
         return usersRepository.findAll(pageable);
     }
 
+
+    @Cacheable(value = "userById", key = "#id")
     public User getUserById(Long id) {
         logger.info("Fetching user with ID: {}", id);
         return findUserById(id);
@@ -77,6 +81,8 @@ public class UsersService {
         return usersRepository.save(user);
     }
 
+
+    @CacheEvict(value = { "userById", "userByUsername", "userProfileSummary", "userReviews", "usersByRole" }, key = "#id")
     @Transactional
     public UserResponseDTO updateUser(Long id, @Valid UpdateUserDTO updateUserDTO) {
         logger.info("Updating user with ID: {}", id);
@@ -108,7 +114,7 @@ public class UsersService {
         return toResponseDTO(savedUser);
     }
 
-
+    @CacheEvict(value = { "userById", "userByUsername", "userProfileSummary", "userReviews", "usersByRole" }, key = "#id")
     @Transactional
     public void deleteUser(Long id) {
         logger.info("Deleting user with ID: {}", id);
@@ -132,7 +138,7 @@ public class UsersService {
         logger.info("User with ID {} deleted successfully.", id);
     }
 
-
+    @Cacheable(value = "usersByRole", key = "#role.name()")
     public List<User> getUsersByRole(Role role) {
         logger.info("Fetching users with role: {}", role);
         return usersRepository.findByRole(role);
@@ -171,6 +177,8 @@ public class UsersService {
 
     }
 
+
+    @Cacheable(value = "userByUsername", key = "#username")
     public Optional<User> findByUsername(String username) {
         return usersRepository.findByUsername(username);
     }
@@ -203,6 +211,8 @@ public class UsersService {
                 .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
+
+    @Cacheable(value = "userProfileSummary", key = "#userId")
     @Transactional
     public UserProfileSummaryDTO getUserProfileSummary(Long userId) {
         User user = findUserById(userId);
@@ -228,6 +238,7 @@ public class UsersService {
         return dto;
     }
 
+    @CacheEvict(value = { "userProfileSummary", "userById" }, key = "#userId")
     public String uploadProfileImage(Long userId, MultipartFile file) {
         User user = findUserById(userId);
         String fileName = "user_" + userId + "_" + file.getOriginalFilename();
@@ -250,6 +261,7 @@ public class UsersService {
         return imageUrl;
     }
 
+    @CacheEvict(value = { "userProfileSummary", "userById" }, key = "#userId")
     @Transactional
     public void removeProfileImage(Long userId) {
         User user = findUserById(userId);
@@ -263,7 +275,7 @@ public class UsersService {
         System.out.println(">> Dopo: " + user.getProfileImageUrl());
     }
 
-
+    @Cacheable(value = "userReviews", key = "#userId + '_' + #pageable.pageNumber")
     @Transactional
     public Page<ReviewDTO> getUserReviews(Long userId, Pageable pageable) {
         // Verifica che l’utente esista

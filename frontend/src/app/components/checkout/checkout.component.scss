@@ -1,6 +1,45 @@
 /* ========================================================================
-   Checkout Component Styles (stand-alone SCSS)
+   Checkout Component Styles (stand-alone SCSS) - Pro Extended Edition
    ======================================================================== */
+
+/* -------------------------------
+   Palette Colori e Variabili
+   ------------------------------- */
+$color-primary: #002f6c;
+$color-secondary: #b33900;
+$color-accent: #ff9800;
+$color-success: #388e3c;
+$color-error: #e53935;
+$color-bg-light: #fffef6;
+$color-bg-neutral: #f5f9ff;
+$color-bg-white: #ffffff;
+$color-border: #ddd;
+$shadow-light: rgba(0, 0, 0, 0.1);
+$shadow-strong: rgba(0, 0, 0, 0.15);
+
+$font-base: "Open Sans", sans-serif;
+$font-title: "Georgia", serif;
+
+$radius-small: 6px;
+$radius-medium: 8px;
+$radius-large: 12px;
+
+/* -------------------------------
+   Reset & Base
+   ------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: $font-base;
+  background-color: $color-bg-neutral;
+  color: #2e2e2e;
+  line-height: 1.5;
+  font-size: 16px;
+}
 
 /* -------------------------------
    Container Principale
@@ -9,23 +48,98 @@
   max-width: 800px;
   margin: 2.5rem auto;
   padding: 2rem;
-  background: #fffef6;              /* Carta vintage */
-  border-radius: 12px;
+  background: $color-bg-light;
+  border-radius: $radius-large;
   box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.1),
+    0 10px 30px $shadow-light,
     inset 0 0 40px rgba(212, 175, 55, 0.05);
-  font-family: "Open Sans", sans-serif;
   color: #2e2e2e;
 
   h2 {
-    font-family: "Georgia", serif;
+    font-family: $font-title;
     font-size: 2.8rem;
-    color: #002f6c;
+    color: $color-primary;
     text-align: center;
     margin-bottom: 1.5rem;
     text-transform: uppercase;
     letter-spacing: 2px;
     text-shadow: 1px 1px 3px rgba(179, 57, 0, 0.3);
+  }
+}
+
+/* -------------------------------
+   Breadcrumb Navigazione Step
+   ------------------------------- */
+.checkout-breadcrumb {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+
+  .step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    font-weight: 600;
+    color: $color-border;
+    font-size: 0.9rem;
+    cursor: default;
+
+    &::before {
+      content: attr(data-step);
+      display: block;
+      width: 32px;
+      height: 32px;
+      margin: 0 auto 0.5rem;
+      background: $color-border;
+      color: white;
+      border-radius: 50%;
+      line-height: 32px;
+      font-size: 1rem;
+      transition: background 0.3s ease;
+    }
+
+    &.active {
+      color: $color-primary;
+
+      &::before {
+        background: $color-primary;
+      }
+    }
+
+    & + .step::after {
+      content: "";
+      position: absolute;
+      top: 16px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: $color-border;
+      z-index: -1;
+      transform: translateX(-50%);
+    }
+
+    &:last-child::after {
+      display: none;
+    }
+  }
+}
+
+/* -------------------------------
+   Progress Bar animata
+   ------------------------------- */
+.progress-bar {
+  height: 8px;
+  background: $color-border;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 1rem 0 2rem;
+
+  .progress {
+    height: 100%;
+    background: $color-accent;
+    width: 25%; // gestito via JS
+    transition: width 0.4s ease-in-out;
+    box-shadow: 0 0 10px rgba(255, 152, 0, 0.7);
   }
 }
 
@@ -36,32 +150,33 @@
   background: linear-gradient(145deg, #faf7f0 0%, #fdfbf8 100%);
   padding: 1.5rem;
   margin-bottom: 2rem;
-  border-radius: 12px;
-  border-left: 5px solid #002f6c;
+  border-radius: $radius-large;
+  border-left: 5px solid $color-primary;
+  box-shadow: 0 3px 8px $shadow-light;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 6px 20px $shadow-strong;
   }
 
   h3 {
     margin: 0 0 1rem;
     font-size: 1.6rem;
     font-weight: 600;
-    color: #b33900;
+    color: $color-secondary;
     border-bottom: 1px solid #eee;
     padding-bottom: 0.5rem;
   }
 }
 
-/* ==============================
+/* -------------------------------
    STEP 1: Riepilogo Carrello
-   ============================== */
+   ------------------------------- */
 .step1 .cart-summary {
-  background: #ffffff;
+  background: $color-bg-white;
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: $radius-medium;
   border: 1px solid #eee;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
@@ -106,7 +221,7 @@
    Discount Badge (lista carrello)
    ------------------------------- */
 .discount-badge {
-  background: #b33900;
+  background: $color-secondary;
   color: #fff;
   font-size: 0.85rem;
   padding: 2px 8px;
@@ -123,24 +238,30 @@
   display: inline-block;
   margin-top: 1rem;
   padding: 0.75rem 1.75rem;
-  background: #ff9800;
+  background: $color-accent;
   color: #fff;
   font-size: 1rem;
   font-weight: 600;
   border: none;
-  border-radius: 8px;
+  border-radius: $radius-medium;
   cursor: pointer;
+  box-shadow: 0 3px 8px rgba(255, 152, 0, 0.7);
   transition: background 0.3s ease, transform 0.2s ease;
 
   &:hover {
-    background: #fb8c00;
+    background: darken($color-accent, 10%);
     transform: translateY(-1px);
+  }
+
+  &:focus {
+    outline: 3px solid lighten($color-accent, 20%);
+    outline-offset: 2px;
   }
 }
 
-/* ==============================
-   STEP 2 & STEP 3: Form
-   ============================== */
+/* -------------------------------
+   STEP 2 & 3: Form Styles
+   ------------------------------- */
 .checkout-container {
   label {
     display: block;
@@ -151,24 +272,30 @@
   }
 
   input,
-  select {
+  select,
+  textarea {
     width: 100%;
     padding: 0.5rem 0.75rem;
     font-size: 1rem;
     border: 1px solid #ccc;
-    border-radius: 6px;
+    border-radius: $radius-small;
     background: #f9f9f9;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 
     &:focus {
       outline: none;
-      border-color: #002f6c;
-      box-shadow: 0 0 8px rgba(0, 47, 108, 0.3);
+      border-color: $color-primary;
+      box-shadow: 0 0 8px rgba($color-primary, 0.3);
     }
   }
 
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+
   .error {
-    color: #e53935;
+    color: $color-error;
     font-size: 0.9rem;
     margin-top: 0.25rem;
   }
@@ -193,12 +320,19 @@
     font-weight: 600;
     color: #fff;
     border: none;
-    border-radius: 8px;
+    border-radius: $radius-medium;
     cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
     transition: background 0.3s ease, transform 0.2s ease;
+
+    &:focus {
+      outline: 3px solid $color-accent;
+      outline-offset: 2px;
+    }
 
     &.back-button {
       background: #1976d2;
+
       &:hover {
         background: #1565c0;
         transform: translateY(-1px);
@@ -207,22 +341,23 @@
 
     &.next-button,
     &.submit-button {
-      background: #ff9800;
+      background: $color-accent;
+
       &:hover {
-        background: #fb8c00;
+        background: darken($color-accent, 10%);
         transform: translateY(-1px);
       }
     }
   }
 }
 
-/* ==============================
+/* -------------------------------
    STEP 4: Riepilogo Ordine
-   ============================== */
+   ------------------------------- */
 .address-summary {
-  background: #f5f9ff;
+  background: $color-bg-neutral;
   padding: 1rem 1.25rem;
-  border-radius: 8px;
+  border-radius: $radius-medium;
   border-left: 4px solid #1976d2;
   margin-bottom: 1.5rem;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
@@ -267,32 +402,53 @@
    Messaggio Successo / Errore
    ------------------------------- */
 .order-error {
-  background: #ffe6e6;
-  border: 1px solid #e53935;
-  color: #e53935;
+  background: lighten($color-error, 40%);
+  border: 1px solid $color-error;
+  color: $color-error;
   padding: 1rem;
-  border-radius: 8px;
+  border-radius: $radius-medium;
   margin-top: 1.5rem;
   text-align: center;
+  font-weight: 600;
+}
+
+.order-success {
+  background: lighten($color-success, 40%);
+  border: 1px solid $color-success;
+  color: $color-success;
+  padding: 1rem;
+  border-radius: $radius-medium;
+  margin-top: 1.5rem;
+  text-align: center;
+  font-weight: 600;
 }
 
 /* -------------------------------
-   Media Queries (Mobile)
+   Tabelle Ordine e Riepilogo
    ------------------------------- */
-@media (max-width: 600px) {
-  .checkout-container {
-    padding: 1rem;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
 
-    h2 {
-      font-size: 2.4rem;
-    }
+  th {
+    background: $color-primary;
+    color: white;
+    padding: 0.75rem;
+    text-align: left;
   }
 
-  .checkout-step {
-    padding: 1rem;
-    margin-bottom: 1.5rem;
+  td {
+    padding: 0.75rem;
+    border-bottom: 1px solid $color-border;
   }
+}
 
+/* -------------------------------
+   Responsive Layout
+   ------------------------------- */
+@media (max-width: 768px) {
   .btn-group {
     flex-direction: column;
 
@@ -310,3 +466,131 @@
     }
   }
 }
+
+@media (max-width: 480px) {
+  .checkout-container {
+    padding: 1rem;
+
+    h2 {
+      font-size: 2.4rem;
+    }
+  }
+
+  .checkout-step {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .btn-group {
+    gap: 0.5rem;
+  }
+
+  .cart-items li {
+    font-size: 0.9rem;
+  }
+}
+
+/* -------------------------------
+   Dark Mode (toggle tramite class .dark-mode sul body)
+   ------------------------------- */
+body.dark-mode {
+  background-color: #121212;
+  color: #eee;
+
+  .checkout-container {
+    background: #1e1e1e;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    color: #eee;
+  }
+
+  .checkout-step {
+    background: #2a2a2a;
+    border-left-color: $color-primary;
+    border-color: #444;
+    box-shadow: 0 3px 8px rgba(255, 255, 255, 0.1);
+  }
+
+  input,
+  select,
+  textarea {
+    background: #333;
+    color: #eee;
+    border-color: #555;
+
+    &:focus {
+      border-color: $color-accent;
+      box-shadow: 0 0 8px rgba($color-accent, 0.5);
+    }
+  }
+
+  table {
+    color: #ccc;
+
+    th {
+      background: #222;
+    }
+
+    td {
+      border-color: #444;
+    }
+  }
+
+  .btn-group button {
+    box-shadow: none;
+  }
+
+  .order-error {
+    background: rgba(255, 83, 83, 0.3);
+    border-color: $color-error;
+    color: $color-error;
+  }
+
+  .order-success {
+    background: rgba(56, 142, 60, 0.3);
+    border-color: $color-success;
+    color: $color-success;
+  }
+}
+
+/* -------------------------------
+   Stili di Stampa
+   ------------------------------- */
+@media print {
+  body {
+    background: white;
+    color: black;
+  }
+
+  .checkout-container {
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+
+  .btn-group,
+  .checkout-breadcrumb,
+  .footer,
+  .navigation {
+    display: none !important;
+  }
+
+  table {
+    font-size: 12pt;
+  }
+}
+
+/* -------------------------------
+   Accessibilità e Focus Visibile
+   ------------------------------- */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid $color-accent;
+  outline-offset: 2px;
+  transition: outline-color 0.3s ease;
+}
+
+/* ========================================================================
+   FINE - Checkout Component Styles Extended
+   ======================================================================== */

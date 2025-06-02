@@ -1,4 +1,10 @@
 <div class="admin-coupons-container">
+
+  <!-- 🔙 Tasto Indietro -->
+  <div class="back-button-wrapper">
+    <button class="back-btn" (click)="goBack()">← Torna alla Dashboard</button>
+  </div>
+
   <h1 class="page-title">Gestione Coupon</h1>
 
   <!-- Bottone di creazione -->
@@ -33,10 +39,8 @@
         </td>
         <td>{{ coupon.minOrderValue | currency }}</td>
         <td>
-          <ng-container *ngIf="coupon.productNames?.length; else noProducts">
-            <td>
-              {{ coupon.productNames?.join(', ') || 'Nessun prodotto' }}
-            </td>
+          <ng-container *ngIf="coupon.productNames && coupon.productNames.length > 0; else noProducts">
+            {{ coupon.productNames?.join(', ') }}
           </ng-container>
           <ng-template #noProducts>
             <span class="no-products">Nessun prodotto</span>
@@ -45,6 +49,23 @@
       </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- 🔁 Paginazione -->
+  <div class="pagination-controls">
+    <button (click)="previousPage()" [disabled]="currentPage === 0">⬅️ Indietro</button>
+    <span>Pagina {{ currentPage + 1 }} / {{ totalPages }}</span>
+    <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">➡️ Avanti</button>
+
+    <label>
+      Mostra:
+      <select [(ngModel)]="pageSize" (change)="onChangePageSize(pageSize)">
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+      </select>
+      per pagina
+    </label>
   </div>
 
   <!-- Modale Creazione -->
@@ -72,7 +93,6 @@
           <label for="productIds">ID Prodotti (virgola separati):</label>
           <input id="productIds" type="text" [(ngModel)]="productIdsString" name="productIds">
         </div>
-
         <div class="modal-actions">
           <button type="submit" class="action-btn save">Salva</button>
           <button type="button" class="action-btn cancel" (click)="cancelCreate()">Annulla</button>

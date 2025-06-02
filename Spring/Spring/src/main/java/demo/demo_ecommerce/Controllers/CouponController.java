@@ -8,6 +8,8 @@ import demo.demo_ecommerce.repositories.OrderRepository;
 import demo.demo_ecommerce.services.CouponService;
 import demo.demo_ecommerce.entities.Order;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -26,9 +28,13 @@ public class CouponController {
     @Autowired private CouponRepository couponRepository;
     @Autowired private OrderRepository orderRepository;
 
+
+
+
     @GetMapping
-    public List<CouponResponseDTO> getAllCoupons() {
-        return couponService.getAllCoupons();
+    @PreAuthorize("hasRole('ADMIN')")
+    public Page<CouponResponseDTO> getAllCoupons(Pageable pageable) {
+        return couponService.getAllCouponsPaged(pageable);
     }
 
     @GetMapping("/{code}")

@@ -102,4 +102,9 @@ export class CartService {
     );
   }
 
+  setCart(cart: CartDTO): void {
+    this.cartSubject.next(cart);
+  }
+
+
 }

@@ -69,10 +69,11 @@
 
       <label>Metodo di Spedizione</label>
       <select formControlName="shippingMethod">
-        <option value="STANDARD">Standard</option>
-        <option value="EXPRESS">Espresso</option>
-        <option value="PREMIUM">Premium</option>
+        <option value="STANDARD" title="Consegna in 4-5 giorni">Standard</option>
+        <option value="EXPRESS" title="Consegna in 2 giorni">Espresso</option>
+        <option value="PREMIUM" title="Consegna in 24h">Premium</option>
       </select>
+
 
       <div class="btn-group">
         <button type="button" class="back-button" (click)="previousStep()">Indietro</button>
@@ -139,53 +140,60 @@
             <span class="spinner"></span> Elaborazione...
           </ng-container>
         </button>
-
       </div>
     </div>
 
-  </form>
+    <!-- Messaggio di successo -->
+    <div *ngIf="checkoutResponse">
+      <h3>Ordine Creato con Successo!</h3>
+      <p><strong>ID Ordine:</strong> {{ checkoutResponse.orderId }}</p>
+      <p><strong>Stato:</strong> {{ checkoutResponse.status }}</p>
+      <p>{{ checkoutResponse.message }}</p>
 
-  <!-- Messaggio di successo -->
-  <div *ngIf="checkoutResponse">
-    <h3>Ordine Creato con Successo!</h3>
-    <p><strong>ID Ordine:</strong> {{ checkoutResponse.orderId }}</p>
-    <p><strong>Stato:</strong> {{ checkoutResponse.status }}</p>
-    <p>{{ checkoutResponse.message }}</p>
-  </div>
+      <!-- ✅ Pulsante download fattura -->
+      <a
+        class="next-button"
+        [href]="'/api/orders/' + checkoutResponse.orderId + '/invoice'"
+        download
+      >
+        📄 Scarica Fattura PDF
+      </a>
+    </div>
 
-  <!-- Dettagli Ordine -->
-  <div *ngIf="createdOrder as order">
-    <h3>Dettagli Ordine #{{ order.id }}</h3>
-    <p><strong>Totale:</strong> {{ order.total | lire }}</p>
-    <p><strong>Creato il:</strong> {{ order.createdAt | date:'short' }}</p>
+    <!-- Dettagli Ordine -->
+    <div *ngIf="createdOrder as order">
+      <h3>Dettagli Ordine #{{ order.id }}</h3>
+      <p><strong>Totale:</strong> {{ order.total | lire }}</p>
+      <p><strong>Spedizione:</strong> {{ order.shippingCost | lire }}</p>
+      <p><strong>Creato il:</strong> {{ order.createdAt | date:'short' }}</p>
 
-    <h4>Prodotti nell'ordine:</h4>
-    <table>
-      <thead>
-      <tr>
-        <th>Prodotto</th>
-        <th>Quantità</th>
-        <th>Prezzo</th>
-        <th>Subtotale</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let item of order.items">
-        <td>{{ item.productName }}</td>
-        <td>{{ item.quantity }}</td>
-        <td>{{ item.price | lire }}</td>
-        <td>{{ (item.price * item.quantity) | lire }}</td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
+      <h4>Prodotti nell'ordine:</h4>
+      <table>
+        <thead>
+        <tr>
+          <th>Prodotto</th>
+          <th>Quantità</th>
+          <th>Prezzo</th>
+          <th>Subtotale</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let item of order.items">
+          <td>{{ item.productName }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.price | lire }}</td>
+          <td>{{ (item.price * item.quantity) | lire }}</td>
+        </tr>
+        </tbody>
+      </table>
 
-  <p class="cart-total">
-    <strong>Totale:</strong> {{ getCartTotal() | lire }}
-  </p>
+      <!-- ✅ Totale finale -->
+      <p class="cart-total">
+        <strong>Totale Ordine:</strong> {{ order.total | lire }}
+      </p>
+    </div>
 
-  <!-- Messaggio di errore -->
-  <div *ngIf="error" class="order-error">
-    <p>❌ Errore: {{ error }}</p>
-  </div>
-</div>
+    <!-- Messaggio di errore -->
+    <div *ngIf="error" class="order-error">
+      <p>❌ Errore: {{ error }}</p>
+    </div>

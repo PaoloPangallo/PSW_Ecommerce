@@ -30,30 +30,28 @@ export class SavedItemsComponent implements OnInit {
     this.loadSavedItems();
   }
 
-  loadSavedItems(): void {
-    this.savedService.getSavedItems().subscribe({
-      next: (items) => this.savedItems = items,
-      error: (err) => this.showSnack('Errore nel caricamento degli elementi salvati')
-    });
-  }
 
   moveToCart(item: any): void {
     const userId = this.authService.getCurrentUserId();
     if (!userId) return;
 
-    this.cartService.addToCart(userId, item.product.id, item.quantity).subscribe({
-      next: () => {
-        this.savedService.removeSavedItem(item.product.id).subscribe({
-          next: () => {
-            this.showSnack('✅ Spostato nel carrello');
-            this.loadSavedItems();
-          },
-          error: () => this.showSnack('Errore nella rimozione dai salvati')
-        });
+    this.isLoading = true;
+    this.savedService.restoreToCart(userId, item.product.id).subscribe({
+      next: (updatedCart) => {
+        this.showSnack('✅ Spostato nel carrello');
+        this.cartService.setCart(updatedCart);
+        this.loadSavedItems();
       },
-      error: () => this.showSnack('Errore nell’aggiunta al carrello')
+      error: (err) => {
+        const msg = err.error?.message || 'Errore durante lo spostamento nel carrello';
+        this.showSnack(msg);
+      },
+      complete: () => this.isLoading = false
     });
   }
+
+
+
 
   removeFromSaved(item: any): void {
     this.savedService.removeSavedItem(item.product.id).subscribe({
@@ -68,4 +66,16 @@ export class SavedItemsComponent implements OnInit {
   private showSnack(msg: string): void {
     this.snackBar.open(msg, 'OK', { duration: 2500 });
   }
+
+  isLoading = false;
+
+  loadSavedItems(): void {
+    this.isLoading = true;
+    this.savedService.getSavedItems().subscribe({
+      next: (items) => this.savedItems = items,
+      error: () => this.showSnack('Errore nel caricamento degli elementi salvati'),
+      complete: () => this.isLoading = false
+    });
+  }
+
 }

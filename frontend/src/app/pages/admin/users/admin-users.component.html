@@ -1,6 +1,31 @@
 <div class="admin-users-container">
   <h1>Gestione Utenti</h1>
 
+  <!-- Tasto indietro retro -->
+  <div class="back-button-wrapper">
+    <button class="back-btn" (click)="goBack()">← Torna alla Dashboard</button>
+  </div>
+
+  <h1>Gestione Utenti</h1>
+
+
+  <!-- Controlli paginazione -->
+  <div class="pagination-controls">
+    <button (click)="previousPage()" [disabled]="currentPage === 0">⬅️ Indietro</button>
+    <span>Pagina {{ currentPage + 1 }} / {{ totalPages }}</span>
+    <button (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">➡️ Avanti</button>
+
+    <label>
+      Mostra:
+      <select [(ngModel)]="pageSize" (change)="onChangePageSize(pageSize)">
+        <option [value]="5">5</option>
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+      </select>
+      utenti per pagina
+    </label>
+  </div>
+
   <!-- Tabella utenti -->
   <table class="users-table">
     <thead>
@@ -30,7 +55,7 @@
     </tbody>
   </table>
 
-  <!-- Modale per aggiornare utente -->
+  <!-- Modale aggiornamento -->
   <div *ngIf="editingUser" class="modal-overlay">
     <div class="modal">
       <h2>Aggiorna Utente: {{ editingUser.username }}</h2>

@@ -1,24 +1,30 @@
 <div class="saved-container">
   <h2>📥 Prodotti salvati per dopo</h2>
 
-  <div *ngIf="savedItems.length === 0" class="empty-message">
+  <div *ngIf="isLoading" class="loading-message">
+    ⏳ Caricamento in corso...
+  </div>
+
+  <div *ngIf="!isLoading && savedItems.length === 0" class="empty-message">
     Nessun prodotto salvato.
   </div>
 
-  <div *ngFor="let item of savedItems" class="saved-card">
-    <div class="product-info">
-      <h3>{{ item.product.name }}</h3>
-      <p>Quantità: {{ item.quantity }}</p>
-      <p>Prezzo: {{ item.product.price | currency:'EUR' }}</p>
-    </div>
+  <div *ngIf="!isLoading && savedItems.length > 0">
+    <div *ngFor="let item of savedItems" class="saved-card">
+      <div class="product-info">
+        <h3>{{ item.product.name }}</h3>
+        <p>Quantità: {{ item.quantity }}</p>
+        <p>Prezzo: {{ item.product.price | currency:'EUR' }}</p>
+      </div>
 
-    <div class="actions">
-      <button mat-raised-button color="primary" (click)="moveToCart(item)">
-        🛒 Sposta nel carrello
-      </button>
-      <button mat-stroked-button color="warn" (click)="removeFromSaved(item)">
-        ❌ Rimuovi
-      </button>
+      <div class="actions">
+        <button mat-raised-button color="primary" (click)="moveToCart(item)" [disabled]="isLoading">
+          🛒 Sposta nel carrello
+        </button>
+        <button mat-stroked-button color="warn" (click)="removeFromSaved(item)" [disabled]="isLoading">
+          ❌ Rimuovi
+        </button>
+      </div>
     </div>
   </div>
 </div>

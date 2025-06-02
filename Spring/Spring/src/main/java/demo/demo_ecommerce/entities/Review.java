@@ -24,6 +24,10 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ReviewReport> reports = new HashSet<>();
+
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
