@@ -59,64 +59,98 @@ public class CartService {
         Optional<Cart> cartOpt = cartRepository.findByUserIdWithItems(userId);
         if (cartOpt.isPresent()) {
             Cart cart = cartOpt.get();
-            cart.getItems().size(); // Forza l'inizializzazione
+            cart.getItems().forEach(item -> {
+                if (item.getAppliedCoupon() != null) {
+                    item.getAppliedCoupon().getCode(); // forza inizializzazione
+                }
+            });
             return cart;
         } else {
             Optional<Cart> cartBaseOpt = cartRepository.findByUserId(userId);
             if (cartBaseOpt.isPresent()) {
                 Cart cart = cartBaseOpt.get();
-                cart.getItems().size();
+                cart.getItems().forEach(item -> {
+                    if (item.getAppliedCoupon() != null) {
+                        item.getAppliedCoupon().getCode(); // forza inizializzazione
+                    }
+                });
                 return cart;
             } else {
                 User user = usersRepository.findById(userId)
                         .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
                 Cart newCart = new Cart(user);
                 newCart = cartRepository.save(newCart);
-                newCart.getItems().size();
+                newCart.getItems().forEach(item -> {
+                    if (item.getAppliedCoupon() != null) {
+                        item.getAppliedCoupon().getCode();
+                    }
+                });
                 return newCart;
             }
         }
     }
 
+
     /**
      * Applica un coupon a un item del carrello, aggiornando il prezzo scontato.
      */
     @Transactional
-    public boolean applyCouponToCartItem(Long cartItemId, String couponCode) {
-        ShoppingCartItem item = shoppingCartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart item not found with ID: " + cartItemId));
+    public Cart applyCouponToCartItemAndReturnCart(Long cartItemId, String couponCode, Long currentUserId, boolean isAdmin) {
+        logger.info("▶ Tentativo di applicare coupon '{}' al cartItem con ID {}", couponCode, cartItemId);
 
-        // Se lo stesso coupon è già applicato, esce
-        if (item.getAppliedCoupon() != null && item.getAppliedCoupon().getCode().equals(couponCode)) {
-            return false;
+        ShoppingCartItem item = shoppingCartItemRepository.findByIdWithCartAndUser(cartItemId)
+                .orElseThrow(() -> {
+                    logger.warn("❌ Cart item non trovato con ID: {}", cartItemId);
+                    return new IllegalArgumentException("Cart item not found with ID: " + cartItemId);
+                });
+
+        Long ownerId = item.getCart().getUser().getId();
+        logger.info("✔ Trovato item nel carrello dell’utente con ID {}", ownerId);
+
+        if (!isAdmin && !ownerId.equals(currentUserId)) {
+            logger.warn("❌ Accesso negato: utente={} non proprietario del cartItem={}", currentUserId, cartItemId);
+            throw new SecurityException("Access denied");
         }
 
-        // Valida il coupon in base al prezzo corrente dell'item
-        boolean isValid = couponService.validateCouponForProduct(couponCode, item.getPrice());
-        if (!isValid) {
-            return false;
+        if (item.getAppliedCoupon() != null && item.getAppliedCoupon().getCode().equals(couponCode)) {
+            logger.info("ℹ️ Coupon già applicato, ritorno il carrello attuale");
+            return getCartByUserId(ownerId); // ✅ evita LazyInitializationException
+        }
+
+
+        logger.info("▶ Validazione del coupon '{}' con prezzo item={}", couponCode, item.getPrice());
+        boolean valid = couponService.validateCouponForProduct(couponCode, item.getPrice());
+
+        if (!valid) {
+            logger.warn("❌ Coupon '{}' non valido per il prezzo {}", couponCode, item.getPrice());
+            throw new IllegalArgumentException("Invalid coupon");
         }
 
         Coupon coupon = couponRepository.findByCode(couponCode)
-                .orElseThrow(() -> new IllegalArgumentException("Coupon not found with code: " + couponCode));
+                .orElseThrow(() -> {
+                    logger.warn("❌ Coupon non trovato con codice: {}", couponCode);
+                    return new IllegalArgumentException("Coupon not found");
+                });
 
-        // Memorizza il prezzo attuale come oldPrice (se non già impostato)
+        logger.info("✔ Coupon trovato: sconto={}%, scadenza={}", coupon.getDiscountPercentage(), coupon.getExpirationDate());
+
         if (item.getOldPrice() == null) {
             item.setOldPrice(item.getPrice());
         }
 
-        // Calcola il nuovo prezzo scontato in base alla percentuale di sconto
         BigDecimal discountRate = coupon.getDiscountPercentage().divide(BigDecimal.valueOf(100));
         BigDecimal newPrice = item.getPrice().subtract(item.getPrice().multiply(discountRate));
         newPrice = newPrice.setScale(2, RoundingMode.HALF_UP);
 
-        // Aggiorna il prezzo e applica il coupon
         item.setPrice(newPrice);
         item.setAppliedCoupon(coupon);
-
         shoppingCartItemRepository.save(item);
-        return true;
+
+        logger.info("✔ Coupon applicato. Nuovo prezzo: {}", newPrice);
+        return getCartByUserId(item.getCart().getUser().getId());
     }
+
+
 
 
     public static class CartSummary {

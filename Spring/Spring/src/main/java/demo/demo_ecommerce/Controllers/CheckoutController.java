@@ -34,8 +34,10 @@ public class CheckoutController {
         Order order = checkoutService.processCheckout(
                 userId,
                 checkoutRequest.getTransaction(),
-                checkoutRequest.getShipping()
+                checkoutRequest.getShipping(),
+                checkoutRequest.getConfirmedItemIds() // ✅ PASSA gli item selezionati!
         );
+
 
         CheckoutResponse response = new CheckoutResponse(
                 order.getId(),

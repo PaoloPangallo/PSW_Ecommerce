@@ -1,28 +1,28 @@
 /* ========================================================================
-   Checkout Component Styles (stand-alone SCSS) - Pro Extended Edition
+   Checkout Component Styles (Versione Aggiornata - Rimozione Spazio Form Spedizione)
    ======================================================================== */
 
 /* -------------------------------
    Palette Colori e Variabili
    ------------------------------- */
-$color-primary: #002f6c;
-$color-secondary: #b33900;
-$color-accent: #ff9800;
-$color-success: #388e3c;
-$color-error: #e53935;
-$color-bg-light: #fffef6;
-$color-bg-neutral: #f5f9ff;
-$color-bg-white: #ffffff;
-$color-border: #ddd;
-$shadow-light: rgba(0, 0, 0, 0.1);
-$shadow-strong: rgba(0, 0, 0, 0.15);
+$color-primary:       #002f6c;
+$color-secondary:     #b33900;
+$color-accent:        #ff9800;
+$color-success:       #388e3c;
+$color-error:         #e53935;
+$color-bg-light:      #fffef6;
+$color-bg-neutral:    #f5f9ff;
+$color-bg-white:      #ffffff;
+$color-border:        #ddd;
+$shadow-light:        rgba(0, 0, 0, 0.1);
+$shadow-strong:       rgba(0, 0, 0, 0.15);
 
-$font-base: "Open Sans", sans-serif;
-$font-title: "Georgia", serif;
+$font-base:           "Open Sans", sans-serif;
+$font-title:          "Georgia", serif;
 
-$radius-small: 6px;
-$radius-medium: 8px;
-$radius-large: 12px;
+$radius-small:        6px;
+$radius-medium:       8px;
+$radius-large:        12px;
 
 /* -------------------------------
    Reset & Base
@@ -31,115 +31,144 @@ $radius-large: 12px;
 *::before,
 *::after {
   box-sizing: border-box;
+  margin:    0;
+  padding:   0;
 }
 
 body {
-  font-family: $font-base;
+  font-family:      $font-base;
   background-color: $color-bg-neutral;
-  color: #2e2e2e;
-  line-height: 1.5;
-  font-size: 16px;
+  color:            #2e2e2e;
+  line-height:      1.5;
+  font-size:        16px;
 }
 
 /* -------------------------------
    Container Principale
    ------------------------------- */
 .checkout-container {
-  max-width: 800px;
-  margin: 2.5rem auto;
-  padding: 2rem;
-  background: $color-bg-light;
-  border-radius: $radius-large;
+  max-width:       800px;
+  margin:          2.5rem auto;
+  padding:         2rem;
+  background:      $color-bg-light;
+  border-radius:   $radius-large;
   box-shadow:
     0 10px 30px $shadow-light,
     inset 0 0 40px rgba(212, 175, 55, 0.05);
-  color: #2e2e2e;
+  color:           #2e2e2e;
+  position:        relative;
 
   h2 {
-    font-family: $font-title;
-    font-size: 2.8rem;
-    color: $color-primary;
-    text-align: center;
-    margin-bottom: 1.5rem;
+    font-family:    $font-title;
+    font-size:      2.8rem;
+    color:          $color-primary;
+    text-align:     center;
+    margin-bottom:  1.5rem;
     text-transform: uppercase;
     letter-spacing: 2px;
-    text-shadow: 1px 1px 3px rgba(179, 57, 0, 0.3);
+    text-shadow:    1px 1px 3px rgba(179, 57, 0, 0.3);
   }
-}
 
-/* -------------------------------
-   Breadcrumb Navigazione Step
-   ------------------------------- */
-.checkout-breadcrumb {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 2rem;
+  /* -------------------------------
+     Breadcrumb Navigazione Step
+     ------------------------------- */
+  .checkout-breadcrumb {
+    display:         flex;
+    justify-content: space-between;
+    margin-bottom:   2rem;
 
-  .step {
-    flex: 1;
-    text-align: center;
-    position: relative;
-    font-weight: 600;
-    color: $color-border;
-    font-size: 0.9rem;
-    cursor: default;
-
-    &::before {
-      content: attr(data-step);
-      display: block;
-      width: 32px;
-      height: 32px;
-      margin: 0 auto 0.5rem;
-      background: $color-border;
-      color: white;
-      border-radius: 50%;
-      line-height: 32px;
-      font-size: 1rem;
-      transition: background 0.3s ease;
-    }
-
-    &.active {
-      color: $color-primary;
+    .step {
+      flex:          1;
+      text-align:    center;
+      position:      relative;
+      font-weight:   600;
+      color:         $color-border;
+      font-size:     0.9rem;
+      cursor:        default;
 
       &::before {
-        background: $color-primary;
+        content:       attr(data-step);
+        display:       block;
+        width:         32px;
+        height:        32px;
+        margin:        0 auto 0.5rem;
+        background:    $color-border;
+        color:         white;
+        border-radius: 50%;
+        line-height:   32px;
+        font-size:     1rem;
+        transition:    background 0.3s ease;
+      }
+
+      &.active {
+        color: $color-primary;
+
+        &::before {
+          background: $color-primary;
+        }
+      }
+
+      & + .step::after {
+        content:     "";
+        position:    absolute;
+        top:         16px;
+        left:        0;
+        width:       100%;
+        height:      3px;
+        background:  $color-border;
+        z-index:     -1;
+        transform:   translateX(-50%);
+      }
+
+      &:last-child::after {
+        display:    none;
       }
     }
+  }
 
-    & + .step::after {
-      content: "";
-      position: absolute;
-      top: 16px;
-      left: 0;
-      width: 100%;
-      height: 3px;
-      background: $color-border;
-      z-index: -1;
-      transform: translateX(-50%);
-    }
+  /* -------------------------------
+     Progress Bar animata
+     ------------------------------- */
+  .progress-bar {
+    height:         8px;
+    background:     $color-border;
+    border-radius:  4px;
+    overflow:       hidden;
+    margin:         1rem 0 2rem;
 
-    &:last-child::after {
-      display: none;
+    .progress {
+      height:      100%;
+      background:  $color-accent;
+      width:       0%; /* impostato via ngStyle in componente */
+      transition:  width 0.4s ease-in-out;
+      box-shadow:  0 0 10px rgba(255, 152, 0, 0.7);
     }
   }
-}
 
-/* -------------------------------
-   Progress Bar animata
-   ------------------------------- */
-.progress-bar {
-  height: 8px;
-  background: $color-border;
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 1rem 0 2rem;
+  /* -------------------------------
+     Cart Sync Info
+     ------------------------------- */
+  .cart-sync-info {
+    margin-bottom: 1rem;
+    padding:       1rem;
+    border-radius: $radius-medium;
+    font-size:     0.95rem;
+    font-weight:   600;
+    box-shadow:    0 3px 6px $shadow-light;
+    border-left:   4px solid;
+    transition:    background 0.3s ease;
 
-  .progress {
-    height: 100%;
-    background: $color-accent;
-    width: 25%; // gestito via JS
-    transition: width 0.4s ease-in-out;
-    box-shadow: 0 0 10px rgba(255, 152, 0, 0.7);
+    &.updated {
+      background-color: #fff3cd;
+      border-color:     #ffc107;
+      color:            #856404;
+    }
+
+    &.original {
+      background-color: #d1ecf1;
+      border-color:     #17a2b8;
+      color:            #0c5460;
+    }
   }
 }
 
@@ -147,187 +176,267 @@ body {
    Step Comune (box + titolo)
    ------------------------------- */
 .checkout-step {
-  background: linear-gradient(145deg, #faf7f0 0%, #fdfbf8 100%);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  border-radius: $radius-large;
-  border-left: 5px solid $color-primary;
-  box-shadow: 0 3px 8px $shadow-light;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background:      linear-gradient(145deg, #faf7f0 0%, #fdfbf8 100%);
+  border-left:     5px solid $color-primary;
+  border-radius:   $radius-large;
+  box-shadow:      0 3px 8px $shadow-light;
+  margin-bottom:   2rem;
+  padding:         0;
 
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px $shadow-strong;
-  }
-
+  /* Header (Titolo fisso) */
   h3 {
-    margin: 0 0 1rem;
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: $color-secondary;
-    border-bottom: 1px solid #eee;
+    margin:         1.5rem 1rem 1rem;
+    font-size:      1.6rem;
+    font-weight:    600;
+    color:          $color-secondary;
+    border-bottom:  1px solid #eee;
     padding-bottom: 0.5rem;
   }
-}
 
-/* -------------------------------
-   STEP 1: Riepilogo Carrello
-   ------------------------------- */
-.step1 .cart-summary {
-  background: $color-bg-white;
-  padding: 1rem;
-  border-radius: $radius-medium;
-  border: 1px solid #eee;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-}
+  /* ------------------------------------------------
+     Wrapper scrollabile: max-height + overflow-auto
+     ------------------------------------------------ */
+  .step-content {
+    padding:       0 1rem 1rem;   /* padding laterale e in basso per tutti gli step */
+    max-height:    none;          /* rimosso qualsiasi vincolo di altezza */
+    overflow-y:    visible;       /* scroll solo se necessario */
+  }
 
-.cart-items {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-
-  li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #eee;
-
-    &:last-child {
-      border-bottom: none;
-    }
-
-    .item-name {
-      font-weight: 500;
-      color: #555;
-    }
-
-    .item-price {
-      font-weight: 600;
-      color: #2e2e2e;
-    }
+  /* -----------------------------------------------
+     Footer pulsanti (“Indietro / Avanti”) fisso
+     ----------------------------------------------- */
+  .btn-group {
+    display:         flex;
+    justify-content: flex-end;
+    gap:             0.75rem;
+    background:      transparent;
+    padding:         1rem;        /* spazio sopra/sotto i pulsanti */
+    border-top:      1px solid #eee;
   }
 }
 
-.cart-total {
-  text-align: right;
-  margin-top: 1rem;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #2e2e2e;
+/* -----------------------------------------------------------------------------------
+   Override specifico per STEP 2 (Indirizzo di Spedizione)
+   – Rimuove ogni padding-bottom e height forzata se presente
+   ----------------------------------------------------------------------------------- */
+.checkout-step.step2 .step-content {
+  padding:       0 1rem !important;
+  max-height:    none    !important;
+  overflow-y:    visible !important;
 }
 
-/* -------------------------------
-   Discount Badge (lista carrello)
-   ------------------------------- */
-.discount-badge {
-  background: $color-secondary;
-  color: #fff;
-  font-size: 0.85rem;
-  padding: 2px 8px;
-  border-radius: 12px;
-  margin-left: 0.5rem;
-  font-weight: 600;
-}
-
-/* -------------------------------
-   Pulsante "Procedi al Checkout"
-   (usato in STEP1)
-   ------------------------------- */
-.step1 .next-button {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.75rem 1.75rem;
-  background: $color-accent;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: $radius-medium;
-  cursor: pointer;
-  box-shadow: 0 3px 8px rgba(255, 152, 0, 0.7);
-  transition: background 0.3s ease, transform 0.2s ease;
-
-  &:hover {
-    background: darken($color-accent, 10%);
-    transform: translateY(-1px);
-  }
-
-  &:focus {
-    outline: 3px solid lighten($color-accent, 20%);
-    outline-offset: 2px;
-  }
-}
-
-/* -------------------------------
-   STEP 2 & 3: Form Styles
-   ------------------------------- */
+/* -----------------------------------------------------------------------------------
+   Piccoli ritocchi per input, select, textarea, ecc.
+   (Manteniamo coerenza stilistica)
+   ----------------------------------------------------------------------------------- */
 .checkout-container {
-  label {
-    display: block;
-    margin-top: 1rem;
-    margin-bottom: 0.25rem;
-    font-weight: 600;
-    color: #444;
-  }
-
   input,
   select,
   textarea {
-    width: 100%;
-    padding: 0.5rem 0.75rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
+    width:         100%;
+    max-width:     600px;   /* non si allarga oltre questo */
+    padding:       0.5rem 0.75rem;
+    font-size:     1rem;
+    border:        1px solid #ccc;
     border-radius: $radius-small;
-    background: #f9f9f9;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background:    #f9f9f9;
+    transition:    border-color 0.3s ease, box-shadow 0.3s ease;
 
     &:focus {
-      outline: none;
+      outline:      none;
       border-color: $color-primary;
-      box-shadow: 0 0 8px rgba($color-primary, 0.3);
+      box-shadow:   0 0 8px rgba($color-primary, 0.3);
+    }
+  }
+
+  .shipping-cost-info {
+    margin-top: 1rem;
+    p {
+      font-size: 1rem;
+      margin:    0.25rem 0;
+      strong {
+        color: $color-primary;
+      }
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   STEP 1: RIEPILOGO CARRELLO
+   ----------------------------------------------------------------------------- */
+.step1 {
+  .cart-summary {
+    background:    $color-bg-white;
+    padding:       1rem;
+    border-radius: $radius-medium;
+    border:        1px solid #eee;
+    box-shadow:    0 3px 6px rgba(0, 0, 0, 0.1);
+
+    ul.cart-items {
+      list-style: none;
+      margin:     0;
+      padding:    0;
+
+      li {
+        display:         flex;
+        justify-content: space-between;
+        align-items:     center;
+        padding:         0.5rem 0;
+        border-bottom:   1px solid #eee;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .item-name {
+          font-weight: 500;
+          color:       #555;
+        }
+
+        .item-price {
+          font-weight: 600;
+          color:       #2e2e2e;
+
+          del.old-price {
+            margin-right: 0.5rem;
+            color:        #999;
+          }
+          strong.new-price {
+            color:        #2e2e2e;
+          }
+          .discount-badge {
+            background:    $color-secondary;
+            color:         #fff;
+            font-size:     0.85rem;
+            padding:       2px 8px;
+            border-radius: 12px;
+            margin-left:   0.5rem;
+            font-weight:   600;
+          }
+        }
+      }
+    }
+
+    .cart-total {
+      text-align:    right;
+      margin-top:    1rem;
+      font-size:     1.2rem;
+      font-weight:   bold;
+      color:         #2e2e2e;
+    }
+  }
+
+  .step1 .next-button {
+    display:        inline-block;
+    margin-top:     1rem;
+    padding:        0.75rem 1.75rem;
+    background:     $color-accent;
+    color:          #fff;
+    font-size:      1rem;
+    font-weight:    600;
+    border:         none;
+    border-radius:  $radius-medium;
+    cursor:         pointer;
+    box-shadow:     0 3px 8px rgba(255, 152, 0, 0.7);
+    transition:     background 0.3s ease, transform 0.2s ease;
+
+    &:hover {
+      background:  darken($color-accent, 10%);
+      transform:   translateY(-1px);
+    }
+
+    &:focus {
+      outline:         3px solid lighten($color-accent, 20%);
+      outline-offset:  2px;
+    }
+
+    &:disabled {
+      background:  lighten($color-accent, 30%);
+      cursor:      not-allowed;
+      box-shadow:  none;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   STEP 2 & 3: FORM STYLES
+   ----------------------------------------------------------------------------- */
+.checkout-container {
+  label {
+    display:       block;
+    margin-top:    1rem;
+    margin-bottom: 0.25rem;
+    font-weight:   600;
+    color:         #444;
+  }
+  select,
+  textarea {
+    width:         100%;
+    max-width:     600px;
+    padding:       0.5rem 0.75rem;
+    font-size:     1rem;
+    border:        1px solid #ccc;
+    border-radius: $radius-small;
+    background:    #f9f9f9;
+    transition:    border-color 0.3s ease, box-shadow 0.3s ease;
+
+    &:focus {
+      outline:      none;
+      border-color: $color-primary;
+      box-shadow:   0 0 8px rgba($color-primary, 0.3);
     }
   }
 
   textarea {
-    resize: vertical;
-    min-height: 80px;
+    resize:       vertical;
+    min-height:   80px;
   }
 
   .error {
-    color: $color-error;
-    font-size: 0.9rem;
+    color:      $color-error;
+    font-size:  0.9rem;
     margin-top: 0.25rem;
+  }
+
+  .shipping-cost-info {
+    margin-top: 1rem;
+    p {
+      font-size: 1rem;
+      margin:    0.25rem 0;
+      strong {
+        color: $color-primary;
+      }
+    }
   }
 }
 
-/* -------------------------------
+/* -----------------------------------------------------------------------------
    Pulsanti "Indietro" / "Avanti"
-   ------------------------------- */
+   ----------------------------------------------------------------------------- */
 .btn-group {
-  display: flex;
-  gap: 0.75rem;
+  display:         flex;
+  gap:             0.75rem;
   justify-content: flex-end;
-  margin-top: 1.5rem;
+  margin-top:      1.5rem;
 
   button {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
+    flex:           1;
+    display:        inline-flex;
+    align-items:    center;
     justify-content: center;
-    padding: 0.75rem 1.75rem;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #fff;
-    border: none;
-    border-radius: $radius-medium;
-    cursor: pointer;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-    transition: background 0.3s ease, transform 0.2s ease;
+    padding:        0.75rem 1.75rem;
+    font-size:      1rem;
+    font-weight:    600;
+    color:          #fff;
+    border:         none;
+    border-radius:  $radius-medium;
+    cursor:         pointer;
+    box-shadow:     0 3px 6px rgba(0, 0, 0, 0.15);
+    transition:     background 0.3s ease, transform 0.2s ease;
 
     &:focus {
-      outline: 3px solid $color-accent;
-      outline-offset: 2px;
+      outline:         3px solid $color-accent;
+      outline-offset:  2px;
     }
 
     &.back-button {
@@ -335,7 +444,13 @@ body {
 
       &:hover {
         background: #1565c0;
-        transform: translateY(-1px);
+        transform:  translateY(-1px);
+      }
+
+      &:disabled {
+        background:  lighten(#1976d2, 40%);
+        cursor:      not-allowed;
+        box-shadow:  none;
       }
     }
 
@@ -345,50 +460,56 @@ body {
 
       &:hover {
         background: darken($color-accent, 10%);
-        transform: translateY(-1px);
+        transform:  translateY(-1px);
+      }
+
+      &:disabled {
+        background:  lighten($color-accent, 40%);
+        cursor:      not-allowed;
+        box-shadow:  none;
       }
     }
   }
 }
 
-/* -------------------------------
-   STEP 4: Riepilogo Ordine
-   ------------------------------- */
+/* -----------------------------------------------------------------------------
+   STEP 4: RIEPILOGO ORDINE
+   ----------------------------------------------------------------------------- */
 .address-summary {
-  background: $color-bg-neutral;
-  padding: 1rem 1.25rem;
+  background:    $color-bg-neutral;
+  padding:       1rem 1.25rem;
   border-radius: $radius-medium;
-  border-left: 4px solid #1976d2;
+  border-left:   4px solid #1976d2;
   margin-bottom: 1.5rem;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  box-shadow:    0 3px 6px rgba(0, 0, 0, 0.1);
 
   p {
-    margin: 0.25rem 0;
-    color: #444;
-    font-size: 0.95rem;
+    margin:     0.25rem 0;
+    color:      #444;
+    font-size:  0.95rem;
 
     strong {
-      color: #1976d2;
+      color:       #1976d2;
       font-weight: 600;
     }
   }
 }
 
-/* -------------------------------
+/* -----------------------------------------------------------------------------
    Pulsante "Conferma" + Spinner
-   ------------------------------- */
+   ----------------------------------------------------------------------------- */
 .submit-button {
   position: relative;
 
   .spinner {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    margin-right: 0.5rem;
-    border: 2px solid #fff;
-    border-top: 2px solid #333;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
+    display:        inline-block;
+    width:          16px;
+    height:         16px;
+    margin-right:   0.5rem;
+    border:         2px solid #fff;
+    border-top:     2px solid #333;
+    border-radius:  50%;
+    animation:      spin 0.6s linear infinite;
     vertical-align: middle;
   }
 }
@@ -398,56 +519,86 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* -------------------------------
-   Messaggio Successo / Errore
-   ------------------------------- */
+/* -----------------------------------------------------------------------------
+   Messaggi Successo / Errore
+   ----------------------------------------------------------------------------- */
 .order-error {
-  background: lighten($color-error, 40%);
-  border: 1px solid $color-error;
-  color: $color-error;
-  padding: 1rem;
+  background:    lighten($color-error, 40%);
+  border:        1px solid $color-error;
+  color:         $color-error;
+  padding:       1rem;
   border-radius: $radius-medium;
-  margin-top: 1.5rem;
-  text-align: center;
-  font-weight: 600;
+  margin-top:    1.5rem;
+  text-align:    center;
+  font-weight:   600;
 }
 
 .order-success {
-  background: lighten($color-success, 40%);
-  border: 1px solid $color-success;
-  color: $color-success;
-  padding: 1rem;
+  background:    lighten($color-success, 40%);
+  border:        1px solid $color-success;
+  color:         $color-success;
+  padding:       1rem;
   border-radius: $radius-medium;
-  margin-top: 1.5rem;
-  text-align: center;
-  font-weight: 600;
+  margin-top:    1.5rem;
+  text-align:    center;
+  font-weight:   600;
 }
 
-/* -------------------------------
+/* -----------------------------------------------------------------------------
    Tabelle Ordine e Riepilogo
-   ------------------------------- */
+   ----------------------------------------------------------------------------- */
 table {
-  width: 100%;
+  width:           100%;
   border-collapse: collapse;
-  margin-top: 1rem;
-  font-size: 0.95rem;
+  margin-top:      1rem;
+  font-size:       0.95rem;
 
   th {
-    background: $color-primary;
-    color: white;
-    padding: 0.75rem;
-    text-align: left;
+    background:  $color-primary;
+    color:       white;
+    padding:     0.75rem;
+    text-align:  left;
   }
 
   td {
-    padding: 0.75rem;
+    padding:       0.75rem;
     border-bottom: 1px solid $color-border;
   }
 }
 
-/* -------------------------------
+/* -----------------------------------------------------------------------------
+   Mini-summary Fisso (Desktop only)
+   ----------------------------------------------------------------------------- */
+.mini-summary {
+  position:      fixed;
+  bottom:        1rem;
+  right:         1rem;
+  background:    rgba(255, 255, 255, 0.95);
+  padding:       0.75rem 1rem;
+  border-radius: $radius-medium;
+  box-shadow:    0 2px 6px $shadow-light;
+  font-size:     0.95rem;
+  border-left:   4px solid $color-primary;
+  max-width:     200px;
+  z-index:       100;
+
+  p {
+    margin:  0.25rem 0;
+    strong {
+      color: $color-primary;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .mini-summary {
+    display: none;
+  }
+}
+
+/* -----------------------------------------------------------------------------
    Responsive Layout
-   ------------------------------- */
+   ----------------------------------------------------------------------------- */
 @media (max-width: 768px) {
   .btn-group {
     flex-direction: column;
@@ -459,7 +610,7 @@ table {
 
   .cart-items li {
     flex-direction: column;
-    align-items: flex-start;
+    align-items:   flex-start;
 
     .item-price {
       margin-top: 0.5rem;
@@ -469,7 +620,7 @@ table {
 
 @media (max-width: 480px) {
   .checkout-container {
-    padding: 1rem;
+    padding:  1rem;
 
     h2 {
       font-size: 2.4rem;
@@ -477,7 +628,7 @@ table {
   }
 
   .checkout-step {
-    padding: 1rem;
+    padding:      0;
     margin-bottom: 1.5rem;
   }
 
@@ -488,48 +639,64 @@ table {
   .cart-items li {
     font-size: 0.9rem;
   }
+
+  .address-summary {
+    padding: 0.75rem 1rem;
+  }
 }
 
-/* -------------------------------
+/* -----------------------------------------------------------------------------
    Dark Mode (toggle tramite class .dark-mode sul body)
-   ------------------------------- */
+   ----------------------------------------------------------------------------- */
 body.dark-mode {
   background-color: #121212;
-  color: #eee;
+  color:            #eee;
 
   .checkout-container {
-    background: #1e1e1e;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-    color: #eee;
+    background:    #1e1e1e;
+    box-shadow:    0 0 10px rgba(255, 255, 255, 0.05);
+    color:         #eee;
   }
 
   .checkout-step {
-    background: #2a2a2a;
-    border-left-color: $color-primary;
-    border-color: #444;
-    box-shadow: 0 3px 8px rgba(255, 255, 255, 0.1);
+    background:    #2a2a2a;
+    border-left:   5px solid $color-primary;
+    box-shadow:    0 3px 8px rgba(255, 255, 255, 0.1);
+    color:         #eee;
   }
 
   input,
   select,
   textarea {
-    background: #333;
-    color: #eee;
+    background:   #333;
+    color:        #eee;
     border-color: #555;
 
     &:focus {
       border-color: $color-accent;
-      box-shadow: 0 0 8px rgba($color-accent, 0.5);
+      box-shadow:   0 0 8px rgba($color-accent, 0.5);
+    }
+  }
+
+  .address-summary {
+    background:    #2a2a2a;
+    border-left:   4px solid #1976d2;
+
+    p {
+      color:      #ccc;
+
+      strong {
+        color:  #1976d2;
+      }
     }
   }
 
   table {
-    color: #ccc;
+    color:        #ccc;
 
     th {
       background: #222;
     }
-
     td {
       border-color: #444;
     }
@@ -542,35 +709,36 @@ body.dark-mode {
   .order-error {
     background: rgba(255, 83, 83, 0.3);
     border-color: $color-error;
-    color: $color-error;
+    color:        $color-error;
   }
 
   .order-success {
     background: rgba(56, 142, 60, 0.3);
     border-color: $color-success;
-    color: $color-success;
+    color:        $color-success;
   }
 }
 
-/* -------------------------------
+/* -----------------------------------------------------------------------------
    Stili di Stampa
-   ------------------------------- */
+   ----------------------------------------------------------------------------- */
 @media print {
   body {
     background: white;
-    color: black;
+    color:      black;
   }
 
   .checkout-container {
     box-shadow: none;
-    border: none;
-    padding: 0;
+    border:     none;
+    padding:    0;
   }
 
   .btn-group,
   .checkout-breadcrumb,
   .footer,
-  .navigation {
+  .navigation,
+  .mini-summary {
     display: none !important;
   }
 
@@ -579,18 +747,18 @@ body.dark-mode {
   }
 }
 
-/* -------------------------------
+/* -----------------------------------------------------------------------------
    Accessibilità e Focus Visibile
-   ------------------------------- */
+   ----------------------------------------------------------------------------- */
 button:focus,
 input:focus,
 select:focus,
 textarea:focus {
-  outline: 3px solid $color-accent;
+  outline:        3px solid $color-accent;
   outline-offset: 2px;
-  transition: outline-color 0.3s ease;
+  transition:     outline-color 0.3s ease;
 }
 
 /* ========================================================================
-   FINE - Checkout Component Styles Extended
+   FINE - Checkout Component Styles (Versione Aggiornata)
    ======================================================================== */

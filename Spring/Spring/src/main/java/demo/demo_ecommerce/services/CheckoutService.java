@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class CheckoutService {
 
@@ -42,7 +44,7 @@ public class CheckoutService {
     }
 
     @Transactional
-    public Order processCheckout(Long userId, TransactionDTO transactionDTO, ShippingDTO shippingDTO) {
+    public Order processCheckout(Long userId, TransactionDTO transactionDTO, ShippingDTO shippingDTO, List<Long> confirmedItemIds) {
         logger.info("📥 Avvio del checkout per userId: {}", userId);
 
         User user = userRepository.findById(userId)
@@ -53,7 +55,8 @@ public class CheckoutService {
                 ? shippingDTO.getShippingMethod()
                 : Order.ShippingMethod.STANDARD;
 
-        OrderDTO orderDto = orderService.createOrder(userId, method);
+        // ✅ Passa la lista degli item confermati
+        OrderDTO orderDto = orderService.createOrder(userId, method, confirmedItemIds);
         entityManager.flush();
         logger.info("🧾 Ordine creato con ID: {}, totale: {}", orderDto.getId(), orderDto.getTotal());
 
@@ -62,10 +65,8 @@ public class CheckoutService {
 
         Payment payment = paymentRepository.findByPaymentMethod(transactionDTO.getPaymentMethod());
         if (payment == null) {
-            logger.error("❌ Metodo di pagamento non valido: {}", transactionDTO.getPaymentMethod());
             throw new RuntimeException("Metodo di pagamento non valido: " + transactionDTO.getPaymentMethod());
         }
-        logger.info("✅ Metodo di pagamento valido: {}", payment.getPaymentMethod());
 
         Transaction transaction = Transaction.builder()
                 .order(order)
@@ -76,7 +77,6 @@ public class CheckoutService {
                 .build();
 
         transactionRepository.save(transaction);
-        logger.info("💰 Transazione salvata (ID={}): {} €", transaction.getId(), transaction.getAmount());
 
         Shipping.ShippingStatus shippingStatus = shippingDTO.getStatus() != null
                 ? Shipping.ShippingStatus.valueOf(shippingDTO.getStatus().toUpperCase())
@@ -92,13 +92,11 @@ public class CheckoutService {
                 .build();
 
         shippingRepository.save(shipping);
-        logger.info("📦 Spedizione salvata per ordine ID: {}", order.getId());
 
-        // Evita sovrascritture precedenti e imposta chiaramente lo stato
         order.setStatus(Order.OrderStatus.PAID);
-        orderRepository.saveAndFlush(order); // forza il flush per evitare inconsistenze
-        logger.info("📝 Stato ordine aggiornato a: {}", order.getStatus());
+        orderRepository.saveAndFlush(order);
 
+        logger.info("✅ Checkout completato con successo per ordine ID: {}", order.getId());
         return order;
     }
 }

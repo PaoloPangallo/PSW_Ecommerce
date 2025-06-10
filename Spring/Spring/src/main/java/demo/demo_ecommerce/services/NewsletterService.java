@@ -32,10 +32,6 @@ public class NewsletterService {
         return newsletterRepository.findAll();
     }
 
-    public Optional<NewsletterSubscriber> findByEmail(String email) {
-        return newsletterRepository.findByEmail(email);
-    }
-
     @Transactional
     public NewsletterSubscriber subscribe(String email) {
         if (!isValidEmail(email)) {

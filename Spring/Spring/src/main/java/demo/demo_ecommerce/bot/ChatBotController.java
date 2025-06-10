@@ -1,9 +1,10 @@
 package demo.demo_ecommerce.bot;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +20,6 @@ public class ChatBotController {
         this.chatLogRepository = chatLogRepository;
     }
 
-    // 1. Endpoint principale: invia messaggio e ricevi risposta dal bot
 
 
     // 2. Endpoint per correggere manualmente l'intento riconosciuto
@@ -37,18 +37,56 @@ public class ChatBotController {
     }
 
     @PostMapping("/message")
-    public ResponseEntity<BotResponseDTO> handleMessage(@RequestParam Long userId, @RequestBody String userMessage) {
-        String sessionId = "user-" + userId;
-        BotResponseDTO response = smartBotService.getBotResponse(userId, sessionId, userMessage);
+    public ResponseEntity<?> handleMessage(@Valid @RequestBody ChatRequestDTO chatReq) {
+        try {
+            System.out.println("✅ Richiesta chatbot ricevuta: " + chatReq);
 
-        ChatLog log = new ChatLog();
-        log.setUserId(userId);
-        log.setUserMessage(userMessage);
-        log.setBotResponse(response.getText());
-        chatLogRepository.save(log);
+            Long userId = chatReq.getUserId();
+            String message = chatReq.getMessage();
+            String sessionId = "user-" + userId;
 
-        return ResponseEntity.ok(response);
+            System.out.println("➡️ Invio a smartBotService...");
+            BotResponseDTO response = smartBotService.getBotResponse(userId, sessionId, message);
+            System.out.println("✅ Risposta bot ricevuta: " + response);
+
+            ChatLog log = ChatLog.builder()
+                    .userId(userId)
+                    .userMessage(message)
+                    .botResponse(response.getText())
+                    .recognizedIntent(response.getIntentName())
+                    .fallback(response.isFallback())
+                    .timestamp(Instant.now())
+                    .build();
+
+            chatLogRepository.save(log);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            e.printStackTrace();  // stampa stacktrace completo
+
+            String errorMsg = e.getMessage() != null ? e.getMessage() : e.toString();
+            System.out.println("❌ Errore nel controller: " + errorMsg);
+
+            BotResponseDTO fallbackResponse = BotResponseDTO.builder()
+                    .text("❌ Errore interno chatbot: " + errorMsg)
+                    .fallback(true)
+                    .build();
+
+            return ResponseEntity.status(500).body(fallbackResponse);
+        }
     }
+
+
+
+
+    @GetMapping("/logs/{userId}")
+    public ResponseEntity<List<ChatLog>> getLogsForUser(@PathVariable Long userId) {
+        List<ChatLog> logs = chatLogRepository.findByUserIdOrderByTimestampDesc(userId);
+        return ResponseEntity.ok(logs);
+    }
+
+
 
 
 }

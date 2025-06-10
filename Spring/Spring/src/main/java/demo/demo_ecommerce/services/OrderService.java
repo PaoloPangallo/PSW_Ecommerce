@@ -1,14 +1,12 @@
 package demo.demo_ecommerce.services;
 
 import com.itextpdf.text.*;
-import java.util.ArrayList;
 
 import com.itextpdf.text.pdf.*;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import demo.demo_ecommerce.dtos.OrderDTO;
 import demo.demo_ecommerce.entities.*;
 import demo.demo_ecommerce.entities.Order.ShippingMethod;
-import demo.demo_ecommerce.repositories.CartRepository;
 import demo.demo_ecommerce.repositories.OrderRepository;
 import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
@@ -30,7 +28,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,37 +46,38 @@ public class OrderService {
 
 
     private final UsersRepository userRepository;
-    private final CartRepository cartRepository;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
 
     public OrderService(EntityManager entityManager, OrderRepository orderRepository,
                         UsersRepository userRepository,
-                        CartRepository cartRepository, ShoppingCartItemRepository shoppingCartItemRepository) {
+                        ShoppingCartItemRepository shoppingCartItemRepository) {
         this.entityManager = entityManager;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
-        this.cartRepository = cartRepository;
         this.shoppingCartItemRepository = shoppingCartItemRepository;
     }
 
+
     @Transactional
-    public OrderDTO createOrder(Long userId, ShippingMethod shippingMethod) {
+    public OrderDTO createOrder(Long userId, ShippingMethod shippingMethod, List<Long> confirmedItemIds){
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Utente non trovato con ID: " + userId));
 
-        Cart cart = cartRepository.findByUserIdWithItems(userId)
+        List<ShoppingCartItem> selectedItems = shoppingCartItemRepository.findAllById(confirmedItemIds);
 
-
-
-                .orElseThrow(() -> new IllegalArgumentException("Carrello non trovato per l'utente con ID: " + userId));
-        entityManager.lock(cart, LockModeType.OPTIMISTIC);
-
-
-        if (cart.getItems().isEmpty()) {
-            throw new IllegalArgumentException("Il carrello è vuoto, impossibile creare un ordine");
+        if (selectedItems.isEmpty()) {
+            throw new IllegalArgumentException("Nessun item selezionato per l'ordine.");
         }
 
-        BigDecimal totalBD = cart.getItems().stream()
+        // Verifica che tutti gli item appartengano allo stesso carrello dell’utente
+        Cart cart = selectedItems.get(0).getCart();
+        if (!Objects.equals(cart.getUser().getId(), userId)) {
+            throw new IllegalArgumentException("Alcuni item non appartengono all'utente.");
+        }
+
+        entityManager.lock(cart, LockModeType.OPTIMISTIC);
+
+        BigDecimal totalBD = selectedItems.stream()
                 .map(cartItem -> {
                     BigDecimal price = cartItem.getProduct().getPrice();
                     if (cartItem.getAppliedCoupon() != null) {
@@ -106,7 +104,7 @@ public class OrderService {
                 .shippingCost(shippingCost)
                 .build();
 
-        List<OrderItem> orderItems = cart.getItems().stream()
+        List<OrderItem> orderItems = selectedItems.stream()
                 .map(cartItem -> {
                     Product product = cartItem.getProduct();
                     int quantity = cartItem.getQuantity();
@@ -125,12 +123,8 @@ public class OrderService {
                     }
 
                     product.setStock(product.getStock() - quantity);
-
                     if (product.getVersion() == null) {
-                        System.out.println("⚠️ WARNING: product.version è null per: " + product.getName() + " → forzatura a 0L");
                         product.setVersion(0L);
-                    } else {
-                        System.out.println("✅ product.version OK per: " + product.getName() + " = " + product.getVersion());
                     }
 
                     return OrderItem.builder()
@@ -140,23 +134,14 @@ public class OrderService {
                             .price(price)
                             .build();
                 })
-                .collect(Collectors.toCollection(ArrayList::new)); // ✅ FIX: lista mutabile
+                .collect(Collectors.toList());
 
         order.setOrderItems(orderItems);
 
-        for (OrderItem item : orderItems) {
-            Product product = item.getProduct();
-            System.out.println("💾 Salvataggio prodotto: " + product.getName() + " (version: " + product.getVersion() + ")");
-            // productRepository.save(product); // decommenta se usi ProductRepository
-        }
-
         Order savedOrder = orderRepository.save(order);
 
-        Iterator<ShoppingCartItem> iterator = cart.getItems().iterator();
-        while (iterator.hasNext()) {
-            ShoppingCartItem item = iterator.next();
+        for (ShoppingCartItem item : selectedItems) {
             shoppingCartItemRepository.delete(item);
-            iterator.remove();
         }
 
         return OrderDTO.fromEntity(savedOrder, true);
@@ -355,6 +340,14 @@ public class OrderService {
             case CANCELLED -> "❌ Annullato";
         };
     }
+
+    public Optional<Order> getLastOrderEntityForUser(Long userId) {
+        return orderRepository.findByUserIdOrderByCreatedAtDesc(userId)
+                .stream()
+                .filter(o -> o.getStatus() != Order.OrderStatus.CANCELLED)
+                .findFirst();
+    }
+
 
 
 

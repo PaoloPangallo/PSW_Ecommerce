@@ -2,130 +2,189 @@ import {
   Component,
   ViewChild,
   ElementRef,
-  AfterViewChecked,
+  AfterViewInit,
+  OnDestroy,
   OnInit
 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
 import { CommonModule, NgClass } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../services/auth.services';
 import { RouterLink } from '@angular/router';
+import { Subject, throwError } from 'rxjs';
+import { takeUntil, catchError, finalize, timeout } from 'rxjs/operators';
+
+interface ChatRequest { userId: number; message: string; }
+interface BotButton  { label: string; link: string; }
+interface BotReply {
+  text: string;
+  buttons?: BotButton[];
+  intentName?: string;
+  confidenceScore?: number;
+  fallback?: boolean;
+  examples?: string[]; // <--- aggiunto
+}
+
+interface Message {
+  sender: 'user' | 'bot';
+  text: string;
+  buttons?: BotButton[];
+  intentName?: string;
+  confidenceScore?: number;
+  fallback?: boolean;
+  examples?: string[]; // <--- aggiunto
+}
+
 
 @Component({
   selector: 'app-chat-bot',
   templateUrl: './chat-bot.component.html',
   styleUrls: ['./chat-bot.component.css'],
   standalone: true,
-  imports: [FormsModule, NgClass, CommonModule, RouterLink],
+  imports: [
+    CommonModule,    // per *ngFor, *ngIf
+    FormsModule,     // per [(ngModel)]
+    NgClass,
+    RouterLink
+  ]
 })
-export class ChatBotComponent implements OnInit, AfterViewChecked {
-  userId: number | null = null;
-  userMessage = '';
-  isLoading = false;
-  shouldScroll = false;
+export class ChatBotComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('chatEnd') private chatEnd!: ElementRef;
 
-  faqQuestions: string[] = [
+  userId!: number;
+  userMessage = '';
+  isLoading   = false;
+  messages: Message[] = [];
+
+  /** FAQ fisse in alto */
+  faqQuestions = [
     "Dov'è il mio ordine 73?",
     "Mi serve il prodotto motorola",
-    "Come posso usare un coupon?",
-    "Quali sono le opzioni di spedizione?",
-    "Come posso fare un reclamo?"
+    "Mostrami il carrello",
+    "Voglio parlare con un operatore",
+    "Mostrami la mia lista desideri",
+    "Quando arriva il mio ordine?",
+
   ];
 
-  messages: { sender: 'user' | 'bot', text: string, buttons?: { label: string, link: string }[] }[] = [];
+  private destroy$ = new Subject<void>();
 
-  @ViewChild('chatEnd') chatEnd!: ElementRef;
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    const stored = localStorage.getItem('chat_messages');
-    if (stored) {
-      this.messages = JSON.parse(stored);
+    const uid = this.authService.getCurrentUserId();
+    if (uid == null) throw new Error('Utente non autenticato');
+    this.userId = uid;
+
+    const saved = localStorage.getItem('chat_messages');
+    if (saved) {
+      try { this.messages = JSON.parse(saved); }
+      catch { this.messages = []; }
     }
   }
 
-  ngAfterViewChecked(): void {
-    this.scrollToBottom(); // Scroll sempre dopo ogni aggiornamento
+  ngAfterViewInit(): void {
+    this.scrollToBottom();
   }
 
-  constructor(private http: HttpClient, private authService: AuthService) {
-    this.userId = this.authService.getCurrentUserId();
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  lastBotButtons: { label: string; link: string }[] = [];
-
-  sendMessage() {
-    if (!this.userMessage.trim()) return;
-
-    const msg = this.userMessage;
-    this.messages.push({ sender: 'user' as const, text: msg }); // ✅ cast 'user' come literal
-    this.saveMessages();
-
-    this.userMessage = '';
-    this.isLoading = true;
-
-    this.http.post<any>(`http://localhost:8080/api/chatbot/message?userId=${this.userId}`, msg)
-      .subscribe({
-        next: (botReply) => {
-          const message = {
-            sender: 'bot' as const, // ✅ cast 'bot' come literal
-            text: botReply.text,
-            buttons: botReply.buttons || []
-          };
-
-          this.messages.push(message);
-          this.lastBotButtons = message.buttons || [];
-          this.isLoading = false;
-          this.saveMessages();
-        },
-        error: () => {
-          const errMsg = {
-            sender: 'bot' as const, // ✅ anche qui
-            text: '❌ Errore nel contattare il bot.'
-          };
-
-          this.messages.push(errMsg);
-          this.lastBotButtons = [];
-          this.isLoading = false;
-          this.saveMessages();
-        }
-      });
-  }
-
-
-
-
-
-  scrollToBottom() {
-    try {
-      this.chatEnd.nativeElement.scrollIntoView({ behavior: 'smooth' });
-    } catch (err) {
-      console.warn('Errore nel fare scroll:', err);
-    }
-  }
-
-  sendFAQ(question: string) {
+  /** Invia una FAQ predefinita */
+  sendFAQ(question: string): void {
     this.userMessage = question;
     this.sendMessage();
   }
 
-  saveMessages() {
+  sendMessage(): void {
+    const text = this.userMessage.trim();
+    if (!text) return;
+
+    // Push user message
+    this.messages.push({ sender: 'user', text });
+    this.saveMessages();
+
+    this.userMessage = '';
+    this.isLoading  = true;
+
+    const payload: ChatRequest = { userId: this.userId, message: text };
+
+    this.http.post<BotReply>(
+      `http://localhost:8080/api/chatbot/message`,
+      payload
+    )
+      .pipe(
+        // timeout(10_000),             // ⬅︎ commenta o alza il valore
+        timeout(30_000),                // ad es. 30 s
+        takeUntil(this.destroy$),
+        catchError(err => this.handleError(err)),
+        finalize(() => this.isLoading = false)
+      )
+
+      .subscribe(reply => {
+        console.log('✅ BOT REPLY:', reply); // <--- AGGIUNGI QUESTO
+
+        const safeText = reply.text ?? '❌ Errore: il bot non ha risposto correttamente.';
+
+        const botMsg: Message = {
+          sender: 'bot',
+          text: safeText,
+          buttons: reply.buttons || [],
+          intentName: reply.intentName,
+          confidenceScore: reply.confidenceScore,
+          fallback: reply.fallback,
+          examples: reply.examples || [] // <---
+        };
+
+
+        this.messages.push(botMsg);
+        this.saveMessages();
+        this.scrollToBottom();
+        console.log('Intent:', reply.intentName, 'score:', reply.confidenceScore, 'fallback:', reply.fallback);
+      });
+
+  }
+
+  clearChat(): void {
+    this.messages = [];
+    localStorage.removeItem('chat_messages');
+    this.scrollToBottom();
+  }
+
+  private scrollToBottom(): void {
+    setTimeout(() => {
+      try { this.chatEnd.nativeElement.scrollIntoView({ behavior: 'smooth' }); }
+      catch {}
+    }, 50);
+  }
+
+  private saveMessages(): void {
     localStorage.setItem('chat_messages', JSON.stringify(this.messages));
   }
 
-  clearChat() {
-    this.messages = [];
-    localStorage.removeItem('chat_messages');
-    this.shouldScroll = true;
+  private handleError(err: HttpErrorResponse) {
+    console.error('❌ ChatBot API error', err);
+
+    let msg = 'Errore sconosciuto.';
+    if (err.status === 0) {
+      msg = '❌ Impossibile raggiungere il server.';
+    } else if (typeof err.error === 'string') {
+      msg = err.error;
+    } else if (err.error?.text) {
+      msg = err.error.text;
+    } else if (err.message) {
+      msg = err.message;
+    }
+
+    this.messages.push({ sender: 'bot', text: msg, buttons: [] });
+    this.saveMessages();
+    this.scrollToBottom();
+    return throwError(() => err);
   }
 
-  splitResponse(text: string): { llama: string, intent: string | null } {
-    if (text.includes("**Suggerimento mirato")) {
-      const [llama, intent] = text.split("**Suggerimento mirato");
-      return {
-        llama: llama.trim(),
-        intent: "**Suggerimento mirato" + intent.trim()
-      };
-    }
-    return { llama: text, intent: null };
-  }
 }

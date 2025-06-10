@@ -3,7 +3,6 @@ package demo.demo_ecommerce.bot;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -12,10 +11,6 @@ public class BotIntent {
     private final List<String> examples;
     private final String response;
     private final List<BotResponseDTO.BotButton> buttons;
-
-    public BotIntent(String name, List<String> examples, String response) {
-        this(name, examples, response, new ArrayList<>());
-    }
 
     public BotIntent(String name, List<String> examples, String response, List<BotResponseDTO.BotButton> buttons) {
         this.name = name;

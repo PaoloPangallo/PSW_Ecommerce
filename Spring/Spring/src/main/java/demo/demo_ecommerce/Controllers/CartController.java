@@ -8,6 +8,8 @@ import demo.demo_ecommerce.entities.User;
 import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
 import demo.demo_ecommerce.services.CartService;
 import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -16,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
+
 
     private final CartService cartService;
     private final ShoppingCartItemRepository shoppingCartItemRepository;
@@ -43,26 +48,28 @@ public class CartController {
             @PathVariable Long cartItemId,
             @PathVariable String couponCode,
             @AuthenticationPrincipal User user) {
+        try {
+            logger.info("➡️ Richiesta di applicazione coupon '{}' per cartItemId={} da parte dell'utente con ID={}", couponCode, cartItemId, user.getId());
 
-        ShoppingCartItem item = shoppingCartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart item non trovato"));
+            Cart updatedCart = cartService.applyCouponToCartItemAndReturnCart(
+                    cartItemId, couponCode, user.getId(), user.getRole().name().equals("ADMIN")
+            );
 
-        Long ownerId = item.getCart().getUser().getId();
+            logger.info("✅ Coupon '{}' applicato con successo", couponCode);
+            return ResponseEntity.ok(CartDTO.fromEntity(updatedCart));
 
-        boolean isAdmin = user.getRole().name().equals("ADMIN");
+        } catch (SecurityException e) {
+            logger.warn("❌ SecurityException: {}", e.getMessage());
+            return ResponseEntity.status(403).body(null);
 
-        if (!isAdmin && !ownerId.equals(user.getId())) {
-            return ResponseEntity.status(403).body(null); // ❌ Non autorizzato
+        } catch (IllegalArgumentException e) {
+            logger.warn("❌ IllegalArgumentException durante applicazione coupon: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(null);
         }
-
-        boolean success = cartService.applyCouponToCartItem(cartItemId, couponCode);
-        if (!success) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Cart updatedCart = cartService.getCartByUserId(ownerId);
-        return ResponseEntity.ok(CartDTO.fromEntity(updatedCart));
     }
+
+
+
 
 
     // Get cart: ADMIN può vedere qualsiasi carrello, l’utente può vedere solo il proprio

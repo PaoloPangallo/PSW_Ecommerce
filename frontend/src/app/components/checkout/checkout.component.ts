@@ -5,10 +5,10 @@ import { RouterModule } from '@angular/router';
 import { CheckoutService, CheckoutRequest, CheckoutResponse } from '../../services/checkout.service';
 import { AuthService } from '../../services/auth.services';
 import { CartService } from '../../services/cart.service';
-import { CartDTO } from '../../models/cart.model';
-import { Subject } from 'rxjs';
+import {CartDTO, CartItemDTO} from '../../models/cart.model';
+import {retry, Subject} from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { Order } from '../../models/order.model';
+import {Order, OrderItem} from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
 import { LirePipe } from '../../services/lire.pipe';
 
@@ -71,6 +71,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return costMap[method as keyof typeof costMap] ?? 0;
   }
 
+  ngOnDestroy(): void {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  cartSyncStatus: 'original' | 'updated' | null = null;
+
+
 
 
   get finalTotal(): number {
@@ -83,10 +91,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.loadCart();
   }
 
-  ngOnDestroy(): void {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
-  }
+
 
   private initializeForm(): void {
     // Form che rispecchia la struttura di CheckoutRequest:
@@ -162,8 +167,34 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
+  private formatCartItems(cart: CartDTO): string {
+    return cart.items.map(item => `• ${item.productName} (x${item.quantity})`).join('\n');
+  }
+
+
+
+
+  private compareCarts(oldCart: CartDTO | null, newCart: CartDTO): boolean {
+    if (!oldCart) return false;
+    const oldSet = new Set(oldCart.items.map(i => `${i.productId}:${i.quantity}`));
+    const newSet = new Set(newCart.items.map(i => `${i.productId}:${i.quantity}`));
+    if (oldSet.size !== newSet.size) return false;
+    for (const entry of newSet) {
+      if (!oldSet.has(entry)) return false;
+    }
+    return true;
+  }
+
+
+
+
+
+
+
+
+
   onSubmit(): void {
-    if (this.loading) return; // 🔐 Protezione sincrona contro doppi clic
+    if (this.loading) return;
 
     if (this.checkoutForm.invalid) {
       this.checkoutForm.markAllAsTouched();
@@ -177,39 +208,99 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.loading = true; // ✅ Appena dopo il blocco, prima di qualsiasi async
+    this.loading = true;
+    const localCart = this.cart;
 
-    const checkoutData: CheckoutRequest = this.checkoutForm.getRawValue();
+    this.cartService.getCart(userId).subscribe({
+      next: (freshCart) => {
+        console.log('🛒 Carrello locale:', localCart);
+        console.log('🆕 Carrello aggiornato da backend:', freshCart);
 
-    this.checkoutService.processCheckout(userId, checkoutData, token)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe({
-        next: (response) => {
-          this.checkoutResponse = response;
-          this.error = null;
-          this.loading = false;
+        const hasChanged = !this.compareCarts(localCart, freshCart);
+        console.log('🔍 Il carrello è cambiato?', hasChanged);
 
-          if (response.orderId) {
-            this.orderService.getOrderById(userId, response.orderId).subscribe({
-              next: (order: Order | null) => {
-                this.createdOrder = order;
-                this.cdRef.detectChanges();
-              },
-              error: (err) => {
-                console.error('Errore nel recupero dell\'ordine creato:', err);
-              }
-            });
+        if (hasChanged) {
+          const itemList = this.formatCartItems(freshCart);
+          const confirmUpdate = window.confirm(
+            '⚠️ Hai modificato il carrello in un\'altra scheda.\n\n' +
+            'Vuoi aggiornare l\'ordine includendo i nuovi prodotti?\n\n' +
+            itemList
+          );
+          console.log('🧠 Scelta utente (true = aggiorna, false = mantieni originale):', confirmUpdate);
+
+          if (confirmUpdate) {
+            console.log('✅ Utente ha accettato il carrello aggiornato');
+            this.cart = freshCart;
+            this.cartSyncStatus = 'updated';
+          } else {
+            console.log('❌ Utente ha rifiutato. Uso carrello originale');
+            this.cart = localCart;
+            this.cartSyncStatus = 'original';
           }
-
-          this.cdRef.detectChanges();
-        },
-        error: (err) => {
-          this.error = err.error?.message || 'Errore durante il checkout';
-          this.loading = false;
-          this.cdRef.detectChanges();
+        } else {
+          console.log('📦 Nessuna modifica nel carrello.');
         }
-      });
+
+        console.log('➡️ Carrello usato per il checkout:', this.cart);
+
+        this.checkoutForm.get('transaction.amount')?.setValue(this.getCartTotal());
+        const formData = this.checkoutForm.getRawValue();
+        const confirmedItemIds = this.cart?.items.map(item => item.id) ?? [];
+
+        const checkoutData: CheckoutRequest = {
+          ...formData,
+          confirmedItemIds
+        };
+
+        console.log('📤 CheckoutRequest inviato:', checkoutData);
+
+        this.checkoutService.processCheckout(userId, checkoutData, token)
+          .pipe(takeUntil(this.unsubscribe$))
+          .subscribe({
+            next: (response) => {
+              console.log('✅ Checkout completato:', response);
+              this.checkoutResponse = response;
+              this.error = null;
+              this.loading = false;
+
+              if (response.orderId) {
+                this.orderService.getOrderById(userId, response.orderId).subscribe({
+                  next: (order: Order | null) => {
+                    console.log('📦 Ordine ricevuto:', order);
+                    this.createdOrder = order;
+                    this.cdRef.detectChanges();
+                  },
+                  error: (err) => {
+                    console.error('❌ Errore nel recupero dell\'ordine:', err);
+                  }
+                });
+              }
+
+              this.cdRef.detectChanges();
+            },
+            error: (err) => {
+              console.error('❌ Errore durante il checkout:', err);
+              this.error = err.error?.message || 'Errore durante il checkout';
+              this.loading = false;
+              this.cdRef.detectChanges();
+            }
+          });
+      },
+      error: (err) => {
+        console.error('❌ Errore nel caricamento del carrello:', err);
+        this.error = 'Errore durante il caricamento del carrello aggiornato.';
+        this.loading = false;
+        this.cdRef.detectChanges();
+      }
+    });
   }
+
+
+
+
+
+
+
 
 
   onZipCodeChange(): void {
@@ -228,4 +319,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
+  trackByProductId(index: number, item: OrderItem): number {
+    return item.productId;
+  }
+
+  trackById(index: number, item: CartItemDTO): number {
+    return item.id;
+  }
+
+
+  protected readonly retry = retry;
 }

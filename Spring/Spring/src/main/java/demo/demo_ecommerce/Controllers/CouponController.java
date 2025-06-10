@@ -10,6 +10,7 @@ import demo.demo_ecommerce.entities.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -49,9 +50,12 @@ public class CouponController {
     }
 
     @GetMapping("/validate/{code}/{orderValue}")
-    public boolean validateCoupon(@PathVariable String code, @PathVariable Double orderValue) {
-        return couponService.validateCoupon(code, orderValue);
+    public ResponseEntity<Boolean> validateCoupon(@PathVariable String code,
+                                                  @PathVariable Double orderValue) {
+        boolean isValid = couponService.validateCoupon(code, orderValue);
+        return ResponseEntity.ok(isValid); // garantisce JSON boolean true/false
     }
+
 
     @GetMapping("/applicable/{productId}")
     public List<Coupon> getApplicableCoupons(@PathVariable Long productId) {

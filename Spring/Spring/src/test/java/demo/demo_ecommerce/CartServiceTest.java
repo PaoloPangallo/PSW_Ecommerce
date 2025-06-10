@@ -68,28 +68,39 @@ class CartServiceTest {
     }
 
     @Test
-    void testApplyCouponToCartItem_ValidCoupon() {
+    void testApplyCouponToCartItemAndReturnCart_ValidCoupon() {
         Long itemId = 1L;
         String code = "SAVE10";
+        Long userId = 42L;
+
+        User user = new User();
+        user.setId(userId);
+
+
+        Cart cart = new Cart();
+        cart.setId(100L);
+        cart.setUser(user);
 
         ShoppingCartItem item = new ShoppingCartItem();
         item.setId(itemId);
         item.setPrice(BigDecimal.valueOf(100));
+        item.setCart(cart);
 
         Coupon coupon = new Coupon();
         coupon.setCode(code);
         coupon.setDiscountPercentage(BigDecimal.valueOf(10));
 
-        when(shoppingCartItemRepository.findById(itemId)).thenReturn(Optional.of(item));
+        when(shoppingCartItemRepository.findByIdWithCartAndUser(itemId)).thenReturn(Optional.of(item));
         when(couponService.validateCouponForProduct(code, BigDecimal.valueOf(100))).thenReturn(true);
         when(couponRepository.findByCode(code)).thenReturn(Optional.of(coupon));
 
-        boolean applied = cartService.applyCouponToCartItem(itemId, code);
+        Cart result = cartService.applyCouponToCartItemAndReturnCart(itemId, code, userId, false);
 
-        assertTrue(applied);
         assertEquals(BigDecimal.valueOf(90.00).setScale(2), item.getPrice());
+        assertEquals(cart, result);
         verify(shoppingCartItemRepository).save(item);
     }
+
 
     @Test
     void testAddItemToCart_NewItemAddedSuccessfully() {

@@ -10,30 +10,33 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-
 public interface ShoppingCartItemRepository extends JpaRepository<ShoppingCartItem, Long> {
-    Optional<ShoppingCartItem> findByCartIdAndProductId(Long cartId, Long productId);
 
+    Optional<ShoppingCartItem> findByCartIdAndProductId(Long cartId, Long productId);
 
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("DELETE FROM ShoppingCartItem i WHERE i.id = :id")
     void deleteByIdWithoutVersion(@Param("id") Long id);
 
+    @Query("""
+        SELECT i FROM ShoppingCartItem i
+        JOIN FETCH i.cart c
+        JOIN FETCH c.user
+        WHERE i.id = :id
+    """)
+    Optional<ShoppingCartItem> findByIdWithCartAndUser(@Param("id") Long id);
+
     Optional<ShoppingCartItem> findByCartIdAndProductIdAndSavedForLaterFalse(Long cartId, Long productId);
-
-
-
-    @Transactional
-    @Modifying(clearAutomatically = true)
-    @Query("DELETE FROM ShoppingCartItem i WHERE i.cart.id = :cartId")
-    void deleteAllByCartId(@Param("cartId") Long cartId);
-
-
     Optional<ShoppingCartItem> findByCartIdAndProductIdAndSavedForLaterTrue(Long cartId, Long productId);
     List<ShoppingCartItem> findByCartIdAndSavedForLaterTrue(Long cartId);
-    boolean existsByCartIdAndProductIdAndSavedForLaterFalse(Long cartId, Long productId);
 
-
-
+    // 🔥 AGGIUNTO: rimozione diretta robusta
+    @Transactional
+    @Modifying(clearAutomatically = true)
+    @Query("""
+        DELETE FROM ShoppingCartItem i
+        WHERE i.cart.id = :cartId AND i.product.id = :productId AND i.savedForLater = true
+    """)
+    void deleteSavedItem(@Param("cartId") Long cartId, @Param("productId") Long productId);
 }

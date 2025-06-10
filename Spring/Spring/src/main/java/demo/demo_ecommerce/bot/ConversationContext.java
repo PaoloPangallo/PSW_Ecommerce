@@ -16,7 +16,4 @@ public class ConversationContext {
         this.step = 0;
     }
 
-    public void incrementStep() {
-        this.step++;
-    }
 }

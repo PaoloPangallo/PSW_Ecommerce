@@ -74,6 +74,11 @@ public class CouponService {
 
     @Cacheable(value = "couponValidationProduct", key = "#code + '-' + #productPrice")
     public boolean validateCouponForProduct(String code, BigDecimal productPrice) {
+        if (productPrice == null) {
+            logger.warn("❌ validateCouponForProduct: prezzo nullo, impossibile validare coupon '{}'", code);
+            return false;
+        }
+
         Optional<Coupon> couponOpt = couponRepository.findByCode(code);
         return couponOpt.map(coupon -> {
             boolean isValid = coupon.getIsActive()
@@ -84,6 +89,7 @@ public class CouponService {
             return isValid;
         }).orElse(false);
     }
+
 
     @Caching(evict = {
             @CacheEvict(value = "coupons", allEntries = true),

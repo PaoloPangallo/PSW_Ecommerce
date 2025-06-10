@@ -1,6 +1,6 @@
 <div class="chat-wrapper">
 
-  <!-- ✅ FAQ FISSE IN ALTO -->
+  <!-- FAQ FISSE IN ALTO -->
   <div class="faq-box">
     <p class="faq-title">❓ Domande frequenti</p>
     <div class="faq-buttons">
@@ -10,47 +10,56 @@
     </div>
   </div>
 
-  <!-- ✅ CHAT SCROLLABILE -->
+  <!-- CHAT SCROLLABILE -->
   <div class="chat-scroll">
     <!-- Messaggi -->
     <div *ngFor="let msg of messages" class="message-wrapper" [ngClass]="msg.sender">
       <div class="message">
-        <!-- Messaggio Bot -->
-        <ng-container *ngIf="msg.sender === 'bot'; else userBlock">
-          <ng-container *ngIf="splitResponse(msg.text).intent; else simpleBot">
-            <p><strong>🤖 LLaMA:</strong><br>{{ splitResponse(msg.text).llama }}</p>
-            <p class="intent"><strong>🎯 Intento:</strong><br>{{ splitResponse(msg.text).intent }}</p>
-          </ng-container>
-          <ng-template #simpleBot>
-            <p><strong>🤖 Bot:</strong> {{ msg.text }}</p>
-          </ng-template>
-        </ng-container>
 
         <!-- Messaggio Utente -->
-        <ng-template #userBlock>
+        <ng-container *ngIf="msg.sender === 'user'; else botBlock">
           <p><strong>👤 Tu:</strong> {{ msg.text }}</p>
+        </ng-container>
+
+        <!-- Messaggio Bot -->
+        <ng-template #botBlock>
+          <p><strong>🤖 Bot:</strong> {{ msg.text }}</p>
+
+          <!-- Se c’è un intent riconosciuto -->
+          <p *ngIf="msg.intentName" class="intent">
+            🎯 <strong>Intent:</strong> {{ msg.intentName }}
+            <small *ngIf="msg.confidenceScore">
+              ({{ (msg.confidenceScore * 100) | number:'1.0-0' }}%)
+            </small>
+          </p>
+
+          <!-- Pulsanti suggeriti dentro ogni messaggio bot -->
+          <div *ngIf="msg.buttons?.length" class="suggested-buttons">
+            <a *ngFor="let b of msg.buttons" [routerLink]="b.link" class="suggestion-btn">
+              {{ b.label }}
+            </a>
+          </div>
         </ng-template>
+
       </div>
     </div>
 
     <!-- Scroll target -->
     <div #chatEnd></div>
-
-    <!-- ✅ BOTTONI SUGGERITI dentro lo scroll -->
-    <div *ngIf="lastBotButtons?.length" class="suggested-buttons">
-      <a *ngFor="let b of lastBotButtons" [routerLink]="b.link" class="suggestion-btn">
-        {{ b.label }}
-      </a>
-    </div>
   </div>
 
-  <!-- ⏳ Loader -->
+  <!-- Loader -->
   <div *ngIf="isLoading" class="loading">⏳ Sto pensando...</div>
 
-  <!-- ✅ INPUT IN BASSO -->
+  <!-- INPUT IN BASSO -->
   <div class="chat-bottom">
     <button (click)="clearChat()" class="clear-btn">🗑️</button>
-    <input [(ngModel)]="userMessage" placeholder="Scrivi un messaggio..." (keyup.enter)="sendMessage()" />
+    <input
+      [(ngModel)]="userMessage"
+      placeholder="Scrivi un messaggio..."
+      (keyup.enter)="sendMessage()" />
     <button (click)="sendMessage()">Invia</button>
   </div>
+
 </div>
+

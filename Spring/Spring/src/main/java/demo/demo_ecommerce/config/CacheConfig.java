@@ -30,10 +30,12 @@ public class CacheConfig {
         CaffeineCacheManager manager = new CaffeineCacheManager(
                 "products", "product", "allProducts", "productsByCategory",
                 "featuredProducts", "productsByCategoryPaged", "allProductsPaged",
-                "productsPaged", "userById", "userByUsername", "userProfileSummary", "userReviews", "usersByRole", "couponsPaged"
+                "productsPaged", "userById", "userByUsername", "userProfileSummary",
+                "userReviews", "usersByRole",
+                "couponsPaged", "couponValidation", "couponValidationProduct", // ✅ aggiunte
+                "coupons", "couponByCode" // ✅ opzionali se usate altrove
         );
         manager.setCaffeine(caffeine);
-
         return manager;
     }
 

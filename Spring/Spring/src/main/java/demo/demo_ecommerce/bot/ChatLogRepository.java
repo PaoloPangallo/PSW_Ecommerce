@@ -10,4 +10,7 @@ public interface ChatLogRepository extends JpaRepository<ChatLog, Long> {
 
     // Trova tutti i log con una correzione umana dell'intent
     List<ChatLog> findByIntentCorrectedIsNotNull();
+
+        List<ChatLog> findByUserIdOrderByTimestampDesc(Long userId);
+
 }

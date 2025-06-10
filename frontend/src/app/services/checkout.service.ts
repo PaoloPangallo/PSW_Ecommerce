@@ -20,7 +20,9 @@ export interface Shipping {
 export interface CheckoutRequest {
   transaction: Transaction;
   shipping: Shipping;
+  confirmedItemIds: number[]; // ✅ nuovo campo
 }
+
 
 export interface CheckoutResponse {
   orderId: number | null;

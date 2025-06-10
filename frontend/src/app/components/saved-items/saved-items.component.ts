@@ -40,7 +40,7 @@ export class SavedItemsComponent implements OnInit {
       next: (updatedCart) => {
         this.showSnack('✅ Spostato nel carrello');
         this.cartService.setCart(updatedCart);
-        this.loadSavedItems();
+        this.savedItems = this.savedItems.filter(i => i.product.id !== item.product.id);
       },
       error: (err) => {
         const msg = err.error?.message || 'Errore durante lo spostamento nel carrello';
@@ -53,15 +53,34 @@ export class SavedItemsComponent implements OnInit {
 
 
 
+
+  removing = new Set<number>();
+
   removeFromSaved(item: any): void {
-    this.savedService.removeSavedItem(item.product.id).subscribe({
+    const targetProductId = +item.product.id;
+    if (this.removing.has(targetProductId)) return;
+
+    this.removing.add(targetProductId);
+    console.log("🗑️ Tentativo di rimozione per productId:", targetProductId);
+
+    this.savedService.removeSavedItem(targetProductId).subscribe({
       next: () => {
         this.showSnack('🗑️ Rimosso dai salvati');
-        this.loadSavedItems();
+        this.savedItems = this.savedItems.filter(i => +i.product.id !== targetProductId);
+        console.log("✅ Lista aggiornata:", this.savedItems.map(i => +i.product.id));
       },
-      error: () => this.showSnack('Errore nella rimozione')
+      error: (err) => {
+        console.error("❌ Errore durante la rimozione:", err);
+        this.showSnack('Errore nella rimozione');
+      },
+      complete: () => this.removing.delete(targetProductId)
     });
   }
+
+
+
+
+
 
   private showSnack(msg: string): void {
     this.snackBar.open(msg, 'OK', { duration: 2500 });
@@ -72,10 +91,14 @@ export class SavedItemsComponent implements OnInit {
   loadSavedItems(): void {
     this.isLoading = true;
     this.savedService.getSavedItems().subscribe({
-      next: (items) => this.savedItems = items,
+      next: (items) => {
+        console.log('🎯 Items ricevuti:', items); // <== aggiungi questo
+        this.savedItems = items;
+      },
       error: () => this.showSnack('Errore nel caricamento degli elementi salvati'),
       complete: () => this.isLoading = false
     });
   }
+
 
 }

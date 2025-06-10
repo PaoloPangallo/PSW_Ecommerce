@@ -6,11 +6,15 @@ import demo.demo_ecommerce.entities.ShoppingCartItem;
 import demo.demo_ecommerce.repositories.ProductRepository;
 import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
+@Slf4j
 @Service
 public class SavedForLaterService {
 
@@ -62,19 +66,30 @@ public class SavedForLaterService {
      */
     public List<ShoppingCartItem> getSavedItems(Long userId) {
         Cart cart = cartService.getCartByUserId(userId);
-        return shoppingCartItemRepository.findByCartIdAndSavedForLaterTrue(cart.getId());
+        List<ShoppingCartItem> items = shoppingCartItemRepository.findByCartIdAndSavedForLaterTrue(cart.getId());
+        log.info("🎯 getSavedItems: restituiti {} item per cart {}", items.size(), cart.getId());
+        return items;
     }
 
-    /**
-     * Rimuove un item dalla lista dei salvati.
-     */
+
+
     @Transactional
     public void removeSavedItem(Long userId, Long productId) {
         Cart cart = cartService.getCartByUserId(userId);
-        shoppingCartItemRepository.findByCartIdAndProductIdAndSavedForLaterTrue(cart.getId(), productId)
-                .ifPresent(shoppingCartItemRepository::delete);
+        Long cartId = cart.getId();
+
+        log.info("🧹 Rimozione via query diretta: cartId={}, productId={}", cartId, productId);
+        shoppingCartItemRepository.deleteSavedItem(cartId, productId);
+        log.info("🗑 Eliminazione completata per utente {} e prodotto {}", userId, productId);
     }
 
+
+
+
+
+    /**
+     * Rimette nel carrello un item salvato, eventualmente sommando la quantità.
+     */
     /**
      * Rimette nel carrello un item salvato, eventualmente sommando la quantità.
      */
@@ -86,14 +101,38 @@ public class SavedForLaterService {
                 .findByCartIdAndProductIdAndSavedForLaterTrue(cart.getId(), productId)
                 .orElseThrow(() -> new IllegalArgumentException("Elemento non trovato tra i salvati."));
 
+        Product product = savedItem.getProduct();
+        if (product == null) {
+            throw new IllegalStateException("Il prodotto dell'item salvato è nullo.");
+        }
+
+        // Calcola prezzo aggiornato con eventuale sconto
+        var basePrice = product.getPrice();
+        var discountPercentage = product.getDiscountPercentage();
+
+        if (discountPercentage != null && discountPercentage > 0) {
+            var discountAmount = basePrice
+                    .multiply(BigDecimal.valueOf(discountPercentage))
+                    .divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+            var discountedPrice = basePrice.subtract(discountAmount);
+            savedItem.setPrice(discountedPrice);
+            savedItem.setOldPrice(basePrice);
+        } else {
+            savedItem.setPrice(basePrice);
+            savedItem.setOldPrice(null);
+        }
+
+        savedItem.setSavedForLater(false);
+
         shoppingCartItemRepository.findByCartIdAndProductIdAndSavedForLaterFalse(cart.getId(), productId)
                 .ifPresentOrElse(existingItem -> {
-                    // Somma quantità e rimuove il salvato
+                    // Prima aggiorniamo e salviamo l'item esistente
                     existingItem.setQuantity(existingItem.getQuantity() + savedItem.getQuantity());
-                    shoppingCartItemRepository.delete(savedItem);
                     shoppingCartItemRepository.save(existingItem);
+                    // Poi eliminiamo l'item salvato, che non va più usato
+                    shoppingCartItemRepository.deleteById(savedItem.getId());
                 }, () -> {
-                    savedItem.setSavedForLater(false);
+                    // Nessun item attivo: basta marcare il salvato come attivo
                     shoppingCartItemRepository.save(savedItem);
                 });
     }

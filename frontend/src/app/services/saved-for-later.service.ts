@@ -38,9 +38,10 @@ export class SavedService {
         userId: userId.toString(),
         productId: productId.toString()
       },
-      responseType: 'text' as 'json'  // ✅ QUI pure
+      responseType: 'text' as 'json'
     });
   }
+
 
   restoreToCart(userId: number, productId: number) {
     return this.http.post<CartDTO>(`http://localhost:8080/api/saved/restore`, null, {

@@ -5,10 +5,10 @@ import demo.demo_ecommerce.dtos.OrderDTO;
 import demo.demo_ecommerce.dtos.OrderRequestDTO;
 import demo.demo_ecommerce.services.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -42,7 +42,11 @@ public class OrdersController {
     public ResponseEntity<?> createOrder(@PathVariable Long userId,
                                          @RequestBody OrderRequestDTO request) {
         try {
-            OrderDTO orderDto = orderService.createOrder(userId, request.getShippingMethod());
+            OrderDTO orderDto = orderService.createOrder(
+                    userId,
+                    request.getShippingMethod(),
+                    request.getConfirmedItemIds() // ✅ Passaggio corretto
+            );
             return ResponseEntity.status(HttpStatus.CREATED).body(orderDto);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -94,16 +98,4 @@ public class OrdersController {
                 .headers(headers)
                 .body(pdf);
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }

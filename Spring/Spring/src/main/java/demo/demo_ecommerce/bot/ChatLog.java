@@ -2,9 +2,14 @@ package demo.demo_ecommerce.bot;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
+/**
+ * Entity per log delle conversazioni del Bot.
+ * Campo 'fallback' con default false e non-nullable per evitare errori DDL.
+ */
 @Entity
+@Table(name = "chat_log")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,19 +19,41 @@ public class ChatLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long userId;
 
+    @Column(nullable = false, length = 1024)
     private String userMessage;
-    @Column(length = 2048) // o più, se vuoi ancora più spazio
-    private String botResponse;         // ✅ Risposta generata
+
+    @Column(nullable = false, length = 2048)
+    private String botResponse;
+
+    @Column(length = 255)
     private String intentPredicted;
+
+    @Column(length = 255)
     private String intentCorrected;
+
     private Double confidenceScore;
 
-    private LocalDateTime timestamp;
+    /**
+     * Indica se si tratta di risposta fallback (no intent manuale matchato)
+     */
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private boolean fallback = false;
+
+    @Column(length = 255)
+    private String recognizedIntent;
+
+    /**
+     * Timestamp della creazione, salvato come Instant (timestamptz)
+     */
+    @Column(nullable = false)
+    private Instant timestamp;
 
     @PrePersist
     public void prePersist() {
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = Instant.now();
+        // fallback è già false di default
     }
 }
