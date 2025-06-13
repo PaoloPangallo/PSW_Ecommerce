@@ -7,6 +7,7 @@ import com.itextpdf.text.pdf.draw.LineSeparator;
 import demo.demo_ecommerce.dtos.OrderDTO;
 import demo.demo_ecommerce.entities.*;
 import demo.demo_ecommerce.entities.Order.ShippingMethod;
+import demo.demo_ecommerce.repositories.CartRepository;
 import demo.demo_ecommerce.repositories.OrderRepository;
 import demo.demo_ecommerce.repositories.ShoppingCartItemRepository;
 import demo.demo_ecommerce.repositories.UsersRepository;
@@ -50,7 +51,7 @@ public class OrderService {
 
     public OrderService(EntityManager entityManager, OrderRepository orderRepository,
                         UsersRepository userRepository,
-                        ShoppingCartItemRepository shoppingCartItemRepository) {
+                        CartRepository cartRepository, ShoppingCartItemRepository shoppingCartItemRepository) {
         this.entityManager = entityManager;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;

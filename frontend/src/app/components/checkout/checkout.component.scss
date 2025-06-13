@@ -762,3 +762,29 @@ textarea:focus {
 /* ========================================================================
    FINE - Checkout Component Styles (Versione Aggiornata)
    ======================================================================== */
+
+
+
+
+.cart-sync-warning.global-warning {
+  background-color: #fff3cd;
+  border-left: 5px solid #ffa000;
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: 0.95rem;
+  color: #8a6d3b;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .sync-button {
+    background-color: #8a6d3b;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+}
+

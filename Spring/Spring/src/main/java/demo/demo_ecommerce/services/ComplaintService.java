@@ -20,7 +20,6 @@ public class ComplaintService {
     private final ComplaintRepository complaintRepo;
     private final ComplaintMessageRepository msgRepo;
 
-    // ✅ Crea reclamo e primo messaggio
     @Transactional
     public void createComplaintWithFirstMessage(String email,
                                                 ComplaintCategory category,
@@ -41,17 +40,14 @@ public class ComplaintService {
         msgRepo.save(first);
     }
 
-    // ✅ Reclami per utente
     public List<Complaint> getComplaintsByEmail(String email) {
         return complaintRepo.findByEmail(email);
     }
 
-    // ✅ Tutti i reclami (admin)
     public List<Complaint> getAllComplaints() {
         return complaintRepo.findAll();
     }
 
-    // ✅ Aggiunta messaggio
     public ComplaintMessage addMessage(Long complaintId, ComplaintMessage message) {
         Complaint complaint = complaintRepo.findById(complaintId)
                 .orElseThrow(() -> new RuntimeException("Reclamo non trovato"));
@@ -59,12 +55,10 @@ public class ComplaintService {
         return msgRepo.save(message);
     }
 
-    // ✅ Recupera messaggi
     public List<ComplaintMessage> getMessages(Long complaintId) {
         return msgRepo.findByComplaintIdOrderByTimestampAsc(complaintId);
     }
 
-    // ✅ Cambia stato (solo admin)
     public Complaint updateStatus(Long id, ComplaintStatus newStatus) {
         Complaint complaint = complaintRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reclamo non trovato"));
@@ -79,13 +73,11 @@ public class ComplaintService {
         return complaintRepo.save(complaint);
     }
 
-    // ✅ Recupera complaint (per controllo ownership nel controller)
     public Complaint getComplaintById(Long id) {
         return complaintRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reclamo non trovato"));
     }
 
-    // ⚙️ Regole di transizione
     private boolean isValidTransition(ComplaintStatus current, ComplaintStatus next) {
         return switch (current) {
             case PENDING -> next == ComplaintStatus.ACCEPTED || next == ComplaintStatus.REJECTED;

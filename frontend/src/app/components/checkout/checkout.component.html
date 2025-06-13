@@ -11,9 +11,18 @@
     <div class="progress" [ngStyle]="{ width: (currentStep - 1) * 33 + '%' }"></div>
   </div>
 
+  <div *ngIf="isCartOutOfSync" class="cart-sync-warning global-warning">
+    ⚠️ Il carrello è stato modificato in un'altra finestra. I dati potrebbero non essere aggiornati.
+    <button type="button" (click)="reloadCart()" class="sync-button">Aggiorna carrello</button>
+  </div>
+
   <!-- =========================
        STEP 1: Riepilogo Carrello
        ========================= -->
+
+
+
+
   <div *ngIf="currentStep === 1" class="checkout-step step1">
     <h3>Riepilogo Carrello</h3>
     <div class="step-content">
@@ -69,6 +78,9 @@
   <!-- ==================================
        STEP 2: Indirizzo di Spedizione
        ================================== -->
+
+
+
   <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
     <div *ngIf="currentStep === 2" class="checkout-step step2" [formGroupName]="'shipping'">
       <h3>Indirizzo di Spedizione</h3>
@@ -176,6 +188,9 @@
     <!-- ===================================
          STEP 3: Metodo di Pagamento
          =================================== -->
+
+
+
     <div *ngIf="currentStep === 3" class="checkout-step step3" [formGroupName]="'transaction'">
       <h3>Metodo di Pagamento</h3>
       <div class="step-content">
@@ -207,6 +222,8 @@
     <!-- ====================================
          STEP 4: Riepilogo Ordine
          ==================================== -->
+
+
     <div *ngIf="currentStep === 4" class="checkout-step step4">
       <h3>Riepilogo Ordine</h3>
       <div class="step-content">

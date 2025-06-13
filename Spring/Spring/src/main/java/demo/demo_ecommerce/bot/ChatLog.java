@@ -54,6 +54,5 @@ public class ChatLog {
     @PrePersist
     public void prePersist() {
         this.timestamp = Instant.now();
-        // fallback è già false di default
     }
 }

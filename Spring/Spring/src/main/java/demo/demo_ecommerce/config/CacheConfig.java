@@ -32,8 +32,8 @@ public class CacheConfig {
                 "featuredProducts", "productsByCategoryPaged", "allProductsPaged",
                 "productsPaged", "userById", "userByUsername", "userProfileSummary",
                 "userReviews", "usersByRole",
-                "couponsPaged", "couponValidation", "couponValidationProduct", // ✅ aggiunte
-                "coupons", "couponByCode" // ✅ opzionali se usate altrove
+                "couponsPaged", "couponValidation", "couponValidationProduct",
+                "coupons", "couponByCode"
         );
         manager.setCaffeine(caffeine);
         return manager;

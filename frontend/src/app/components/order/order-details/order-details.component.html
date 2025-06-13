@@ -6,7 +6,7 @@
 
   <mat-card-content>
     <p><strong>Totale:</strong> {{ order.total | lire }}</p>
-    <p><strong>Data:</strong> {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}</p>
+    <p>{{ order.createdAt | date:'medium' }}</p>
 
     <!-- Mostra i prodotti acquistati se order.items esiste e contiene elementi -->
     <div *ngIf="(order?.items?.length || 0) > 0; else noItems">

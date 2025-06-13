@@ -45,7 +45,7 @@ public class OrdersController {
             OrderDTO orderDto = orderService.createOrder(
                     userId,
                     request.getShippingMethod(),
-                    request.getConfirmedItemIds() // ✅ Passaggio corretto
+                    request.getConfirmedItemIds()
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(orderDto);
         } catch (IllegalArgumentException e) {

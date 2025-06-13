@@ -6,7 +6,7 @@ import { CheckoutService, CheckoutRequest, CheckoutResponse } from '../../servic
 import { AuthService } from '../../services/auth.services';
 import { CartService } from '../../services/cart.service';
 import {CartDTO, CartItemDTO} from '../../models/cart.model';
-import {retry, Subject} from 'rxjs';
+import {interval, retry, Subject} from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import {Order, OrderItem} from '../../models/order.model';
 import { OrderService } from '../../services/order.service';
@@ -31,6 +31,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   currentStep = 1;
   createdOrder: Order | null = null;
   estimatedDelivery: Date | null = null;
+  cartChangesSummary: string[] = [];
+
 
 
   checkoutResponse: CheckoutResponse | null = null;
@@ -89,7 +91,31 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForm();
     this.loadCart();
+
+    // 🔁 Verifica automatica ogni 15 secondi
+    interval(15000).pipe(takeUntil(this.unsubscribe$)).subscribe(() => {
+      this.checkCartSync();
+    });
   }
+
+  private checkCartSync(): void {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId || !this.cart) return;
+
+    this.cartService.getCart(userId).subscribe({
+      next: (freshCart) => {
+        const hasChanged = !this.compareCarts(this.cart, freshCart);
+        if (hasChanged) {
+          this.cartSyncStatus = 'updated';
+          this.cdRef.detectChanges(); // 🔁 forza la UI ad aggiornarsi
+        }
+      },
+      error: (err) => {
+        console.error('Errore durante il controllo automatico del carrello:', err);
+      }
+    });
+  }
+
 
 
 
@@ -327,6 +353,31 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     return item.id;
   }
 
+  get isCartOutOfSync(): boolean {
+    return this.cartSyncStatus === 'updated';
+  }
+
+  reloadCart(): void {
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) return;
+
+    this.cartService.getCart(userId).subscribe({
+      next: (freshCart) => {
+        this.cart = freshCart;
+        this.cartSyncStatus = null;
+        this.checkoutForm.get('transaction.amount')?.setValue(this.getCartTotal());
+        this.cdRef.detectChanges();
+      },
+      error: (err) => {
+        console.error('❌ Errore nel ricaricamento del carrello:', err);
+      }
+    });
+  }
+
+
+
 
   protected readonly retry = retry;
 }
+
+

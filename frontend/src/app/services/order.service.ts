@@ -13,16 +13,17 @@ export class OrderService {
 
   // Recupera la lista di ordini paginati per l'utente
   getOrdersByUserPaginated(userId: number, page: number, size: number): Observable<Page<Order>> {
-    // Creiamo i parametri ?page=...&size=...
-    let params = new HttpParams()
+    const params = new HttpParams()
       .set('page', page)
-      .set('size', size);
+      .set('size', size)
+      .set('sort', 'createdAt,desc'); // 🔥 ORDINA per data decrescente
 
     return this.http.get<Page<Order>>(
       `${this.baseUrl}/users/${userId}/orders`,
       { params }
     );
   }
+
 
   // Recupera i dettagli di un singolo ordine
   getOrderById(userId: number, orderId: number): Observable<Order> {

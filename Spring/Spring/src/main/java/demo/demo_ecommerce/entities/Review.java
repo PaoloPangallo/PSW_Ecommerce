@@ -27,6 +27,10 @@ public class Review {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ReviewReport> reports = new HashSet<>();
 
+    @Column(length = 20)
+    private String sentiment;
+
+
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

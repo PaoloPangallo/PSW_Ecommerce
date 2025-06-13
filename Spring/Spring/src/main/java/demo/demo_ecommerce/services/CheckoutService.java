@@ -55,7 +55,6 @@ public class CheckoutService {
                 ? shippingDTO.getShippingMethod()
                 : Order.ShippingMethod.STANDARD;
 
-        // ✅ Passa la lista degli item confermati
         OrderDTO orderDto = orderService.createOrder(userId, method, confirmedItemIds);
         entityManager.flush();
         logger.info("🧾 Ordine creato con ID: {}, totale: {}", orderDto.getId(), orderDto.getTotal());
