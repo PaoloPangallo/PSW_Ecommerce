@@ -114,7 +114,9 @@ The project also uses DTOs and a controller/service/repository separation to kee
 
 ### Backend
 
-A PostgreSQL instance and the corresponding datasource configuration are required.
+A PostgreSQL instance and the corresponding environment variables are required. Copy `.env.example` as a reference and export the values in your shell or IDE before starting Spring Boot.
+
+Required secrets such as the database password and JWT signing key are intentionally not committed to the repository.
 
 ```bash
 cd Spring/Spring
