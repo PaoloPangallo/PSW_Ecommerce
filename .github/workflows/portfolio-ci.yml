@@ -1,0 +1,38 @@
+name: Portfolio CI — Java and Angular build
+
+on:
+  push:
+    branches: [master, portfolio-refresh-2026-10]
+  pull_request:
+
+jobs:
+  java-compile:
+    name: Spring backend compile
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: Spring/Spring/pom.xml
+      - name: Compile backend (without starting database)
+        working-directory: Spring/Spring
+        run: mvn -B -DskipTests compile
+
+  angular-build:
+    name: Angular production build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run build
