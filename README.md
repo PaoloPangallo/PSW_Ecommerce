@@ -1,5 +1,18 @@
 # Full-Stack E-Commerce Platform
 
+<div align="center">
+
+![Java](https://img.shields.io/badge/Java_17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
+![Angular](https://img.shields.io/badge/Angular_19-DD0031?style=for-the-badge&logo=angular&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+
+**Full-stack application · REST APIs · Authentication · Persistence**
+
+[**Architecture diagram →**](docs/PORTFOLIO_OVERVIEW.md) · [**Backend →**](Spring/Spring/) · [**Frontend →**](frontend/)
+
+</div>
+
 **A complete e-commerce application built with Spring Boot and Angular**
 
 This project implements a working end-to-end e-commerce platform, covering the full flow from authentication and product browsing to cart management, checkout, orders, payments, reviews and wishlists.
